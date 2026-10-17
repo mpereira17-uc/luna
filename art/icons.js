@@ -1021,6 +1021,25 @@ S.i_monedas = icon((d) => {
     ${sparkO(55, 13, 0.85, '#fff3a0')}${spark(9, 24, 0.7)}`;
 });
 
+S.i_perla = icon((d) => {
+  const SHELL = [[0, '#ffe6ef'], [0.5, '#f5a3c1'], [1, '#b0507f']];
+  const lid = 'M9,33 C9,17 19,6 32,6 C45,6 55,17 55,33 C47,30 40,29 32,29 C24,29 17,30 9,33 Z';
+  const bowl = 'M6,41 C7,53 19,60 32,60 C45,60 57,53 58,41 C50,46 42,47.5 32,47.5 C22,47.5 14,46 6,41 Z';
+  const ribs = (cx, cy, r0, r1, a0, a1, n) => Array.from({ length: n }, (_, i) => { const a = rd(a0 + (a1 - a0) * (i + 0.5) / n); return `M${P([cx + Math.cos(a) * r0, cy + Math.sin(a) * r0])} L${P([cx + Math.cos(a) * r1, cy + Math.sin(a) * r1])}`; }).join(' ');
+  return `<circle cx="32" cy="36" r="30" fill="${d.glow('gl', '#f4e2ff', 0.5)}"/>
+    <path d="${lid}" fill="${d.lin('ld', SHELL, 0.3, 1)}" ${ol(3)}/>
+    <path d="${ribs(32, 33, 6, 25, 200, 340, 6)}" stroke="#a24a76" stroke-width="1.5" opacity="0.55" stroke-linecap="round"/>
+    ${hl('M14,24 C16,15 22,10 29,9', 2, 0.7)}
+    <ellipse cx="32" cy="42" rx="25" ry="6.5" fill="#7c2f5a" ${ol(2.4)}/>
+    <circle cx="32" cy="36" r="12" fill="${d.rad('pr', [[0, '#ffffff'], [0.4, '#f1e4ff'], [0.8, '#c4a9e8'], [1, '#8a6cc2']], 0.36, 0.3, 0.75)}" ${ol(2.6)}/>
+    <ellipse cx="27.5" cy="31.5" rx="4" ry="2.6" fill="#fff" opacity="0.9" transform="rotate(-35 27.5 31.5)"/>
+    <path d="M36,45 C40,43 42.5,40 43.5,36" stroke="#fbe9ff" stroke-width="1.6" fill="none" opacity="0.8" stroke-linecap="round"/>
+    <path d="${bowl}" fill="${d.lin('bw', SHELL, 0.25, 1)}" ${ol(3)}/>
+    <path d="${ribs(32, 20, 29, 38.5, 62, 118, 5)}" stroke="#a24a76" stroke-width="1.5" opacity="0.55" stroke-linecap="round"/>
+    ${hl('M11,46 C14,52 19,55.5 24,57', 1.8, 0.55)}
+    ${sparkO(52, 14, 0.8, '#fff3fb')}${spark(11, 12, 0.7)}`;
+});
+
 S.i_coin = icon((d) => {
   const notches = Array.from({ length: 24 }, (_, i) => { const a = rd(i * 15); return `M${P([32 + Math.cos(a) * 25.2, 32 + Math.sin(a) * 25.2])} L${P([32 + Math.cos(a) * 27, 32 + Math.sin(a) * 27])}`; }).join(' ');
   return `<circle cx="32" cy="32" r="31" fill="${d.glow('gl', '#ffd860', 0.45)}"/>
