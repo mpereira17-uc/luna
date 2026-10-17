@@ -1312,4 +1312,43 @@ if (!process.env.ICONS_NOFIT) for (const n in FIT) {
   S[n].draw = I => `<g transform="translate(32 32) scale(${s}) translate(-32 -32)">${dr(I)}</g>`;
 }
 
+// ---- settings menu
+const gearD = (cx, cy, rO, rI, n) => {
+  const st = 360 / n, pt = (r, a) => P([cx + r * Math.cos(rd(a)), cy + r * Math.sin(rd(a))]);
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const a = i * st - 90;
+    d += `${i ? 'L' : 'M'}${pt(rI, a - st * 0.3)} L${pt(rO, a - st * 0.17)} L${pt(rO, a + st * 0.17)} L${pt(rI, a + st * 0.3)} `;
+  }
+  return d + 'Z';
+};
+S.i_ajustes = icon((d) => {
+  return `<path d="${gearD(32, 32, 28.5, 21, 8)}" fill="${d.lin('gr', SILVER, 0.4, 1)}" ${ol(3.2)}/>
+    <circle cx="32" cy="32" r="13.5" fill="none" stroke="#9aa6c2" stroke-width="2"/>
+    <circle cx="32" cy="32" r="8.6" fill="${d.rad('hb', DEEP, 0.4, 0.35, 0.9)}" ${ol(2.6)}/>
+    <path d="M29.6,27.4 A4.6,4.6 0 1 0 35.8,34.6 A6,6 0 0 1 29.6,27.4 Z" fill="${d.lin('mn', MOON, 0.3, 1)}"/>
+    ${hlArc(32, 32, 18, 200, 250, 2.6, 0.75)}${spark(53, 11, 0.8)}`;
+});
+S.i_vibra = icon((d) => {
+  const waves = side => [8, 14].map(r => `<path d="${arcD(32, 32, r + 12, side ? -35 : 145, side ? 35 : 215)}" fill="none" stroke="${OUT}" stroke-width="6.6" stroke-linecap="round"/><path d="${arcD(32, 32, r + 12, side ? -35 : 145, side ? 35 : 215)}" fill="none" stroke="#ffd23c" stroke-width="3.2" stroke-linecap="round"/>`).join('');
+  return `${waves(0)}${waves(1)}
+    <rect x="19" y="6" width="26" height="52" rx="6" fill="${d.lin('ph', IRON, 0.4, 1)}" ${ol(3)}/>
+    <rect x="23" y="12" width="18" height="36" rx="2.4" fill="${d.lin('sc', WATER, 0.3, 1)}" stroke="${OUT}" stroke-width="1.4"/>
+    <circle cx="32" cy="53" r="2.2" fill="#c9cde0"/>
+    ${hl('M26,16 L26,30', 1.8, 0.7)}`;
+});
+S.i_libro = icon((d) => {
+  return `<path d="M4,16 C14,12 24,13 32,19 C40,13 50,12 60,16 L60,54 C50,50 40,51 32,57 C24,51 14,50 4,54 Z" fill="${d.lin('cv', RED, 0.3, 1)}" ${ol(3)}/>
+    <path d="M8,12 C17,8 26,10 32,16 L32,52 C26,46 17,45 8,48 Z" fill="${d.lin('pl', PARCH, 0.5, 1)}" ${ol(2.4)}/>
+    <path d="M56,12 C47,8 38,10 32,16 L32,52 C38,46 47,45 56,48 Z" fill="${d.lin('pr', PARCH, 0.5, 1)}" ${ol(2.4)}/>
+    <rect x="12" y="17" width="15" height="12" rx="1.6" fill="${d.lin('pn', DEEP, 0.3, 1)}" stroke="${OUT}" stroke-width="1.3"/>
+    <circle cx="20" cy="22.6" r="3.6" fill="${d.lin('mo', MOON, 0.3, 1)}"/>
+    <path d="M12.6,27.4 Q16,25 19.5,27.4 T26.4,27.4" fill="none" stroke="#7fe0ff" stroke-width="1.4"/>
+    <path d="M13,35 L27,37 M13,40 L25,41.6" stroke="#b08a52" stroke-width="1.8" stroke-linecap="round"/>
+    <rect x="37" y="17" width="15" height="12" rx="1.6" fill="${d.lin('pn2', CORAL, 0.3, 1)}" stroke="${OUT}" stroke-width="1.3"/>
+    <path d="M40,26 L44,20 L46,24 L48,21 L50,26" fill="none" stroke="#fff6b8" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M37,37 L51,35 M39,41.6 L51,40" stroke="#b08a52" stroke-width="1.8" stroke-linecap="round"/>
+    ${hl('M10,15 C17,12 24,13 29,17', 1.4, 0.7)}${spark(57, 7, 0.7)}`;
+});
+
 module.exports = { S };

@@ -1,5 +1,5 @@
 // Rasterises the sprite sources into atlases (PNG + JSON) and preview sheets.
-// usage: node art/build.js preview <group> [scale]   -> art/out/preview-<group>.png
+// usage: node art/build.js preview <group> [scale] [name,name]  -> art/out/preview-<group>.png (optionally only those sprites)
 //        node art/build.js atlas                     -> art/out/<atlas>.png, .webp and .json for every atlas, plus atlas.js,
 //                                                       and copies atlas.js and the .webp sheets into web/ for the game
 // The game loads the .webp atlases (4x smaller than PNG); the PNGs are kept for editing and review.
@@ -45,13 +45,13 @@ function pack(items, width, pad = 3) {
 }
 
 (async () => {
-  const [, , cmd = 'preview', group = 'units', scaleArg] = process.argv;
+  const [, , cmd = 'preview', group = 'units', scaleArg, only] = process.argv;
   const b = await chromium.launch();
   const p = await b.newPage();
   if (cmd === 'preview') {
     const S = groups[group]();
     const R = +(scaleArg || 4);
-    const names = Object.keys(S);
+    const names = Object.keys(S).filter(n => !only || only.split(',').includes(n));
     const cells = names.map(n => `<div style="display:inline-flex;flex-direction:column;align-items:center;margin:6px;vertical-align:top;font:11px sans-serif;color:#9ab">
       <div style="position:relative;background:linear-gradient(#16264a,#0d1830);outline:1px dashed #2c3f6a">${svgOf(n, S[n], R)}
       <div style="position:absolute;left:${S[n].ax * R - 3}px;top:${S[n].ay * R - 3}px;width:6px;height:6px;border-radius:50%;background:#ff3d71"></div></div>${n}</div>`).join('');

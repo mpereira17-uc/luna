@@ -93,6 +93,25 @@ h2.st { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 
 .mship { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 98px; }
 .danger button:disabled { opacity: 0.3; cursor: default; }
 h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: var(--gold); margin: 6px 0 0; }
+/* title: coins and settings up top, four menu tiles under the two big buttons */
+.titlebar { position: sticky; top: 0; z-index: 2; margin-bottom: 0; }
+.coinPill { padding: 9px 14px; border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 85%, transparent); font-size: 15px; }
+.icon-btn.gear { width: 48px; height: 48px; }
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.tile { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 2px 9px; border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 88%, transparent); font-size: 13px; font-weight: 800; }
+.tile .badge { position: absolute; top: -7px; right: -4px; }
+/* settings */
+.set-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: color-mix(in srgb, var(--panel) 92%, transparent); }
+.set-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 62px; padding: 10px 14px; border: 0; background: none; text-align: left; font-size: 16px; font-weight: 800; }
+.set-row + .set-row { border-top: 1px solid var(--line); }
+.set-row .lbl { flex: 1; min-width: 0; }
+.set-row .lbl small { display: block; font-weight: 500; font-size: 13px; color: var(--ink-dim); margin-top: 2px; }
+.set-row .go { font-size: 24px; color: var(--ink-dim); }
+.switch { position: relative; flex: none; width: 52px; height: 30px; border-radius: 999px; background: #2a3554; transition: background 0.2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.45); transition: transform 0.2s; }
+.set-row[aria-checked="true"] .switch { background: var(--ok); }
+.set-row[aria-checked="true"] .switch::after { transform: translateX(22px); }
+.set-foot { margin: 6px 0 0; text-align: center; color: var(--ink-dim); font-size: 12px; }
 .reefs { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
 .reefc { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 12px 10px; border-radius: 18px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); }
 .reefc .rpic { height: 96px; display: grid; place-items: end center; }
@@ -282,6 +301,10 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 
 <!-- Title -->
 <div class="screen clear" id="scrTitle">
+  <div class="topbar titlebar">
+    <span class="chip coinPill"><i class="coin"></i><span class="coinCount">0</span></span>
+    <button class="icon-btn gear" id="goSettings" type="button" aria-label="Ajustes"><span id="gearIco"></span></button>
+  </div>
   <div class="inner">
     <div class="title-wrap">
       <span class="eyebrow">La marea es tu arma</span>
@@ -291,23 +314,31 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
     <div class="stack" style="margin-top: 20vh">
       <button class="btn primary" id="goPlay" type="button"><span>Jugar<small id="playSub">Isla Coral</small></span><span aria-hidden="true">→</span></button>
       <button class="btn hot" id="goDaily" type="button"><span>Reto diario<small id="dailySub"></small></span><span class="badge" id="dailyBadge">NUEVO</span></button>
-      <div class="row">
-        <button class="btn ghost center" id="goShop" type="button"><span>Taller</span><span class="badge" id="shopBadge" hidden>!</span></button>
-        <button class="btn ghost center" id="goMoons" type="button">Lunas</button>
+      <div class="tiles">
+        <button class="tile" id="goShop" type="button"><span data-ico="i_arsenal"></span>Taller<span class="badge" id="shopBadge" hidden>!</span></button>
+        <button class="tile" id="goMoons" type="button"><span data-ico="i_dorada"></span>Lunas</button>
+        <button class="tile" id="goMis" type="button"><span data-ico="i_mision"></span>Misiones<span class="badge" id="misBadge" hidden>!</span></button>
+        <button class="tile" id="goAch" type="button"><span data-ico="i_trofeo"></span>Logros<span class="badge" id="achBadge" hidden>!</span></button>
       </div>
-      <div class="row">
-        <button class="btn ghost center" id="goMis" type="button"><span>Misiones</span><span class="badge" id="misBadge" hidden>!</span></button>
-        <button class="btn ghost center" id="goAch" type="button"><span>Logros</span><span class="badge" id="achBadge" hidden>!</span></button>
-      </div>
-      <div class="row">
-        <button class="btn ghost center" id="goStory" type="button">Ver la historia</button>
-      </div>
-      <div class="row">
-        <button class="btn ghost center" id="musicBtn" type="button">Música</button>
-        <button class="btn ghost center" id="sfxBtn" type="button">Efectos</button>
-      </div>
-      <p class="lede" style="text-align:center"><span class="chip"><i class="coin"></i><span class="coinCount">0</span> monedas</span></p>
     </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="screen" id="scrSettings" hidden>
+  <div class="topbar"><button class="icon-btn" id="setBack" type="button" aria-label="Volver">←</button><h2 class="st">Ajustes</h2><span style="width:44px"></span></div>
+  <div class="inner" style="margin-block: 0 auto">
+    <h3 class="sec">Sonido</h3>
+    <div class="set-list">
+      <button class="set-row" id="setMusic" type="button" role="switch" aria-checked="true"><span data-ico="i_musica"></span><span class="lbl">Música</span><span class="switch"></span></button>
+      <button class="set-row" id="setSfx" type="button" role="switch" aria-checked="true"><span data-ico="i_sonido"></span><span class="lbl">Efectos de sonido</span><span class="switch"></span></button>
+      <button class="set-row" id="setVib" type="button" role="switch" aria-checked="true"><span data-ico="i_vibra"></span><span class="lbl">Vibración</span><span class="switch"></span></button>
+    </div>
+    <h3 class="sec">Historia</h3>
+    <div class="set-list">
+      <button class="set-row" id="goStory" type="button"><span data-ico="i_libro"></span><span class="lbl">Ver la historia<small>El cómic de por qué la luna defiende la isla</small></span><span class="go" aria-hidden="true">›</span></button>
+    </div>
+    <p class="set-foot">Luna · un juego de IA Games</p>
   </div>
 </div>
 
@@ -640,7 +671,7 @@ const COMBO_TXT = [[10, '¡Racha!'], [25, '¡Brutal!'], [50, '¡Masacre!'], [100
 // =====================================================================
 const DEF_SAVE = { coins: 0, meta: {}, reef: 0, moons: ['llena'], moon: 'llena', isl: {}, endlessBest: 0,
   stats: { kills: 0, bosses: 0, evos: [], unions: [], golds: 0, maxCombo: 0, dailies: 0, dangerBest: 0 }, ach: {}, daily: { date: '', best: 0, played: false },
-  missions: { date: '', list: [] }, music: true, sfx: true, tips: {}, intro: false };
+  missions: { date: '', list: [] }, music: true, sfx: true, vib: true, tips: {}, intro: false };
 let save = JSON.parse(JSON.stringify(DEF_SAVE));
 function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') a[k] = deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
 try {
@@ -838,7 +869,7 @@ function setAudioGains() {
   AU.sfx.gain.value = save.sfx ? 0.6 : 0;
   AU.mus.gain.value = save.music ? (mode === 'play' ? 0.3 : 0.12) : 0;
 }
-function vib(p) { if (navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
+function vib(p) { if (save.vib !== false && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
 
 
 // =====================================================================
@@ -2453,7 +2484,7 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.filter
 // =====================================================================
 // SCREENS
 // =====================================================================
-const SCREENS = ['scrIntro', 'scrTitle', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
+const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) { SCREENS.forEach(s => $(s).hidden = s !== id); $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant'); }
 function refreshCoins() { document.querySelectorAll('.coinCount').forEach(el => el.textContent = Math.floor(save.coins).toLocaleString('es')); }
 function statVal(s) {
@@ -2468,6 +2499,15 @@ function statVal(s) {
 const achClaimable = () => ACH.filter(a => !save.ach[a.id] && statVal(a.stat) >= a.goal).length;
 const coinBtn = n => `<i class="coin"></i>${n.toLocaleString('es')}`;
 
+// fills every <span data-ico="name"> inside root with that icon from the icons atlas
+function paintIcons(root, size) { root.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico, size); }); }
+function openSettings() {
+  paintIcons($('scrSettings'), 32);
+  $('setMusic').setAttribute('aria-checked', save.music);
+  $('setSfx').setAttribute('aria-checked', save.sfx);
+  $('setVib').setAttribute('aria-checked', save.vib !== false);
+  show('scrSettings');
+}
 function openTitle() {
   mode = 'menu'; S = null; musicStop(); setAudioGains();
   refreshCoins();
@@ -2479,8 +2519,7 @@ function openTitle() {
   $('achBadge').hidden = achClaimable() === 0;
   $('misBadge').hidden = missionsReady() === 0;
   $('shopBadge').hidden = !canBuySomething();
-  $('musicBtn').textContent = `Música: ${save.music ? 'sí' : 'no'}`;
-  $('sfxBtn').textContent = `Efectos: ${save.sfx ? 'sí' : 'no'}`;
+  paintIcons($('scrTitle'), 34); $('gearIco').innerHTML = ico('i_ajustes', 32);
   show('scrTitle');
 }
 // =====================================================================
@@ -2733,7 +2772,9 @@ function endRun(won) {
 
 // wiring
 $('goPlay').onclick = () => { audioInit(); if (save.intro) openIslands(); else openIntro(openIslands); };
-$('goStory').onclick = () => { audioInit(); openIntro(openTitle); };
+$('goSettings').onclick = () => { audioInit(); openSettings(); };
+$('setBack').onclick = () => openTitle();
+$('goStory').onclick = () => { audioInit(); openIntro(openSettings); };
 $('goDaily').onclick = () => { audioInit(); openDaily(); };
 $('startDaily').onclick = () => startRun('daily', 0);
 $('goMoons').onclick = () => openMoons('title');
@@ -2743,8 +2784,9 @@ $('goMis').onclick = () => openMissions();
 $('moonsBack').onclick = () => moonsReturn === 'islands' ? openIslands() : openTitle();
 $('shopBack').onclick = () => shopReturn === 'result' ? show('scrResult') : openTitle();
 document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'title') openTitle(); else if (g === 'moons') openMoons('islands'); }));
-$('musicBtn').onclick = () => { save.music = !save.music; persist(); audioInit(); setAudioGains(); openTitle(); };
-$('sfxBtn').onclick = () => { save.sfx = !save.sfx; persist(); audioInit(); setAudioGains(); openTitle(); };
+$('setMusic').onclick = () => { save.music = !save.music; persist(); audioInit(); setAudioGains(); openSettings(); };
+$('setSfx').onclick = () => { save.sfx = !save.sfx; persist(); audioInit(); setAudioGains(); openSettings(); sfx('coin'); };
+$('setVib').onclick = () => { save.vib = save.vib === false; persist(); openSettings(); vib(40); };
 $('pauseBtn').onclick = pause;
 $('activeBtn').addEventListener('pointerdown', e => { e.preventDefault(); useActive(); });
 $('resumeBtn').onclick = resume;
