@@ -11,6 +11,7 @@ fonts = (
     "<style>"
     "@font-face{font-family:'Young Serif';src:url(fonts/youngserif.woff2) format('woff2');font-display:swap}"
     "@font-face{font-family:'Figtree';src:url(fonts/figtree.woff2) format('woff2');font-weight:100 900;font-display:swap}"
+    "@font-face{font-family:'Lilita One';src:url(fonts/lilitaone.woff2) format('woff2');font-display:swap}"
     "</style>\n"
 )
 head = (
@@ -24,7 +25,7 @@ assets = root / "app" / "src" / "main" / "assets"
 dst = assets / "index.html"
 dst.write_text(out, encoding="utf-8")
 print(f"wrote {dst.relative_to(root)} ({len(out):,} bytes)")
-# sprite atlases drawn by art/build.js: the frame table (atlas.js) and the three WebP sheets
-for name in ["atlas.js", "sprites.webp", "world.webp", "icons.webp"]:
+# sprite atlases drawn by art/build.js: the frame table (atlas.js) and the WebP sheets (comic.webp holds the intro comic)
+for name in ["atlas.js", "sprites.webp", "world.webp", "icons.webp", "comic.webp"]:
     shutil.copyfile(root / "web" / name, assets / name)
     print(f"copied web/{name}")

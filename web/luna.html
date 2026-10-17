@@ -1,7 +1,7 @@
 <title>Luna</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600;700;800;900&family=Lilita+One&display=swap">
 <style>
 /* Layout: one full-screen canvas battlefield (side view: moon arc, island, reefs, sea floor), DOM layers for HUD, level-up cards and menu screens. Deliberately single dark theme: the game always happens at night. */
 :root {
@@ -20,6 +20,7 @@
   --ink-dim: #9aa8c4;
   --display: "Young Serif", Georgia, "Times New Roman", serif;
   --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --comic: "Lilita One", var(--body);
   color-scheme: dark;
 }
 [hidden] { display: none !important; }
@@ -163,6 +164,33 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes slide { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 
+/* ---------- intro comic: panels stacked like a strip, revealed one per tap ---------- */
+#scrIntro { background: radial-gradient(circle at 50% 0%, #1b2a5a, var(--night) 70%); backdrop-filter: none; -webkit-backdrop-filter: none; cursor: pointer; }
+#scrIntro .topbar { position: sticky; top: 0; z-index: 3; width: calc(100% + 32px); max-width: none; margin: 0 -16px; padding: 4px max(16px, calc((100% - 428px) / 2)) 16px; background: linear-gradient(180deg, var(--night) 72%, transparent); box-shadow: 0 -40px 0 var(--night); }
+.strip { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 8px; }
+.cp { margin: 0; opacity: 0; transform: translateY(18px) scale(0.97); transition: opacity 0.35s, transform 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.cp.on { opacity: 1; transform: none; }
+.cp:nth-child(even) .art { transform: rotate(0.6deg); }
+.cp:nth-child(odd) .art { transform: rotate(-0.5deg); }
+.cp .cap { position: relative; z-index: 2; display: inline-block; max-width: 88%; margin: 0 0 -12px 10px; padding: 7px 11px; background: #fff3d1; color: #2a1d3a; border: 2.5px solid #1c1430; border-radius: 4px; box-shadow: 3px 3px 0 #1c1430; font-size: 13.5px; font-weight: 700; line-height: 1.35; transform: rotate(-1deg); }
+.cp .art { position: relative; aspect-ratio: 360 / 220; border: 3px solid #1c1430; border-radius: 6px; background-color: #0d1830; background-repeat: no-repeat; box-shadow: 0 0 0 2px #f4ecd0, 0 8px 0 2px rgba(0,0,0,0.35); }
+.bub { position: absolute; max-width: 48%; padding: 6px 11px 7px; background: #fff; color: #1c1430; border: 2.5px solid #1c1430; border-radius: 16px; font: 15px/1.15 var(--comic); letter-spacing: 0.02em; text-align: center; text-wrap: balance; opacity: 0; }
+.cp.on .bub { animation: pop 0.32s 0.45s both cubic-bezier(0.2, 1.6, 0.4, 1); }
+.cp.on .bub + .bub { animation-delay: 0.9s; }
+.bub::before, .bub::after { content: ""; position: absolute; width: 0; height: 0; border-style: solid; }
+.bub.tb::before { left: var(--t, 30%); bottom: -14px; border-width: 14px 7px 0; border-color: #1c1430 transparent transparent; transform: skewX(var(--k, 0deg)); transform-origin: top; }
+.bub.tb::after { left: calc(var(--t, 30%) + 3.5px); bottom: -8.5px; border-width: 9px 3.5px 0; border-color: #fff transparent transparent; transform: skewX(var(--k, 0deg)); transform-origin: top; }
+.bub.tr::before { top: var(--t, 40%); right: -14px; border-width: 7px 0 7px 14px; border-color: transparent transparent transparent #1c1430; }
+.bub.tr::after { top: calc(var(--t, 40%) + 3.5px); right: -8.5px; border-width: 3.5px 0 3.5px 9px; border-color: transparent transparent transparent #fff; }
+.bub.tl::before { top: var(--t, 40%); left: -14px; border-width: 7px 14px 7px 0; border-color: transparent #1c1430 transparent transparent; }
+.bub.tl::after { top: calc(var(--t, 40%) + 3.5px); left: -8.5px; border-width: 3.5px 9px 3.5px 0; border-color: transparent #fff transparent transparent; }
+.sfx { position: absolute; font: 34px/1 var(--comic); color: #ffe45a; -webkit-text-stroke: 7px #1c1430; paint-order: stroke fill; letter-spacing: 0.03em; transform: rotate(-8deg); text-shadow: 0 4px 0 #1c1430; opacity: 0; white-space: nowrap; }
+.cp.on .sfx { animation: pop 0.4s 0.5s both cubic-bezier(0.2, 1.8, 0.4, 1); }
+#introTap { margin: 14px 0 4px; font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); animation: blink 1.4s ease-in-out infinite alternate; }
+#introGo { width: 100%; max-width: 460px; margin-top: 16px; animation: slide 0.4s both; }
+@keyframes blink { from { opacity: 0.35; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .cp, .cp.on .bub, .cp.on .sfx, #introTap { transition: none; animation: none; opacity: 1; } }
+
 /* ---------- HUD ---------- */
 #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
 .hud-top { position: absolute; left: 0; right: 0; top: 0;
@@ -264,12 +292,23 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
         <button class="btn ghost center" id="goAch" type="button"><span>Logros</span><span class="badge" id="achBadge" hidden>!</span></button>
       </div>
       <div class="row">
+        <button class="btn ghost center" id="goStory" type="button">Ver la historia</button>
+      </div>
+      <div class="row">
         <button class="btn ghost center" id="musicBtn" type="button">Música</button>
         <button class="btn ghost center" id="sfxBtn" type="button">Efectos</button>
       </div>
       <p class="lede" style="text-align:center"><span class="chip"><i class="coin"></i><span class="coinCount">0</span> monedas</span></p>
     </div>
   </div>
+</div>
+
+<!-- Intro comic -->
+<div class="screen" id="scrIntro" hidden>
+  <div class="topbar"><span class="eyebrow">La leyenda de la Luna</span><button class="btn ghost" id="introSkip" type="button" style="padding: 9px 16px; font-size: 15px">Saltar</button></div>
+  <div class="strip" id="introStrip"></div>
+  <p id="introTap">Toca para seguir</p>
+  <button class="btn primary" id="introGo" type="button" hidden><span>¡A defender la isla!</span><span aria-hidden="true">→</span></button>
 </div>
 
 <!-- Islands -->
@@ -593,7 +632,7 @@ const COMBO_TXT = [[10, '¡Racha!'], [25, '¡Brutal!'], [50, '¡Masacre!'], [100
 // =====================================================================
 const DEF_SAVE = { coins: 0, meta: {}, reef: 0, moons: ['llena'], moon: 'llena', isl: {}, endlessBest: 0,
   stats: { kills: 0, bosses: 0, evos: [], unions: [], golds: 0, maxCombo: 0, dailies: 0, dangerBest: 0 }, ach: {}, daily: { date: '', best: 0, played: false },
-  missions: { date: '', list: [] }, music: true, sfx: true, tips: {} };
+  missions: { date: '', list: [] }, music: true, sfx: true, tips: {}, intro: false };
 let save = JSON.parse(JSON.stringify(DEF_SAVE));
 function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') a[k] = deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
 try {
@@ -675,6 +714,7 @@ let artReady = false;
 function loadArt() {
   const A = window.LUNA_ATLAS; if (!A) return;
   for (const k in A) {
+    if (k === 'comic') continue;   // intro panels: CSS backgrounds only, never drawn on the canvas
     const img = new Image();
     img.onload = () => { artReady = Object.values(FR).every(f => f.img.complete); };
     img.src = `${k}.webp`;
@@ -2405,7 +2445,7 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.filter
 // =====================================================================
 // SCREENS
 // =====================================================================
-const SCREENS = ['scrTitle', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
+const SCREENS = ['scrIntro', 'scrTitle', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) { SCREENS.forEach(s => $(s).hidden = s !== id); $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant'); }
 function refreshCoins() { document.querySelectorAll('.coinCount').forEach(el => el.textContent = Math.floor(save.coins).toLocaleString('es')); }
 function statVal(s) {
@@ -2435,6 +2475,53 @@ function openTitle() {
   $('sfxBtn').textContent = `Efectos: ${save.sfx ? 'sí' : 'no'}`;
   show('scrTitle');
 }
+// =====================================================================
+// INTRO COMIC (before the first run, and again from "Ver la historia")
+// =====================================================================
+// bubbles: x/y = top-left corner in % of the panel; tail b(ottom)/l(eft)/r(ight) at t% along that side, k = skew
+const COMIC = [
+  { cap: 'Cada noche, la Luna mecía las mareas de Isla Coral y guiaba a los pescadores de vuelta a casa.', snd: 'card',
+    bub: [{ t: '¡Gracias, Luna!', x: 40, y: 42, tail: 'b', at: 62, k: 18 }] },
+  { cap: 'Pero una noche, del fondo del mar despertó el Demonio del Eclipse.', snd: 'roar',
+    bub: [{ t: '¡Apagaré la Luna y el mar será MÍO!', x: 3, y: 44, tail: 'r', at: 30 }] },
+  { cap: 'Mandó a la Armada Negra, al Kraken y al Leviatán a conquistar las islas.', snd: 'boom',
+    bub: [{ t: '¡Al abordaje!', x: 64, y: 30, tail: 'b', at: 18, k: -20 }] },
+  { cap: 'En lo alto del faro, la pequeña Marina alzó su farol al cielo.', snd: 'card',
+    bub: [{ t: '¡Luna, ayúdanos!', x: 48, y: 36, tail: 'l', at: 10 }] },
+  { cap: 'Y la Luna despertó.', snd: 'thunder',
+    bub: [{ t: '¿Atacar MI isla?', x: 3, y: 6, tail: 'r', at: 55 }, { t: '¡Ni lo sueñen!', x: 64, y: 6, tail: 'l', at: 55 }] },
+  { cap: 'Desde aquella noche, la Luna defiende la isla con la fuerza de las mareas. Y ahora, la Luna eres tú.', snd: 'tsunami',
+    sfx: { t: '¡FUUUSH!', x: 50, y: 64 } },
+];
+let introNext = null, introStep = 0;
+// panel i of the comic sheet as a background that scales with the panel box
+function comicBg(i) {
+  const A = window.LUNA_ATLAS?.comic, f = A?.frames[`comic${i + 1}`];
+  if (!f) return '';
+  return `background-image:url(comic.webp);background-size:${(A.w / f[2] * 100).toFixed(3)}% ${(A.h / f[3] * 100).toFixed(3)}%;background-position:${(f[0] / (A.w - f[2]) * 100).toFixed(3)}% ${(f[1] / (A.h - f[3]) * 100).toFixed(3)}%`;
+}
+function openIntro(next) {
+  introNext = next; introStep = 0;
+  $('introStrip').innerHTML = COMIC.map((p, i) => `<figure class="cp"><figcaption class="cap">${p.cap}</figcaption><div class="art" role="img" aria-label="Viñeta ${i + 1}" style="${comicBg(i)}">${(p.bub || []).map(b => `<span class="bub t${b.tail}" style="left:${b.x}%;top:${b.y}%;--t:${b.at}%;--k:${b.k || 0}deg">${b.t}</span>`).join('')}${p.sfx ? `<span class="sfx" style="left:${p.sfx.x}%;top:${p.sfx.y}%">${p.sfx.t}</span>` : ''}</div></figure>`).join('');
+  $('introTap').hidden = false; $('introGo').hidden = true;
+  show('scrIntro'); $('scrIntro').scrollTop = 0;
+  introAdvance();
+}
+function introAdvance() {
+  const panels = $('introStrip').children;
+  if (introStep >= panels.length) return;
+  const el = panels[introStep];
+  el.classList.add('on'); sfx(COMIC[introStep].snd);
+  introStep++;
+  if (introStep === panels.length) { $('introTap').hidden = true; $('introGo').hidden = false; }
+  // keep the newest panel (or the final button) in view
+  requestAnimationFrame(() => (introStep === panels.length ? $('introGo') : el).scrollIntoView({ behavior: 'smooth', block: 'end' }));
+}
+function introDone() { save.intro = true; persist(); const n = introNext; introNext = null; (n || openTitle)(); }
+$('scrIntro').addEventListener('click', e => { if (!e.target.closest('button')) introAdvance(); });
+$('introSkip').onclick = introDone;
+$('introGo').onclick = introDone;
+
 function canBuySomething() {
   if (REEF_TIERS[save.reef + 1] && save.coins >= REEF_TIERS[save.reef + 1].cost) return true;
   return META.some(M => metaLv(M.id) < M.max && save.coins >= metaCost(M, metaLv(M.id)));
@@ -2637,7 +2724,8 @@ function endRun(won) {
 }
 
 // wiring
-$('goPlay').onclick = () => { audioInit(); openIslands(); };
+$('goPlay').onclick = () => { audioInit(); if (save.intro) openIslands(); else openIntro(openIslands); };
+$('goStory').onclick = () => { audioInit(); openIntro(openTitle); };
 $('goDaily').onclick = () => { audioInit(); openDaily(); };
 $('startDaily').onclick = () => startRun('daily', 0);
 $('goMoons').onclick = () => openMoons('title');

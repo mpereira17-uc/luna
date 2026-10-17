@@ -18,12 +18,14 @@ const groups = {
   fx: () => require('./fx').S,
   world: () => require('./world').S,
   icons: () => require('./icons').S,
+  comic: () => require('./comic').S,
 };
 // which groups go in which atlas, and at what resolution
 const ATLASES = [
   { name: 'sprites', groups: ['units', 'bosses', 'fx'], R: 3, width: 2048 },
   { name: 'world', groups: ['world'], R: 2.5, width: 2048 },
   { name: 'icons', groups: ['icons'], R: 2.5, width: 2048 },
+  { name: 'comic', groups: ['comic'], R: 2.5, width: 2048 },   // intro comic panels, shown as CSS backgrounds only
 ];
 
 function svgOf(name, sp, R) {

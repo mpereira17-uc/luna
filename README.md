@@ -10,6 +10,7 @@ Juego móvil para Android: eres la luna. Mueves la luna por el cielo para apunta
 - **6 lunas** jugables con su arma inicial y su habilidad especial (la dorada da +50% de monedas a cambio de -30% de vida).
 - **Barco del tesoro** que huye, **cofres** de élites y jefes, **mercader** que atraca tras cada jefe, **misiones diarias**, **reto diario**, 20 logros y modo **Marea sin fin**.
 - 4 jefes: el Kraken, la Armada Negra, el Leviatán y el Demonio del Eclipse.
+- Un **cómic de inicio** de 6 viñetas que cuenta por qué la Luna defiende la isla. Sale antes de la primera partida y se puede volver a ver con «Ver la historia».
 
 Funciona sin internet, sin anuncios y sin recoger datos. El progreso se guarda en el teléfono.
 
@@ -17,8 +18,8 @@ Funciona sin internet, sin anuncios y sin recoger datos. El progreso se guarda e
 
 | Carpeta | Qué hay |
 | --- | --- |
-| `web/` | El juego: `luna.html` (código, estilos y pantallas en un solo archivo) y las hojas de sprites `sprites.webp`, `world.webp`, `icons.webp` con su tabla `atlas.js`. |
-| `art/` | Los dibujos en SVG, escritos como módulos de JavaScript (`units`, `bosses`, `fx`, `world`, `icons`). `build.js` los convierte en las hojas de sprites. |
+| `web/` | El juego: `luna.html` (código, estilos y pantallas en un solo archivo) y las hojas de sprites `sprites.webp`, `world.webp`, `icons.webp` y `comic.webp` (las viñetas del cómic) con su tabla `atlas.js`. |
+| `art/` | Los dibujos en SVG, escritos como módulos de JavaScript (`units`, `bosses`, `fx`, `world`, `icons` y `comic`). `build.js` los convierte en las hojas de sprites. |
 | `app/` | La app de Android: una actividad en Java con un WebView a pantalla completa. |
 | `tools/` | `build_assets.py` copia el juego a la app; `play-test.js` juega partidas con un bot para medir la dificultad; `store-shots.js` saca las capturas de Google Play. |
 | `google-play/` | Ficha de la tienda, política de privacidad, icono, gráfico destacado y capturas. |
