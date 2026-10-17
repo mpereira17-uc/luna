@@ -17,6 +17,9 @@ CADA PARTIDA ES DISTINTA
 • Une dos armas a nivel 3 en una sola: tiburones lanzados por trombas, prismas de hielo, bombas de trueno y arrecifes estelares.
 • Cofres de enemigos de élite, barcos del tesoro que huyen y un mercader que atraca después de cada jefe.
 
+LA LEYENDA DE LA LUNA
+Un cómic de inicio cuenta cómo despertó el Demonio del Eclipse y por qué la Luna defiende la isla.
+
 JEFES ÉPICOS
 El Kraken, la Armada Negra, el Leviatán y el Demonio del Eclipse. Cada uno se vence de una forma distinta.
 
@@ -28,6 +31,12 @@ PROGRESO QUE SE NOTA
 • Misiones diarias, reto diario con reglas nuevas, 20 logros y modo Marea sin fin.
 
 Sin anuncios, sin conexión a internet y sin recoger ningún dato. Partidas cortas de 5 minutos, perfectas para jugar en cualquier momento.
+
+## Desarrollador
+Nombre público: **IA Games**. En Play Console, Página de desarrollador:
+- Icono (512×512): `desarrollador/icono-512.png`
+- Imagen de cabecera (4096×2304): `desarrollador/cabecera-4096x2304.jpg`
+- Descripción corta: Juegos cartoon para tu móvil.
 
 ## Categoría
 Juegos > Acción (alternativa: Arcade)

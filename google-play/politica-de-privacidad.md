@@ -2,7 +2,7 @@
 
 Última actualización: 17 de octubre de 2026
 
-Luna es un juego para un solo jugador que funciona por completo en tu teléfono.
+Luna es un juego de IA Games para un solo jugador que funciona por completo en tu teléfono.
 
 **Datos que recogemos: ninguno.** Luna no pide cuentas, no muestra anuncios, no usa analíticas ni servicios de terceros y no tiene permiso para conectarse a internet.
 

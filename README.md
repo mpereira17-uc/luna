@@ -22,7 +22,7 @@ Funciona sin internet, sin anuncios y sin recoger datos. El progreso se guarda e
 | `art/` | Los dibujos en SVG, escritos como módulos de JavaScript (`units`, `bosses`, `fx`, `world`, `icons` y `comic`). `build.js` los convierte en las hojas de sprites. |
 | `app/` | La app de Android: una actividad en Java con un WebView a pantalla completa. |
 | `tools/` | `build_assets.py` copia el juego a la app; `play-test.js` juega partidas con un bot para medir la dificultad; `store-shots.js` saca las capturas de Google Play. |
-| `google-play/` | Ficha de la tienda, política de privacidad, icono, gráfico destacado y capturas. |
+| `google-play/` | Ficha de la tienda, política de privacidad, icono, gráfico destacado y capturas. En `desarrollador/` están el icono y la cabecera de la página de IA Games. |
 
 ## Probar el juego en el ordenador
 

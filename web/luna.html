@@ -164,6 +164,13 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes slide { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
 
+/* ---------- studio splash (IA Games) over the title on launch ---------- */
+#splash { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: radial-gradient(circle at 50% 42%, #6a4ff0, #2a1d8a 60%, #140e45); transition: opacity 0.5s; }
+#splash img { width: 150px; height: 150px; animation: pop 0.5s 0.1s both cubic-bezier(0.2, 1.6, 0.4, 1); }
+#splash b { font: 44px/1 var(--comic); color: #fff; -webkit-text-stroke: 9px #1c1430; paint-order: stroke fill; letter-spacing: 0.02em; animation: slide 0.4s 0.35s both; }
+#splash small { font-size: 13px; font-weight: 800; letter-spacing: 0.3em; text-transform: uppercase; color: #ffe9a8; animation: slide 0.4s 0.5s both; }
+#splash.out { opacity: 0; pointer-events: none; }
+
 /* ---------- intro comic: panels stacked like a strip, revealed one per tap ---------- */
 #scrIntro { background: radial-gradient(circle at 50% 0%, #1b2a5a, var(--night) 70%); backdrop-filter: none; -webkit-backdrop-filter: none; cursor: pointer; }
 #scrIntro .topbar { position: sticky; top: 0; z-index: 3; width: calc(100% + 32px); max-width: none; margin: 0 -16px; padding: 4px max(16px, calc((100% - 428px) / 2)) 16px; background: linear-gradient(180deg, var(--night) 72%, transparent); box-shadow: 0 -40px 0 var(--night); }
@@ -244,6 +251,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 @media (prefers-reduced-motion: reduce) { .up, #levelUp h2, #comboNum.bump, #comboTxt.bump { animation: none; } #activeBtn.ready { animation: none; } }
 </style>
 
+<div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
 <canvas id="game" aria-label="Isla bajo asedio: mueve la luna para levantar el mar y defenderla"></canvas>
 
 <div id="hud" hidden>
@@ -2791,5 +2799,11 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+// studio splash: fades out on its own, or on the first tap
+{
+  const sp = $('splash');
+  const hide = () => { if (sp.classList.contains('out')) return; sp.classList.add('out'); setTimeout(() => sp.remove(), 600); };
+  sp.addEventListener('pointerdown', hide); setTimeout(hide, 1700);
+}
 })();
 </script>

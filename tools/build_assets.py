@@ -25,7 +25,8 @@ assets = root / "app" / "src" / "main" / "assets"
 dst = assets / "index.html"
 dst.write_text(out, encoding="utf-8")
 print(f"wrote {dst.relative_to(root)} ({len(out):,} bytes)")
-# sprite atlases drawn by art/build.js: the frame table (atlas.js) and the WebP sheets (comic.webp holds the intro comic)
-for name in ["atlas.js", "sprites.webp", "world.webp", "icons.webp", "comic.webp"]:
+# sprite atlases drawn by art/build.js: the frame table (atlas.js) and the WebP sheets (comic.webp holds the intro comic),
+# plus the IA Games mascot shown on the launch splash
+for name in ["atlas.js", "sprites.webp", "world.webp", "icons.webp", "comic.webp", "studio.webp"]:
     shutil.copyfile(root / "web" / name, assets / name)
     print(f"copied web/{name}")
