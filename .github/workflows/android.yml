@@ -54,7 +54,14 @@ jobs:
           LUNA_KEY_ALIAS: ${{ secrets.LUNA_KEY_ALIAS }}
           LUNA_KEY_PASSWORD: ${{ secrets.LUNA_KEY_PASSWORD }}
           LUNA_VERSION_CODE: ${{ github.run_number }}
+          LUNA_ADMOB_APP_ID: ${{ secrets.LUNA_ADMOB_APP_ID }}
+          LUNA_ADMOB_REWARDED_ID: ${{ secrets.LUNA_ADMOB_REWARDED_ID }}
         run: |
+          if [ -n "$LUNA_ADMOB_APP_ID" ] && [ -n "$LUNA_ADMOB_REWARDED_ID" ]; then
+            echo "Release build shows real AdMob ads"
+          else
+            echo "::warning::LUNA_ADMOB_APP_ID / LUNA_ADMOB_REWARDED_ID not set: the release build shows Google test ads"
+          fi
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease
 

@@ -804,6 +804,12 @@ body.guiding #banner { top: 34%; }
       <button class="set-row" id="goStory" type="button"><span data-ico="i_libro"></span><span class="lbl">Ver la historia<small>El cómic de por qué la luna defiende la isla</small></span><span class="go" aria-hidden="true">›</span></button>
     </div>
     </div>
+    <div class="stack" id="adPrivacyRow" hidden>
+      <h3 class="sec">Anuncios</h3>
+      <div class="set-list">
+        <button class="set-row" id="goAdPrivacy" type="button"><span class="lbl">Privacidad de anuncios<small>Cambia tu consentimiento para los anuncios</small></span><span class="go" aria-hidden="true">›</span></button>
+      </div>
+    </div>
     <p class="set-foot">Luna · un juego de IA Games</p>
   </div>
 </div>
@@ -1085,10 +1091,11 @@ body.guiding #banner { top: 34%; }
     <div class="card result">
       <span class="eyebrow">Último aliento</span>
       <h3>La isla se hunde</h3>
-      <p class="lede">Puedes revivir: recuperas media vida y lanzas un tsunami.</p>
+      <p class="lede" id="reviveLede">Puedes revivir: recuperas media vida y lanzas un tsunami.</p>
     </div>
     <div class="stack">
       <button class="btn primary center" id="reviveBtn" type="button">Revivir</button>
+      <button class="btn hot center" id="adReviveBtn" type="button" hidden><span>Ver anuncio y revivir</span><span aria-hidden="true">▶</span></button>
       <button class="btn ghost center" id="giveUpBtn" type="button">Rendirse</button>
     </div>
   </div>
@@ -1111,6 +1118,7 @@ body.guiding #banner { top: 34%; }
       <div class="stack" id="rUnlocks"></div>
     </div>
     <div class="stack">
+      <button class="btn hot center" id="rDouble" type="button" hidden></button>
       <button class="btn primary center" id="rAgain" type="button">Otra vez</button>
       <button class="btn primary first" id="rNext" type="button" hidden></button>
       <div class="row">
@@ -4623,6 +4631,7 @@ function openSettings() {
   $('setMusic').setAttribute('aria-checked', save.music);
   $('setSfx').setAttribute('aria-checked', save.sfx);
   $('setVib').setAttribute('aria-checked', save.vib !== false);
+  $('adPrivacyRow').hidden = !adPrivacy();
   show('scrSettings');
 }
 function openTitle() {
@@ -5041,9 +5050,38 @@ function buildHtml() {
     + S.pacts.map(id => `<span class="pk">${ico(PACT[id].ico, 20)} ${PACT[id].name}</span>`).join('');
 }
 function resume() { audioInit(); mode = 'play'; show(null); setAudioGains(); }
+// Rewarded ads come from the Android app (MainActivity's LunaAds bridge). The web build has no bridge,
+// so adsReady() is false there and every ad button stays hidden.
+const adWait = {};
+function adsReady() { try { return !!(window.LunaAds && window.LunaAds.ready()); } catch (e) { return false; } }
+function adPrivacy() { try { return !!(window.LunaAds && window.LunaAds.privacyRequired()); } catch (e) { return false; } }
+function showAd(tag, done) {
+  adWait[tag] = done;
+  // the screen fades to dark before the ad opens and fades back in when it closes
+  $('curtain').classList.add('on');
+  setTimeout(() => { try { window.LunaAds.show(tag); } catch (e) { $('curtain').classList.remove('on'); delete adWait[tag]; done(false); } }, reduceMotion ? 0 : 280);
+}
+window.lunaAdDone = (tag, ok) => {
+  const done = adWait[tag]; delete adWait[tag];
+  $('curtain').classList.remove('on');
+  if (AU.ctx && AU.ctx.state === 'suspended' && mode !== 'paused') AU.ctx.resume();
+  if (done) done(!!ok);
+};
+window.lunaAdReady = () => adButtons();
+function adButtons() {
+  const r = adsReady();
+  $('adReviveBtn').hidden = !(r && mode === 'revive' && S && S.revives <= 0 && !S.adRevived);
+  $('rDouble').hidden = !(r && mode === 'result' && S && S.adCoins > 0 && !S.adDoubled);
+}
 function onDeath() {
   if (S.lab) { S.hp = S.maxHp; return; }
-  if (S.revives > 0) { mode = 'revive'; show('scrRevive'); setAudioGains(); sfx('hurt'); vib([200, 100, 200]); return; }
+  const free = S.revives > 0;
+  if (free || (!S.adRevived && adsReady())) {
+    mode = 'revive';
+    $('reviveBtn').hidden = !free;
+    $('reviveLede').textContent = free ? 'Puedes revivir: recuperas media vida y lanzas un tsunami.' : 'Mira un anuncio corto y revive: recuperas media vida y lanzas un tsunami.';
+    adButtons(); show('scrRevive'); setAudioGains(); sfx('hurt'); vib([200, 100, 200]); return;
+  }
   endRun(false);
 }
 function revive() {
@@ -5051,6 +5089,7 @@ function revive() {
   for (const p of S.proj) if (p.hostile) p.done = true;
 }
 function victory() { endRun(true); }
+let paintTally = () => {};
 // what sank the island, by the source key of islandDamage
 const CAUSE = { sloop: 'las balandras', galleon: 'los galeones', mortar: 'los morteros', pirate: 'los piratas', crab: 'los cangrejos', gull: 'las gaviotas', serpent: 'las serpientes', brulote: 'los brulotes', ghost: 'el Holandés Errante', lava: 'las rocas de lava', meteor: 'la lluvia de estrellas', gold: 'el barco del tesoro' };
 const lowArt = n => n.replace(/^El /, 'el ').replace(/^La /, 'la ').replace(/^(Demonio|Kraken)/, 'el $1');
@@ -5097,6 +5136,7 @@ function endRun(won, quit) {
   const fromRetire = S.retired ? Math.round((fromKills + fromBoss + waveBonus) * 0.25) : 0;
   const total = fromKills + fromBoss + waveBonus + bonus + fromPearls + fromRetire + (camp ? camp.coins : 0) + xCoins();
   save.coins += total;
+  S.adCoins = fromKills + fromBoss;   // a rewarded ad doubles what the run earned
   const cl = achClaimable(); if (cl) unlocks.push(`${cl} logro${cl > 1 ? 's' : ''} listo${cl > 1 ? 's' : ''} para cobrar`);
   const mr = missionsReady(); if (mr) unlocks.push(`${mr} misi${mr > 1 ? 'ones' : 'ón'} cumplida${mr > 1 ? 's' : ''}: cóbrala${mr > 1 ? 's' : ''} en Misiones`);
   if (canBuySomething()) unlocks.push('Tienes monedas para mejorar el taller');
@@ -5134,14 +5174,19 @@ function endRun(won, quit) {
     coins.push(...(S.xRows || []));
     if (camp) coins.unshift(...camp.rows);
     $('rCoins').dataset.total = total;
-    $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
+    paintTally = () => {
+      const all = S.adDoubled ? coins.concat([['Anuncio visto', S.adCoins]]) : coins, tot = total + (S.adDoubled ? S.adCoins : 0);
+      $('rCoins').innerHTML = all.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${tot}" data-pre="">${tot.toLocaleString('es')}</span></dd>`;
+    };
+    paintTally();
+    $('rDouble').innerHTML = `<span>Duplicar monedas · ver anuncio</span><span>+${coinBtn(S.adCoins)}</span>`;
     $('rBuild').innerHTML = buildHtml();
     $('rUnlocks').innerHTML = unlocks.map(t => `<div class="unlock">${t}</div>`).join('');
     const nx = M && won && !M.echo ? (M.puz ? puzNext(M.k) : misNext()) : null;
     $('rNext').hidden = !nx; if (nx) { $('rNext').dataset.m = nx.i; $('rNext').innerHTML = `<span>Siguiente: ${nx.name}</span><span aria-hidden="true">→</span>`; }
     $('rAgain').classList.toggle('primary', !nx); $('rAgain').classList.toggle('ghost', !!nx);
     $('rMenu').textContent = M ? (M.puz ? 'Desafíos' : M.echo ? 'Archivo' : 'Mapa') : 'Menú';
-    show('scrResult');
+    show('scrResult'); adButtons();
     countUp($('rCoins'));
   }, delay);
 }
@@ -5199,6 +5244,25 @@ $('rAgain').onclick = () => storyThen(() => startRun(lastRun.mode, lastRun.isl))
 $('rShop').onclick = () => storyThen(() => openShop('result'));
 $('mDone').onclick = () => { persist(); resume(); };
 $('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
+$('adReviveBtn').onclick = () => {
+  const b = $('adReviveBtn'); if (b.disabled) return; b.disabled = true;
+  showAd('revive', ok => {
+    b.disabled = false;
+    if (mode !== 'revive') return;
+    if (ok) { S.adRevived = true; S.revives++; revive(); return; }
+    $('reviveLede').textContent = 'Hay que ver el anuncio entero para revivir.';
+    adButtons();
+  });
+};
+$('rDouble').onclick = () => {
+  const b = $('rDouble'); if (b.disabled || !S || S.adDoubled) return; b.disabled = true;
+  showAd('double', ok => {
+    b.disabled = false;
+    if (ok && S && !S.adDoubled) { S.adDoubled = true; save.coins += S.adCoins; persist(); refreshCoins(); sfx('coin'); paintTally(); }
+    adButtons();
+  });
+};
+$('goAdPrivacy').onclick = () => { try { window.LunaAds.privacy(); } catch (e) {} };
 // app shell hooks: Android back button and backgrounding
 window.lunaPause = () => { if (mode === 'play') pause(); persist(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
