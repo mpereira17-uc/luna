@@ -24,11 +24,29 @@ jobs:
           KEYSTORE_B64: ${{ secrets.LUNA_KEYSTORE_B64 }}
         run: |
           if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            # tolerate spaces or line breaks picked up when pasting the secret
+            printf '%s' "$KEYSTORE_B64" | tr -d '[:space:]' | base64 -d > "$RUNNER_TEMP/upload.jks"
             echo "LUNA_KEYSTORE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "Upload key file: $(wc -c < "$RUNNER_TEMP/upload.jks") bytes, sha256 starts $(sha256sum "$RUNNER_TEMP/upload.jks" | cut -c1-16)"
           else
             echo "::warning::No upload key in secrets: the release bundle will be unsigned."
           fi
+
+      - name: Check upload key password
+        if: env.LUNA_KEYSTORE != ''
+        env:
+          PW: ${{ secrets.LUNA_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.LUNA_KEY_ALIAS }}
+        run: |
+          # same cleanup as app/build.gradle.kts; only lengths are printed, never the values
+          clean() { printf '%s' "$1" | sed -e 's/^[[:space:]`"'"'"']*//' -e 's/[[:space:]`"'"'"']*$//'; }
+          P=$(clean "$PW"); A=$(clean "$ALIAS")
+          echo "Password: ${#PW} characters as stored, ${#P} after cleanup. Alias: ${#A} characters."
+          if ! keytool -list -keystore "$LUNA_KEYSTORE" -storepass "$P" -alias "$A" > /dev/null 2>&1; then
+            echo "::error::The upload key could not be opened with LUNA_KEYSTORE_PASSWORD and LUNA_KEY_ALIAS. Check that both secrets match clave-de-subida/LEEME.md and that LUNA_KEYSTORE_B64 is the whole luna-upload.jks.b64.txt file."
+            exit 1
+          fi
+          echo "Upload key opens correctly."
 
       - name: Build APK and bundle
         env:

@@ -3,6 +3,8 @@ plugins {
 }
 
 // Release signing comes from environment variables (set as GitHub secrets in CI).
+// Values pasted into the GitHub form often carry stray spaces, newlines or quotes; strip them.
+fun secret(name: String): String? = System.getenv(name)?.trim()?.trim('`', '"', '\'')?.trim()
 val ksPath: String? = System.getenv("LUNA_KEYSTORE")
 val hasReleaseKey = ksPath != null && file(ksPath).exists()
 
@@ -22,9 +24,9 @@ android {
         if (hasReleaseKey) {
             create("release") {
                 storeFile = file(ksPath!!)
-                storePassword = System.getenv("LUNA_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("LUNA_KEY_ALIAS")
-                keyPassword = System.getenv("LUNA_KEY_PASSWORD")
+                storePassword = secret("LUNA_KEYSTORE_PASSWORD")
+                keyAlias = secret("LUNA_KEY_ALIAS")
+                keyPassword = secret("LUNA_KEY_PASSWORD")
             }
         }
     }
