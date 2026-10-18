@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
         s.setAllowContentAccess(false);
         s.setSupportZoom(false);
         s.setTextZoom(100);
+        web.addJavascriptInterface(new ShareBridge(this), "LunaShare");
 
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient() {

@@ -637,6 +637,48 @@ body.guiding #banner { top: 34%; }
 .lrow b { display: block; font-size: 14px; } .lrow small { display: block; font-size: 12px; color: var(--ink-dim); }
 .lrow button { min-height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); font-size: 20px; font-weight: 900; }
 .lrow button:disabled { opacity: 0.35; }
+
+/* ---------- phase 7: tide challenges ---------- */
+.tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tile { font-size: 12px; }
+#hud.puz #activeBtn, #hud.puz .xpline { display: none; }
+.puz-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.puz-head .lede { margin: 0; }
+.lc.puz .ico { background: color-mix(in srgb, #3fb8c9 22%, transparent); }
+
+/* ---------- phase 7: masteries, defences, specials, share ---------- */
+.mpips { display: inline-flex; gap: 3px; vertical-align: middle; }
+.mpips i { border-radius: 50%; background: rgba(255,255,255,0.14); box-shadow: 0 0 0 1px rgba(255,255,255,0.18) inset; }
+.mpips i.on { background: #dfe6f5; box-shadow: 0 0 6px rgba(223,230,245,0.6); }
+.mpips i.gold { background: var(--gold); box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 70%, transparent); }
+.mast { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 8px 12px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--night) 45%, transparent); color: var(--ink); font: inherit; font-size: 13px; }
+.mast b { display: block; font-size: 14px; }
+.mast small { display: block; color: var(--ink-dim); font-size: 12px; line-height: 1.3; }
+.mast .go { color: var(--gold); font-weight: 900; font-size: 18px; }
+.mast .ctag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 8px; background: #6a2a8a; color: #f1d6ff; font-size: 11px; font-weight: 800; vertical-align: 1px; }
+#mastLede { display: flex; align-items: center; gap: 10px; margin: 0; font-weight: 800; }
+.mtask.done { border-color: color-mix(in srgb, var(--gold) 50%, transparent); }
+.mtask .d { color: var(--ink-dim); font-size: 13px; }
+.mrew { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.mrew li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-dim); }
+.mrew li b { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: var(--ink-dim); font-size: 13px; }
+.mrew li.on { color: var(--ink); }
+.mrew li.on b { background: var(--gold); color: var(--night); }
+#mastCorr { display: grid; grid-template-columns: 76px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, #6a2a8a 40%, transparent), color-mix(in srgb, var(--panel) 90%, transparent)); border: 1px solid color-mix(in srgb, #b46cff 45%, transparent); }
+#mastCorr.locked { filter: grayscale(0.7); opacity: 0.75; }
+#mastCorr canvas { width: 76px; height: 76px; }
+#mastCorr b { display: block; font-size: 15px; }
+#mastCorr span > span { display: block; font-size: 12.5px; line-height: 1.35; }
+#mastCorr .plus { color: var(--ok); font-weight: 700; }
+#mastCorr .weak { color: #ff9a9a; font-weight: 700; }
+#mastCorr .d { color: var(--ink-dim); }
+#mapDefs .gdot, #prepDefs .gdot { width: auto; display: flex; gap: 2px; }
+.csteps { display: flex; gap: 4px; margin-top: 6px; }
+.csteps i { width: 18px; height: 5px; border-radius: 3px; background: var(--line); }
+.csteps i.on { background: var(--gold); }
+.lc.replay { opacity: 0.85; }
+#shareImg { width: 100%; height: auto; border-radius: 16px; display: block; }
+.result-share { display: flex; }
 </style>
 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
@@ -694,6 +736,7 @@ body.guiding #banner { top: 34%; }
         <button class="tile" id="goMoons" type="button"><span data-ico="i_dorada"></span>Lunas</button>
         <button class="tile" id="goShop" type="button"><span data-ico="i_arsenal"></span>Taller<span class="badge" id="shopBadge" hidden>!</span></button>
         <button class="tile" id="goMis" type="button"><span data-ico="i_mision"></span>Misiones<span class="badge" id="misBadge" hidden>!</span></button>
+        <button class="tile" id="goPuz" type="button"><span data-ico="i_marea"></span>Desafíos<span class="badge" id="puzBadge" hidden>!</span></button>
         <button class="tile" id="goAch" type="button"><span data-ico="i_libro"></span>Archivo<span class="badge" id="achBadge" hidden>!</span></button>
       </div>
     </div>
@@ -737,6 +780,7 @@ body.guiding #banner { top: 34%; }
     <div class="map-head"><div class="moon-pick"><span class="moon-dot" id="pickDot"></span><span id="pickName"></span><button type="button" data-go="moons">Cambiar</button></div><span class="mapstars" id="mapStars" aria-label="Estrellas"></span></div>
     <div class="host" id="mapHost"><p class="hsay"></p></div>
     <div class="moon-pick" id="mapGuard" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
+    <div class="moon-pick" id="mapDefs" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
     <div class="stack" id="islandList"></div>
   </div>
 </div>
@@ -756,6 +800,7 @@ body.guiding #banner { top: 34%; }
     </div>
     <div class="moon-pick"><span class="moon-dot" id="prepDot"></span><span id="prepMoonName"></span><button type="button" id="prepMoon">Cambiar</button></div>
     <div class="moon-pick" id="prepGuard" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
+    <div class="moon-pick" id="prepDefs" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
     <button class="btn primary big" id="prepGo" type="button"><span>Zarpar</span><span aria-hidden="true">→</span></button>
   </div>
 </div>
@@ -821,6 +866,31 @@ body.guiding #banner { top: 34%; }
   <div class="stack" id="guardList"></div>
 </div></div>
 
+
+<!-- Moon mastery -->
+<div class="sheet" id="mastSheet" hidden><div class="in">
+  <div class="sh-h"><h3 id="mastTitle">Maestría</h3><button class="icon-btn" id="mastClose" type="button" aria-label="Cerrar">✕</button></div>
+  <p class="lede small" id="mastLede"></p>
+  <h3 class="sec2">Retos</h3><div class="stack" id="mastTasks"></div>
+  <h3 class="sec2">Premios por nivel</h3><ul class="mrew" id="mastRew"></ul>
+  <h3 class="sec2">Versión corrupta</h3><div id="mastCorr"></div>
+</div></div>
+
+<!-- Castle defences -->
+<div class="sheet" id="defSheet" hidden><div class="in">
+  <div class="sh-h"><h3>Defensas del castillo</h3><button class="icon-btn" id="defClose" type="button" aria-label="Cerrar">✕</button></div>
+  <p class="lede small">Elige dos. Se quedan para las próximas partidas (no en los desafíos de marea). <b id="defCount"></b></p>
+  <div class="stack" id="defList"></div>
+  <button class="btn primary center" id="defDone" type="button">Listo</button>
+</div></div>
+
+<!-- Share a run -->
+<div class="sheet" id="shareSheet" hidden><div class="in">
+  <div class="sh-h"><h3>Tu partida</h3><button class="icon-btn" id="shareClose" type="button" aria-label="Cerrar">✕</button></div>
+  <img id="shareImg" alt="Tarjeta con el resumen de la partida">
+  <a class="btn primary center" id="shareDl" download="luna.png" href="#">Guardar imagen</a>
+</div></div>
+
 <!-- Mara's lab: what to try, during the run -->
 <div id="labBar" hidden><button type="button" id="labGear">Armas</button><button type="button" id="labWave">Oleada +1</button><button type="button" id="labBoss">Jefe</button><button type="button" id="labClear">Limpiar</button><button type="button" id="labExit">Salir</button></div>
 <div class="sheet" id="labSheet" hidden><div class="in">
@@ -859,6 +929,17 @@ body.guiding #banner { top: 34%; }
   <div class="inner" style="margin-block: 0 auto">
     <p class="lede">Cuatro misiones nuevas cada día y tres cada semana. El progreso se suma en todas tus partidas.</p>
     <div class="stack" id="misList"></div>
+  </div>
+</div>
+
+
+<!-- Tide challenges -->
+<div class="screen" id="scrPuzzles" hidden>
+  <div class="topbar"><button class="icon-btn" id="puzBack" type="button" aria-label="Volver">←</button><h2 class="st">Desafíos</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
+  <div class="inner" style="margin-block: 0 auto">
+    <div class="host" id="puzHost"><p class="hsay"></p></div>
+    <div class="puz-head"><p class="lede small">Retos de marea: cortos, sin armas y con pocas mareas.</p><span class="mapstars" id="puzStarsN" aria-label="Estrellas"></span></div>
+    <div class="stack" id="puzList"></div>
   </div>
 </div>
 
@@ -979,6 +1060,7 @@ body.guiding #banner { top: 34%; }
       <button class="btn primary center" id="rAgain" type="button">Otra vez</button>
       <button class="btn primary first" id="rNext" type="button" hidden></button>
       <div class="row">
+        <button class="btn ghost center" id="rShare" type="button">Compartir</button>
         <button class="btn ghost center" id="rShop" type="button">Taller</button>
         <button class="btn ghost center" id="rMenu" type="button">Menú</button>
       </div>
@@ -1200,6 +1282,9 @@ const ACH = [
   { id: 'echo1', name: 'Eco lejano', desc: 'Encuentra un eco de antiguas mareas.', goal: 1, stat: 'echoes', reward: 200 },
   { id: 'echo4', name: 'Las cuatro mareas', desc: 'Supera los 4 ecos de antiguas mareas.', goal: 4, stat: 'echoWins', reward: 900 },
   { id: 'beasts', name: 'Naturalista', desc: 'Descubre las 20 criaturas del bestiario.', goal: 20, stat: 'beastSeen', reward: 500 },
+  { id: 'puz1', name: 'Mente de marea', desc: 'Supera tu primer desafío de marea.', goal: 1, stat: 'puzWon', reward: 100 },
+  { id: 'puz36', name: 'Señora de las mareas', desc: 'Consigue las 36 estrellas de los desafíos de marea.', goal: 36, stat: 'puzStars', reward: 700 },
+  { id: 'mast5', name: 'Maestra de la luna', desc: 'Lleva una luna a la maestría 5.', goal: 5, stat: 'mastMax', reward: 600 },
   { id: 'village', name: 'La aldea crece', desc: 'Haz crecer la aldea superando 10 misiones.', goal: 10, stat: 'village', reward: 300 },
 ];
 // daily missions: four a day from this pool, progress adds up across that day's runs
@@ -1400,7 +1485,7 @@ function sprOn(g, n, x, y, s, sy) {
   const syy = sy || s; g.drawImage(f.img, f.x, f.y, f.w, f.h, x - f.ax * s, y - f.ay * syy, f.pw * s, f.ph * syy); return true;
 }
 // a moon with a face on a small canvas: k = size pulse, dy = hop, rot = tilt
-function moonPortrait(cv, id, face, k = 1, dy = 0, rot = 0) {
+function moonPortrait(cv, id, face, k = 1, dy = 0, rot = 0, corr) {
   const g = cv.getContext('2d'), w = cv.width, h = cv.height, M = MOONS.find(m => m.id === id) || MOONS[0];
   g.clearRect(0, 0, w, h);
   const n = parseInt(M.color.slice(1), 16), rgb = `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`;
@@ -1410,7 +1495,9 @@ function moonPortrait(cv, id, face, k = 1, dy = 0, rot = 0) {
   const s = w * 0.34 / 31 * k;
   g.save(); g.translate(w / 2, h / 2 + dy); g.rotate(rot);
   if (!sprOn(g, `moon_${id}`, 0, 0, s)) { g.fillStyle = M.color; g.beginPath(); g.arc(0, 0, w * 0.34, 0, TAU); g.fill(); }
+  if (corr || corrOn(id)) corrPaint(g, 0, 0, w * 0.34 * k);
   sprOn(g, `face_${face}`, 0, 0, s);
+  mastAura(g, 0, 0, w * 0.34 * k * 0.95, mastLv(id));
   g.restore();
 }
 // an icon from the icons atlas as an inline element for the DOM screens
@@ -1531,7 +1618,7 @@ const dangerSel = id => Math.min(save.isl[id]?.dsel || 0, save.isl[id]?.danger |
 
 function newRun(runMode, islIdx) {
   // a campaign mission plays on its chapter's island with its own waves, fleet and objective
-  const mis = runMode === 'mission' ? CAMPAIGN[islIdx] : runMode === 'echo' ? ECHOES[islIdx] : null;
+  const mis = runMode === 'mission' ? CAMPAIGN[islIdx] : runMode === 'echo' ? ECHOES[islIdx] : runMode === 'puzzle' ? PUZZLES[islIdx] : null;
   if (mis) { runMode = 'island'; islIdx = mis.ch; }
   const moon = MOONS.find(m => m.id === save.moon) || MOONS[0];
   const mods = {};
@@ -1564,7 +1651,7 @@ function newRun(runMode, islIdx) {
   addWeapon(moon.weapon);
   if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
   recompute();
-  lastRun = mis ? (mis.echo ? { mode: 'echo', isl: mis.k } : { mode: 'mission', isl: mis.i }) : { mode: runMode, isl: islIdx };
+  lastRun = mis ? (mis.puz ? { mode: 'puzzle', isl: mis.k } : mis.echo ? { mode: 'echo', isl: mis.k } : { mode: 'mission', isl: mis.i }) : { mode: runMode, isl: islIdx };
 }
 // how many waves the run has (0: endless)
 const waveMax = () => S.mis ? S.mis.waves : S.mode === 'island' ? 20 : 0;
@@ -1707,6 +1794,7 @@ function spawnGroup() {
 }
 function isBossWave(w) { if (S.mis) return S.mis.boss && (w === 5 || w === 10); return S.mode === 'island' ? (w === 10 || w === 20) : (w % 10 === 0); }
 function waves(dt) {
+  if (S.puz) { puzTick(dt); return; }
   const bw = isBossWave(S.wave);
   if (bw) {
     if (!S.bossSpawned) { spawnBoss(); S.bossSpawned = true; }
@@ -1756,6 +1844,7 @@ function nextWave() {
   S.wave++; S.waveT = 0; S.bossSpawned = false; S.bossClearT = 0; S.boss = null;
   for (const c of S.coins) c.home = true;
   for (const c of S.chests) c.home = true;
+  p7WaveEnd();
   if (S.waveHurt === 0 && S.wave > 2) missionProgress('nohit', 1);
   S.waveHurt = 0;
   S.theme = pickTheme();
@@ -2078,7 +2167,7 @@ function killBoss(b) {
 let SRC = null;
 function hit(e, base, o) {
   if (e.dead || e.invuln || e.shield || e.phased) return 0;
-  let d = base * S.st.dmg * (S.furia > 0 ? 2 : 1) * (S.eclipse > 0 ? 1.6 : 1) * (S.anom === 'sangre' ? 1.25 : 1);
+  let d = base * S.st.dmg * (S.furia > 0 ? (S.corr === 'roja' ? 2.8 : 2) : 1) * (S.eclipse > 0 ? 1.6 : 1) * (S.anom === 'sangre' ? 1.25 : 1);
   // the black armada's formation and the eclipse's hold on the tide soak up most of the damage
   if (e.isBoss && (e.formN > 0 || e.orbHold)) d *= e.formN > 0 ? 0.3 : 0.5;
   let crit = false;
@@ -2119,7 +2208,7 @@ function bruloteBoom(e, atIsland) {
     islandDamage(S.maxHp * 0.08 + 4 * scaleW(), false, 'brulote');
     S.face = 'hurt'; S.faceT = 1.2; S.flash = Math.min(0.6, S.flash + 0.35);
     if (!S.seen.brulBoom) { S.seen.brulBoom = 1; banner('¡Un brulote ha estallado!', 'Húndelos antes de que lleguen a la isla', 1.8, true); }
-  } else for (const o of S.threat) if (o !== e && !o.isBoss && Math.hypot(o.x - e.x, o.y - e.y) < 52 * u + o.r * u) hit(o, 30 * scaleW());
+  } else for (const o of S.threat) if (o !== e && !o.isBoss && Math.hypot(o.x - e.x, o.y - e.y) < 52 * u + o.r * u) hit(o, 30 * scaleW() * (S.puz && S.puz.boomK || 1));
 }
 function kill(e, silent) {
   if (e.dead) return;
@@ -2128,6 +2217,7 @@ function kill(e, silent) {
   if (S.mis && S.mis.kill) S.mis.kill(e, SRC === 'mar' || (e.seaD || 0) >= e.maxHp * 0.4);
   if (S.tut && SRC === 'mar' && e.def.kind === 'walk') S.tutDrown = true;
   S.killsBy[e.type] = (S.killsBy[e.type] || 0) + 1;
+  p7Kill(e);
   if (!e.decoy && !e.cap) countSink(e.type);
   missionProgress(e.type, 1); missionProgress('kill', 1);
   if (e.tr) missionProgress('trait', 1);
@@ -2245,9 +2335,10 @@ function moonSwat(dt) {
   }
 }
 function islandDamage(d, ignoreEclipse, src = 'boss') {
-  if (S.eclipse > 0 && !ignoreEclipse) return;
+  if (S.eclipse > 0 && !ignoreEclipse) { if (S.mst) S.mst.ecl += d; return; }
   if (S.eclipse > 0) d *= 0.3;
   d *= (S.mods.dmgTaken || 1) * S.st.taken * (1 + 0.12 * S.danger) * (S.anom === 'sangre' ? 1.25 : 1);
+  d = defAbsorb(d);
   S.hp -= d; S.hurtAcc += d; S.dmgBy[src] = (S.dmgBy[src] || 0) + d; S.waveHurt += d;
   if (S.mis && S.mis.hurt) S.mis.hurt(d, src);
   if (S.hurtT <= 0) {
@@ -2785,7 +2876,7 @@ function updEnemy(e, dt) {
   const lvl = levelAt(e.x), pull = pullAt(e.x) / 0.3;
   if (def.kind === 'ship') {
     e.y = waveY(e.x);
-    const over = inReef(e.x, e.r * u * 0.4);
+    const over = inReef(e.x, e.r * u * 0.4) && !reefSunk(e.x);
     if (over && lvl - REEF < def.draft + (e.deep || 0)) {
       sp *= 0.35; e.aground = true; if (S.tut) S.tutCrash = true;
       hit(e, reefDps() * dt, { dot: true, col: '#9fd8ff' });
@@ -2795,6 +2886,7 @@ function updEnemy(e, dt) {
     }
     if (over && S.coralWall) sp *= 0.5;
     if (over && S.mis && S.mis.lure) sp *= 0.55;
+    if (S.bars && S.bars.length) sp *= barShip(e, lvl, dt);
     if (S.wrecks.length) sp *= wreckShip(e, lvl, dt);
     if (S.frozenSea > 0) sp *= 0.35;
   } else if (def.kind === 'walk') {
@@ -2982,18 +3074,18 @@ function hazards(dt) {
 function useActive() {
   if (mode !== 'play' || S.charge < 1 || S.mods.noActive) return;
   if (S.noLight > 0) { sfx('card'); vib(12); return; }
-  S.charge = 0; missionProgress('active', 1); SRC = 'luna'; S.usedActive = true; if (S.tut) S.tutUsed = true;
+  S.charge = 0; if (S.mst) S.mst.use++; missionProgress('active', 1); SRC = 'luna'; S.usedActive = true; if (S.tut) S.tutUsed = true;
   const id = S.moon.id;
-  if (id === 'llena') tsunami(1);
-  else if (id === 'roja') { S.furia = 8; banner('¡Furia!', 'Doble daño durante 8 s', 1.4); }
+  if (id === 'llena') tsunami(S.corr === 'llena' ? 1.7 : 1);
+  else if (id === 'roja') { S.furia = S.corr === 'roja' ? 12 : 8; banner('¡Furia!', S.corr === 'roja' ? 'Daño feroz durante 12 s' : 'Doble daño durante 8 s', 1.4); }
   else if (id === 'hielo') {
-    for (const e of S.enemies) { freeze(e, 4 * S.st.cc, 0, true); hit(e, 40); }
+    for (const e of S.enemies) { freeze(e, (S.corr === 'hielo' ? 6 : 4) * S.st.cc, S.corr === 'hielo' ? 50 * scaleW() : 0, true); hit(e, 40); }
     if (S.boss && !S.boss.dead) { S.boss.frozen = 1.6; hit(S.boss, 80); }
     S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.8, r1: W * 1.1, c: '#e6fbff' });
     banner('¡Ventisca!', '', 1.2); sfx('freeze');
-  } else if (id === 'nueva') { S.eclipse = 6; banner('¡Eclipse!', 'La isla es invulnerable', 1.4); }
-  else if (id === 'tormenta') { S.diluvio = 6; S.diluvioT = 0; banner('¡Diluvio!', 'Rayos por todo el mar', 1.4); }
-  else if (id === 'dorada') { S.fiebre = 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
+  } else if (id === 'nueva') { S.eclipse = S.corr === 'nueva' ? 9 : 6; banner('¡Eclipse!', 'La isla es invulnerable', 1.4); }
+  else if (id === 'tormenta') { S.diluvio = S.corr === 'tormenta' ? 8 : 6; S.diluvioT = 0; banner('¡Diluvio!', 'Rayos por todo el mar', 1.4); }
+  else if (id === 'dorada') { S.fiebre = S.corr === 'dorada' ? 11 : 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
   S.face = id === 'roja' ? 'angry' : 'effort'; S.faceT = 1.6;
   S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.5, r1: MOON_R() * 3, c: S.moon.color });
   sfx('tsunami'); vib([60, 40, 140]);
@@ -3203,7 +3295,7 @@ function updTide(dt) {
     if (S.mods.storm) S.tideP += Math.sin(S.t * 0.9) * Math.sin(S.t * 2.3) * dt * 2.2;
     if (S.anom === 'loca') S.tideP += Math.sin(S.t * 1.3) * Math.sin(S.t * 3.1) * dt * 3.2 * S.anomK;
   }
-  S.level = surgeLevel((TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * tideShape(S.tideP));
+  S.level = S.puz ? puzLevel(dt) : surgeLevel((TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * tideShape(S.tideP));
   if (S.orbs) S.level = 0.62 + 0.04 * Math.sin(S.t * 2);
   const d = Math.sign(S.level - prev);
   if (d && d !== S.tideDir) { S.tideDir = d; if (!S.seen.tideTip && S.t > 3) { S.seen.tideTip = 1; tip('tide', 'La marea sube y baja sola', 'Bajamar: los barcos encallan · Pleamar: los piratas se ahogan'); } }
@@ -3234,6 +3326,7 @@ function update(dt) {
   updSea(dt);
   legendsTick(dt);
   guardTick(dt);
+  p7Tick(dt);
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
@@ -3367,7 +3460,7 @@ function drawCoralSpikes() {
 function drawReefs() {
   const tier = reefTier(), name = `reef${tier}_${biome()}`, sy = reefScaleY(), fy = floorY();
   for (const R of REEFS()) {
-    if (!spr(name, R.c, fy + 2 * u, u, R.c > W / 2, 0, sy)) {
+    if (!spr(name, R.c, fy + 2 * u + reefDrop(R.c), u, R.c > W / 2, 0, sy)) {
       ctx.fillStyle = '#3a3d4d'; ctx.beginPath(); ctx.moveTo(R.a - 12 * u, fy); ctx.lineTo(R.c, levelY(REEF)); ctx.lineTo(R.b + 12 * u, fy); ctx.fill();
     }
   }
@@ -3399,7 +3492,7 @@ function villageLife(b, vx, top, k) {
     softGlow(cx, cy, 9 * k, b === 'abismo' ? '#d58cff' : '#ffb04a', 0.3 + 0.12 * Math.sin(T * 3.1 + i * 1.7));
   });
   // the flag: a pole (coral's is part of the sprite) and a pennant that ripples in the wind
-  const [fx, fy, fb, len, col] = V.flag, x0 = X(fx), y0 = Y(fy), n = 9, hh = (b === 'coral' ? 10 : 8) * k;
+  const [fx, fy, fb, len, col0] = V.flag, col = save.goldFlag ? '#ffd36b' : col0, x0 = X(fx), y0 = Y(fy), n = 9, hh = (b === 'coral' ? 10 : 8) * k;
   if (b !== 'coral') {
     ctx.lineCap = 'round'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 2.6 * k; ctx.beginPath(); ctx.moveTo(x0, Y(fb)); ctx.lineTo(x0, y0 - 1 * k); ctx.stroke();
     ctx.strokeStyle = '#a2683a'; ctx.lineWidth = 1.2 * k; ctx.stroke(); ctx.lineCap = 'butt';
@@ -3455,7 +3548,7 @@ function drawFarShips() {
 }
 function drawLand() {
   const P = pal(), I = ISL(), fy = floorY(), b = biome();
-  drawReefs();
+  drawReefs(); drawBars();
   // island on its sea stack: plateau spans the island's width, the cliff stretches down into the sand
   const sx = (I.r - I.l) / 104, sy = (fy - I.top + 8 * u) / 236;
   if (!spr(`isl_${b}`, W / 2, I.top, sx, false, 0, sy)) {
@@ -3524,7 +3617,7 @@ function drawWater(back) {
   // foam where the water breaks over the reefs and on the moon's dome
   const foam = P.foam;
   for (const R of REEFS()) {
-    const depth = levelAt(R.c) - REEF;
+    const depth = levelAt(R.c) - REEF + (reefSunk(R.c) ? 0.3 : 0);
     if (depth < 0.14) {
       const a = Math.max(0, 1 - Math.abs(depth) / 0.14) * 0.85;
       for (let x = R.a - 6 * u; x < R.b + 6 * u; x += 5 * u) { ctx.fillStyle = hexA(foam, a * (0.35 + 0.65 * Math.abs(Math.sin(x * 0.3 + T * 4)))); ctx.beginPath(); ctx.arc(x, waveY(x) + 1, 2.2 * u, 0, TAU); ctx.fill(); }
@@ -4067,7 +4160,9 @@ function drawMoon() {
   const s = r / 31 * kick, sq = !S && titleKick > T ? 1 - Math.sin((titleKick - T) / 0.35 * Math.PI) * 0.08 : 1;
   if (!spr(`moon_${id}`, m.x, m.y + bob, s, false, 0, s * sq)) { ctx.fillStyle = moonColor(); ctx.beginPath(); ctx.arc(m.x, m.y + bob, r, 0, TAU); ctx.fill(); }
   const [lx, ly] = moonLook(m, s);
+  moonExtras(ctx, id, m.x, m.y + bob, r * kick, !!S);
   spr(`face_${moonFace(id)}`, m.x + lx, m.y + bob + ly, s, false, 0, s * sq);
+  moonAura(ctx, id, m.x, m.y + bob, r * kick);
   if (S && S.moonSlow > 0) {
     const a = Math.min(1, S.moonSlow * 2), k = S.moonSlowK, cy = m.y + bob;
     if (k === 'ice') {
@@ -4115,7 +4210,7 @@ function drawDark() {
   const hz = S ? (S.mode === 'island' ? S.isl.hazard : ISLANDS[S.palIdx].hazard) : null;
   const night = S && S.night > 0 ? Math.min(1, S.night * 1.5, (5 - S.night) * 3) : 0;
   // a mission or an echo can bring its own night to any sea
-  const md = S && S.mis && S.mis.dark;
+  const md = S && (S.mis && S.mis.dark || (S.corr === 'nueva' ? 0.6 : 0));
   if (hz !== 'dark' && !night && !md) return;
   const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, k = hz === 'dark' || md ? Math.max(md || 0.82, 0.93 * night) : 0.93 * night;
   const g = ctx.createRadialGradient(m.x, cy, W * (0.18 - 0.06 * night), m.x, cy, W * (0.8 - 0.35 * night));
@@ -4150,6 +4245,7 @@ function draw() {
     drawWeather();
     drawLegends();
     drawGuardSay();
+    p7Draw();
   }
   drawMoon();
   if (S && S.tut && mode === 'play') drawTutHint();
@@ -4274,6 +4370,7 @@ function ensureMissions() {
 }
 function missionProgress(id, v, isMax) {
   if (!S || S.mode === 'daily' && id === 'wave') return;
+  chainProg(id, v, isMax);
   ensureMissions();
   for (const [list, pool] of [[save.missions.list, MISSIONS], [save.weekly.list, WEEKLY]]) for (const m of list) {
     if (m.id !== id || m.prog >= m.goal) continue;
@@ -4286,7 +4383,7 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.concat
 // =====================================================================
 // SCREENS
 // =====================================================================
-const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'scrArchive', 'scrTalk', 'levelUp', 'scrMerchant', 'scrChoice', 'scrPause', 'scrRevive', 'scrResult'];
+const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'scrPuzzles', 'scrArchive', 'scrTalk', 'levelUp', 'scrMerchant', 'scrChoice', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) {
   SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
   $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant');
@@ -4317,6 +4414,9 @@ function statVal(s) {
   if (s === 'echoWins') return ECHOES.filter(m => echoRec(m.k).s[0]).length;
   if (s === 'beastSeen') return BEAST.filter(beastSeen).length;
   if (s === 'village') return villageP();
+  if (s === 'mastMax') return mastMax();
+  if (s === 'puzWon') return puzWon();
+  if (s === 'puzStars') return puzStars();
   return save.stats[s] || 0;
 }
 const achClaimable = () => ACH.filter(a => !save.ach[a.id] && statVal(a.stat) >= a.goal).length;
@@ -4344,7 +4444,8 @@ function openTitle() {
   $('goEndless').disabled = !eo;
   $('endlessSub').textContent = !eo ? 'Supera el capítulo I' : save.endlessBest ? `Récord: oleada ${save.endlessBest}` : 'Sin final';
   $('achBadge').hidden = achClaimable() === 0;
-  $('misBadge').hidden = missionsReady() === 0;
+  $('misBadge').hidden = missionsReady() + specReady() === 0;
+  $('puzBadge').hidden = !PUZZLES.some(P => puzOpen(P.k) && !puzRec(P.k).s[0]);
   $('shopBadge').hidden = !canBuySomething();
   paintIcons($('scrTitle'), 34); $('gearIco').innerHTML = ico('i_ajustes', 32);
   show('scrTitle');
@@ -4462,7 +4563,9 @@ function openMoons(from) {
     <div class="mbars">${MOON_BARS.map((b, k) => `<span>${b}</span><span class="pp" aria-label="${b}: ${m.bars[k]} de 5">${[0, 1, 2, 3, 4].map(j => `<i class="${j < m.bars[k] ? 'on' : ''}"></i>`).join('')}</span>`).join('')}</div>
     <div class="mabil">${ico(m.ico, 40)}<span><b>${m.active}</b>${m.activeDesc}</span></div>
     <div class="mfacts"><span>${ico(WEAPONS[m.weapon].ico, 20)} Empieza con ${WEAPONS[m.weapon].name}</span><span class="plus">✓ ${m.plus}</span><span class="weak">✗ Punto débil: ${m.weak}</span></div>
+    ${mastRow(i)}
   </article>`).join('');
+  track.querySelectorAll('.mast').forEach(b => b.onclick = () => { sfx('card'); openMastSheet(+b.dataset.i); });
   moonCvs = [...track.querySelectorAll('.mcv')];
   // tap a moon: it reacts and says another line
   moonCvs.forEach((c, i) => c.onclick = () => {
@@ -4576,6 +4679,7 @@ function openMissions() {
     btn.onclick = () => { m.claimed = true; save.coins += m.reward; persist(); sfx('evo'); vib(40); openMissions(); };
     el.appendChild(btn); list.appendChild(el);
   }); }
+  specInto(list);
   show('scrMissions');
 }
 function openDaily() {
@@ -4602,9 +4706,10 @@ function beginRun(runMode, islIdx) {
   S.intro = 1;
   // the relic you carry, the islander who guards the island, the answer to their last question
   S.relic = save.relic && relicOwned(save.relic) ? save.relic : null;
-  guardStart(); applyBoon();
+  guardStart(); applyBoon(); p7Start();
   $('game').classList.toggle('echo', !!(S.mis && S.mis.echo));
   hudCache = {};
+  $('hud').classList.toggle('puz', !!(S.mis && S.mis.puz)); $('tideLbl').textContent = 'Marea';
   mode = 'play'; show(null); setAudioGains();
   const m = S.moon;
   $('hpIco').innerHTML = ico('i_murallas', 26); $('chestPop').hidden = true;
@@ -4652,6 +4757,7 @@ $('pYes').onclick = () => { const a = confirmAct; closeConfirm(); if (a === 'qui
 function srcInfo(k) {
   if (k === 'luna') return { name: `${S.moon.active} y golpes de la luna`, ico: S.moon.ico };
   if (k === 'mar') return { name: 'Marea y arrecife', ico: 'i_marea' };
+  if (k === 'def') return { name: 'Defensas del castillo', ico: 'i_canon' };
   if (PASSIVES[k]) return { name: PASSIVES[k].name, ico: PASSIVES[k].ico };
   if (UNIONS[k]) return { name: UNIONS[k].name, ico: UNIONS[k].ico };
   const W0 = WEAPONS[k]; if (!W0) return { name: 'Otros', ico: 'i_estrella' };
@@ -4782,6 +4888,7 @@ function endRun(won, quit) {
     save.daily.played = true;
     if (S.wave > save.daily.best) save.daily.best = S.wave;
   }
+  p7End(won && !quit, quit, unlocks);
   if (S.maxCombo > save.stats.maxCombo) save.stats.maxCombo = S.maxCombo;
   // workshop coins are paid at the end of the run (pearls stay in the run)
   const cm = ic * S.coinMul * (1 + 0.1 * metaLv('codicia')) * (1 + 0.3 * S.danger) * (1 + S.tideBonus);
@@ -4804,9 +4911,9 @@ function endRun(won, quit) {
   mode = 'result';
   setTimeout(() => {
     const M = S.mis, wm = waveMax();
-    $('rEyebrow').textContent = M ? (M.echo ? `${M.n} · ${ISLANDS[M.ch].name}` : `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}`) : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
-    $('rTitle').textContent = M ? (won ? (M.echo ? '¡Eco superado!' : '¡Misión cumplida!') : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : S.failWhy === 'mission' ? S.failTitle : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
-    const wv = wm ? `Oleada ${won && !M ? wm : S.wave} de ${wm}` : `Oleada ${S.wave}`;
+    $('rEyebrow').textContent = M ? (M.puz ? `${M.n} · Desafío de marea` : M.echo ? `${M.n} · ${ISLANDS[M.ch].name}` : `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}`) : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
+    $('rTitle').textContent = M ? (won ? (M.puz ? '¡Desafío superado!' : M.echo ? '¡Eco superado!' : '¡Misión cumplida!') : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : S.failWhy === 'mission' ? S.failTitle : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
+    const wv = M && M.puz ? M.name : wm ? `Oleada ${won && !M ? wm : S.wave} de ${wm}` : `Oleada ${S.wave}`;
     $('rSum').textContent = `${wv} · ${fmtT(S.t)} · ${S.kills.toLocaleString('es')} hundidos`;
     // the cause of a defeat: whatever did the most damage to the island
     const hurt = Object.entries(S.dmgBy).sort((a, b) => b[1] - a[1]), all = hurt.reduce((a, h) => a + h[1], 0);
@@ -4819,7 +4926,7 @@ function endRun(won, quit) {
     const dr = dmgRows();
     $('rStar').hidden = !dr.length;
     if (dr.length) $('rStar').innerHTML = `<span class="hd">${ico(dr[0].ico, 40)}<span><small>Arma estrella</small><b>${dr[0].name}</b></span></span>${dmgBarsHtml(dr, 5)}`;
-    const rows = [['Oleada', wm ? `${won && !M ? wm : S.wave} / ${wm}` : S.wave], ['Enemigos hundidos', S.kills.toLocaleString('es')], ['Racha máxima', S.maxCombo], ['Jefes derrotados', S.bossKills], ['Nivel alcanzado', S.lv], ['Tiempo', fmtT(S.t)],
+    const rows = [M && M.puz ? ['Mareas usadas', M.tides ? `${M.tides - S.puzTides} de ${M.tides}` : 'Ninguna'] : ['Oleada', wm ? `${won && !M ? wm : S.wave} / ${wm}` : S.wave], ['Enemigos hundidos', S.kills.toLocaleString('es')], ['Racha máxima', S.maxCombo], ['Jefes derrotados', S.bossKills], ['Nivel alcanzado', S.lv], ['Tiempo', fmtT(S.t)],
       ['Perlas recogidas', `<i class="pearl"></i>${Math.floor(S.pearlsGot).toLocaleString('es')}`]];
     if (S.treasures) rows.push(['Tesoros hundidos', S.treasures]);
     $('rTally').innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
@@ -4832,10 +4939,10 @@ function endRun(won, quit) {
     $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
     $('rBuild').innerHTML = buildHtml();
     $('rUnlocks').innerHTML = unlocks.map(t => `<div class="unlock">${t}</div>`).join('');
-    const nx = M && won && !M.echo ? misNext() : null;
+    const nx = M && won && !M.echo ? (M.puz ? puzNext(M.k) : misNext()) : null;
     $('rNext').hidden = !nx; if (nx) { $('rNext').dataset.m = nx.i; $('rNext').innerHTML = `<span>Siguiente: ${nx.name}</span><span aria-hidden="true">→</span>`; }
     $('rAgain').classList.toggle('primary', !nx); $('rAgain').classList.toggle('ghost', !!nx);
-    $('rMenu').textContent = M ? (M.echo ? 'Archivo' : 'Mapa') : 'Menú';
+    $('rMenu').textContent = M ? (M.puz ? 'Desafíos' : M.echo ? 'Archivo' : 'Mapa') : 'Menú';
     show('scrResult');
     countUp($('rCoins'));
   }, delay);
@@ -4897,6 +5004,9 @@ $('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
 window.lunaPause = () => { if (mode === 'play') pause(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
   if (!$('guardSheet').hidden) { closeGuardSheet(); return true; }
+  if (!$('mastSheet').hidden) { closeMastSheet(); return true; }
+  if (!$('defSheet').hidden) { closeDefSheet(false); return true; }
+  if (!$('shareSheet').hidden) { $('shareSheet').hidden = true; return true; }
   if (mode === 'lab') { labClose(); return true; }
   if (!$('scrTalk').hidden) { $('talkSkip').click(); return true; }
   if (mode === 'play') { pause(); return true; }
@@ -4910,8 +5020,8 @@ window.lunaBack = () => {
 document.addEventListener('visibilitychange', () => { if (document.hidden) window.lunaPause(); else if (AU.ctx && AU.ctx.state === 'suspended' && mode !== 'paused') AU.ctx.resume(); });
 // back from a mission: to the map, or straight to the next mission's briefing
 const toMenu = () => { S = null; mode = 'menu'; musicStop(); setAudioGains(); $('game').classList.remove('echo'); };
-$('rMenu').onclick = () => storyThen(() => { if (S && S.mis && S.mis.echo) { toMenu(); openArchive('sec'); } else if (S && S.mis) { const c = S.mis.ch; toMenu(); openIslands(c); } else openTitle(); });
-$('rNext').onclick = () => storyThen(() => { const i = +$('rNext').dataset.m; toMenu(); openPrep(i); });
+$('rMenu').onclick = () => storyThen(() => { if (S && S.mis && S.mis.puz) { toMenu(); openPuzzles(); } else if (S && S.mis && S.mis.echo) { toMenu(); openArchive('sec'); } else if (S && S.mis) { const c = S.mis.ch; toMenu(); openIslands(c); } else openTitle(); });
+$('rNext').onclick = () => storyThen(() => { const i = +$('rNext').dataset.m; if (i <= -100) { startRun('puzzle', -100 - i); return; } toMenu(); openPrep(i); });
 
 // test hooks for automated play-testing
 window.__luna = { get S() { return S; }, get mode() { return mode; }, pick: i => chooseCard(i), choice: i => chooseOpt(i), tide: () => useTide(), story: k => openStory(k, openTitle), moveTo: (x, y) => { if (S) { const B = moonBounds(); S.mx = clamp(x, B.x0, B.x1); S.my = clamp(y, B.y0, B.y1); } }, active: () => useActive(),
@@ -5024,6 +5134,7 @@ function openIslands(focusCh) {
   const mh = folkOpen('salina') ? 'salina' : 'marina';
   hostSay($('mapHost'), mh, next ? (mh === 'salina' ? `Según mi mapa, lo próximo es «${next.name}».` : `¡La Luna nos necesita en «${next.name}»!`) : 'Has recorrido todos los mares. Aún quedan estrellas por conseguir.');
   guardRow($('mapGuard'), () => openIslands(focusCh));
+  defRow($('mapDefs'), () => openIslands(focusCh));
   list.innerHTML = '';
   CHAPTERS.forEach((C, c) => {
     const I = ISLANDS[c], open = chOpen(c), sec = document.createElement('section');
@@ -5090,6 +5201,7 @@ function openPrep(i) {
   const m = MOONS.find(x => x.id === save.moon);
   $('prepDot').innerHTML = pic(`moon_${m.id}`, 26); $('prepMoonName').textContent = `${m.name} · ${m.active}`;
   guardRow($('prepGuard'), () => openPrep(i));
+  defRow($('prepDefs'), () => openPrep(i));
   show('scrPrep');
 }
 $('prepBack').onclick = () => openIslands(CAMPAIGN[prepIdx].ch);
@@ -5127,6 +5239,7 @@ function misLine() {
 
 // ---- the end of a mission: stars, coins and whatever opens next
 function misEnd(won) {
+  if (S.mis.puz) return puzEnd(won);
   if (S.mis.echo) return echoEnd(won);
   const M = S.mis, base = misBase(M), rec = save.camp[M.i + 1] || (save.camp[M.i + 1] = { s: [0, 0, 0], n: 0 });
   const st = [won, won && S.hp / S.maxHp > 0.5, won && !!(M.x3ok && M.x3ok())];
@@ -5153,7 +5266,7 @@ function misEnd(won) {
   return { rows, unlocks, coins: rows.reduce((a, r) => a + r[1], 0) };
 }
 function misResultHtml() {
-  const M = S.mis, labels = ['Objetivo', 'Más de la mitad de vida', M.x3];
+  const M = S.mis, labels = ['Objetivo', M.x2 || 'Más de la mitad de vida', M.x3];
   return S.stars.map((v, k) => `<li class="${v ? 'on' : ''}${S.newStars[k] ? ' new' : ''}" style="--d:${0.35 + k * 0.28}s">${ico('i_estrella', 40)}<span>${labels[k]}</span></li>`).join('');
 }
 
@@ -5273,12 +5386,13 @@ function rollWeather() {
 // called at the start of every wave, after nextWave() has set it up
 function oceanWave() {
   const busy = isBossWave(S.wave) || !!S.theme;
+  terrWave(busy);
   const later = (fn, d) => setTimeout(() => { if (S && !S.ended) fn(); }, d);
   // the anomaly announced a wave ago arrives; the next one is announced a wave ahead
   const keep = S.mis && S.mis.anom;
   S.anom = keep || S.anomNext || null; S.anomNext = null; if (!keep) S.anomK = 0;
   if (S.anom && !keep) { const A = ANOMS[S.anom]; later(() => { banner(A.name, A.sub, 2.4, true); sfx('warn'); }, busy ? 2200 : 900); missionProgress('anom', 1); }
-  else if (!keep && anomOk(S.wave + 1) && Math.random() < (S.mode === 'endless' ? 0.35 : 0.28)) S.anomNext = pick(Object.keys(ANOMS));
+  else if (!keep && anomOk(S.wave + 1) && Math.random() < (S.mode === 'endless' ? (S.wave >= 60 ? 1 : 0.35) : 0.28)) S.anomNext = pick(Object.keys(ANOMS));
   // the forecast comes every 5 waves from wave 6 (a mission keeps its own weather)
   if (!S.mis && S.wave >= 6 && S.wave % 5 === 1 && (!waveMax() || S.wave <= waveMax())) {
     rollWeather();
@@ -5302,14 +5416,15 @@ function surgeLevel(level) {
   const sg = S.surge, k = Math.min(1, sg.t / 0.6, ((sg.T || 3.2) - sg.t) / 0.35);
   return level + ((sg.dir > 0 ? TIDE_HI + 0.08 : TIDE_LO - 0.06) - level) * clamp(k, 0, 1);
 }
-const tideBtnOn = () => S && !(S.mis && S.mis.tut);
+const tideBtnOn = () => S && !(S.mis && S.mis.tut) && !(S.puz && !S.puz.tides);
 function tideCharge(e) {
-  if (!tideBtnOn() || S.surge) return;
+  if (!tideBtnOn() || S.surge || S.puz) return;
   const before = S.tideCh;
   S.tideCh = Math.min(1, S.tideCh + (e.def.kind === 'ship' ? 0.05 : e.def.kind === 'walk' ? 0.025 : 0.02) * (e.elite ? 3 : 1) * (S.tideMul || 1));
   if (before < 1 && S.tideCh >= 1) { sfx('card'); tip('tidebtn', '¡Botón de marea listo!', 'Fuerza una pleamar o una bajamar y aparta la flota de tu lado'); }
 }
 function useTide() {
+  if (mode === 'play' && S && S.puz) { puzTide(); return; }
   if (mode !== 'play' || !tideBtnOn() || S.tideCh < 1 || S.surge) return;
   const mid = (TIDE_LO + TIDE_HI) / 2, dir = S.level > mid ? -1 : 1, side = S.mx < W / 2 ? -1 : 1;
   S.tideCh = 0; S.surge = { t: 3.2, dir, side };
@@ -5379,7 +5494,8 @@ function oceanHud() {
   if (ah !== hudCache.anom) { hudCache.anom = ah; $('seaInfo').innerHTML = ah; $('seaInfo').hidden = !ah; }
   const on = tideBtnOn();
   if (on !== hudCache.tideOn) { hudCache.tideOn = on; $('tideBtn').hidden = !on; }
-  if (on) {
+  if (on && S.puz) puzHud();
+  else if (on) {
     setStyle('tideBtn', '--p', String(Math.round((S.surge ? S.surge.t / (S.surge.T || 3.2) : S.tideCh) * 100) / 100));
     const r = S.tideCh >= 1 && !S.surge;
     if (r !== hudCache.tideReady) { hudCache.tideReady = r; $('tideBtn').classList.toggle('ready', r); }
@@ -5428,7 +5544,7 @@ const fogAlpha = e => S && S.wx === 'niebla' ? clamp(1.25 - Math.abs(e.x - S.mx)
 // sunken treasure that shows at very low tide, and whales and turtles crossing the sea
 // =====================================================================
 const WRECK_MAX = 4, WRECK_GROUND = 0.3, WRECK_TOP = 0.2, TREASURE_LO = 0.22;
-const seaExtras = () => S && !(S.mis && S.mis.tut);
+const seaExtras = () => S && !(S.mis && (S.mis.tut || S.mis.puz));
 
 // ---- wrecks: a sunk galleon, treasure ship or the Black Armada leaves its broken hull behind
 function addWreck(x, kind) {
@@ -6696,7 +6812,7 @@ function guardRow(el, back) {
 // ---- the guardian during a run: stands on the island next to the lighthouse and helps in their own way
 const GUARD_HI = { marina: '¡Yo vigilo desde el faro!', mara: 'Mis inventos están listos.', boro: 'Si algo se rompe, lo arreglo.', salina: 'Las perlas, para ti. Casi todas.' };
 function guardStart() {
-  const g = S.mis && S.mis.tut ? null : guardOf();
+  const g = S.mis && (S.mis.tut || S.mis.puz) ? null : guardOf();
   S.guard = g; S.gT = 10; S.gAct = 0; S.gSay = null;
   if (!g) return;
   if (g === 'mara') { S.chargeMul *= 1.2; S.tideMul = 1.2; }
@@ -6897,7 +7013,7 @@ function askDecision(then) {
 const boonOf = () => save.boon && DEC[save.boon.id] ? DEC[save.boon.id].o[save.boon.o] : null;
 // the next campaign mission takes the answer and spends it
 function applyBoon() {
-  const b = boonOf(); if (!b || !S.mis || S.mis.echo || S.mis.tut) return;
+  const b = boonOf(); if (!b || !S.mis || S.mis.echo || S.mis.tut || S.mis.puz) return;
   const d = DEC[save.boon.id];
   b.apply(); recompute(); save.boon = null; persist();
   setTimeout(() => { if (S && !S.ended) banner(`${FOLK[d.who].name}: ${b.name.replace(/^¡|!$/g, '')}`, b.good, 2); }, 2700);
@@ -7193,6 +7309,911 @@ $('labWave').onclick = () => { if (mode === 'play' && S && S.lab) { for (const e
 $('labBoss').onclick = () => { if (mode !== 'play' || !S || !S.lab) return; for (const e of S.enemies) e.dead = true; S.enemies = []; S.boss = null; S.eclipse = 0; S.night = 0; S.labBoss = ['kraken', 'armada', 'leviatan', 'eclipse'][labBossI++ % 4]; S.wave = 9; nextWave(); sfx('roar'); };
 $('labClear').onclick = () => { if (mode === 'play' && S && S.lab) { for (const e of S.enemies) if (!e.isBoss) e.dead = true; S.enemies = S.enemies.filter(e => !e.dead); S.boss = null; sfx('splash'); } };
 $('labExit').onclick = () => { if (S && S.lab) labEnd(); };
+// =====================================================================
+// TIDE CHALLENGES: short puzzles with a fixed fleet, no weapons and only a few tides. The sea stays
+// where you leave it: each tide you spend switches it between high and low water. The moon still
+// lifts the water under it (or pushes it down in an inverted tide) and drags the ships back out.
+// Fleet entries: [time, type, side (-1 left, 1 right), how many, gap between them, { hp }].
+// =====================================================================
+const PUZ_TIDE_T = 0.7;
+const PUZZLES = [
+  { name: 'Primera bajamar', ch: 0, tides: 1, from: 'hi', time: 25, par: 12, need: 3,
+    goal: 'Hunde 3 balandras', intro: 'Una sola marea. Deja que la pleamar ahogue a los piratas y bájala cuando las balandras lleguen al arrecife.',
+    count: e => e.type === 'sloop', fleet: [[1, 'pirate', 1, 2, 14], [3.5, 'sloop', -1, 1], [5, 'sloop', -1, 1], [6.5, 'sloop', -1, 1]] },
+  { name: 'Pleamar y bajamar', ch: 0, tides: 2, from: 'lo', time: 25, par: 15, need: 6,
+    goal: 'Ahoga 3 piratas y hunde 3 balandras', intro: 'Primero llegan los piratas a pie y después las balandras. Cada uno necesita su marea.',
+    fleet: [[1.5, 'pirate', 1, 3, 14], [8, 'sloop', -1, 1], [9.5, 'sloop', -1, 1], [11, 'sloop', -1, 1]] },
+  { name: 'La luna sujeta', ch: 0, tides: 1, from: 'hi', time: 40, par: 26, need: 2,
+    goal: 'Hunde 2 galeones', intro: 'Los galeones aguantan el arrecife. Baja la luna encima del galeón encallado para sujetarlo allí.',
+    fleet: [[2, 'galleon', -1, 1, 0, { hp: 1.35 }], [12, 'galleon', 1, 1, 0, { hp: 1.35 }]] },
+  { name: 'Gaviotas al acecho', ch: 1, tides: 2, from: 'hi', time: 30, par: 20, need: 12,
+    goal: 'Hunde toda la flota (12)', intro: 'Mientras cambias la marea, las gaviotas van a por la isla. Atrápalas con la luna.',
+    fleet: [[2, 'sloop', -1, 2, 30], [3, 'gull', 1, 3, 20], [8, 'pirate', 1, 4, 12], [12, 'gull', -1, 3, 20]] },
+  { name: 'Morteros en el arrecife', ch: 1, tides: 2, from: 'hi', time: 30, par: 16, need: 7,
+    goal: 'Hunde 3 morteros y ahoga 4 piratas', intro: 'Los morteros fondean sobre el arrecife y disparan. Detén sus balas con la luna mientras se hunden.',
+    fleet: [[1.5, 'mortar', -1, 1], [1.5, 'mortar', 1, 1], [3.5, 'mortar', -1, 1], [10, 'pirate', -1, 2, 14], [10, 'pirate', 1, 2, 14]] },
+  { name: 'Aguas divididas', ch: 1, tides: 1, from: 'lo', time: 35, par: 24, need: 10, anom: 'divididas',
+    goal: 'Hunde toda la flota (10)', intro: 'A la izquierda el mar está más alto que a la derecha. Elige bien el momento de tu única marea.',
+    fleet: [[2, 'sloop', -1, 2, 26], [2, 'sloop', 1, 2, 26], [8, 'pirate', -1, 3, 12], [9, 'galleon', 1, 1, 0, { hp: 0.6 }], [14, 'sloop', 1, 2, 30]] },
+  { name: 'Pólvora en el agua', ch: 2, tides: 1, from: 'hi', time: 30, par: 20, need: 4, boomK: 4,
+    goal: 'Hunde 4 brulotes', intro: 'Si un brulote toca la isla, se acabó. Sujétalos con la luna en el arrecife hasta que estallen.',
+    guard: 'brulote', count: e => e.type === 'brulote',
+    fleet: [[2, 'brulote', -1, 1], [2.4, 'sloop', -1, 2, 26], [7, 'brulote', 1, 1], [7.4, 'sloop', 1, 2, 26], [12, 'brulote', -1, 1], [15, 'brulote', 1, 1]] },
+  { name: 'Serpientes y cangrejos', ch: 2, tides: 2, from: 'hi', time: 30, par: 18, need: 9,
+    goal: 'Hunde 4 serpientes y ahoga 5 cangrejos', intro: 'Con la marea baja las serpientes se quedan varadas, pero los cangrejos solo se ahogan con la alta.',
+    count: e => e.type !== 'gull', fleet: [[2, 'serpent', 1, 2, 40], [2.5, 'serpent', -1, 2, 40], [7, 'crab', -1, 3, 16], [12, 'crab', 1, 2, 16], [13, 'gull', -1, 2, 24]] },
+  { name: 'Marea invertida', ch: 2, tides: 0, from: 'hi', time: 45, par: 30, need: 10, anom: 'invertida',
+    goal: 'Hunde toda la flota (10)', intro: 'Hoy la luna hunde el agua. Los piratas se ahogan solos, salvo si la luna está encima, y los barcos solo encallan bajo ella.',
+    fleet: [[2, 'galleon', -1, 1], [4, 'pirate', 1, 3, 14], [9, 'galleon', 1, 1], [11, 'pirate', -1, 3, 14], [15, 'mortar', -1, 1], [17, 'galleon', -1, 1]] },
+  { name: 'Lo que hay debajo', ch: 3, tides: 4, from: 'hi', time: 32, par: 26, need: 13,
+    goal: 'Hunde toda la flota (13)', intro: 'Los nautilos solo asoman con la marea baja. Si la luna se pone encima, se vuelven a sumergir.',
+    fleet: [[2, 'nautilo', -1, 2, 40], [2, 'nautilo', 1, 1], [7, 'pirate', -1, 2, 14], [7, 'pirate', 1, 2, 14], [12, 'nautilo', 1, 2, 40], [12.5, 'sloop', -1, 2, 30], [17, 'crab', -1, 2, 16]] },
+  { name: 'Noche cerrada', ch: 3, tides: 3, from: 'lo', time: 35, par: 26, need: 13, dark: 0.95,
+    goal: 'Hunde toda la flota (13)', intro: 'No se ve nada más allá de la luz de la luna. Escucha a la flota y adelántate.',
+    fleet: [[2, 'pirate', 1, 3, 14], [7, 'sloop', -1, 3, 26], [12, 'crab', 1, 2, 16], [15, 'gull', -1, 3, 22], [18, 'sloop', 1, 2, 26]] },
+  { name: 'La gran marea', ch: 3, tides: 4, from: 'hi', time: 60, par: 45, need: 23, boomK: 3,
+    goal: 'Hunde toda la flota (23)', intro: 'El último desafío lo junta todo: galeones, piratas, gaviotas, un brulote, morteros y cangrejos.',
+    fleet: [[2, 'sloop', -1, 3, 26], [2.5, 'galleon', 1, 1, 0, { hp: 0.8 }], [12, 'pirate', -1, 3, 14], [12, 'pirate', 1, 3, 14], [13, 'gull', 1, 3, 22], [18, 'brulote', -1, 1], [18.5, 'sloop', -1, 2, 26],
+      [26, 'mortar', 1, 1], [26, 'mortar', -1, 1], [30, 'crab', 1, 2, 16], [36, 'gull', -1, 3, 22]] },
+];
+PUZZLES.forEach((P, k) => {
+  P.k = k; P.i = -100 - k; P.n = `Desafío ${k + 1}`; P.puz = true; P.kind = 'sink'; P.waves = 1; P.ready = true; P.noHorde = true;
+  P.gico = 'i_marea'; P.cond = `${P.tides ? `${P.tides} marea${P.tides > 1 ? 's' : ''}` : 'Sin mareas'} · ${P.time} s`;
+  P.x2 = P.x2 || 'Que no te dañen la isla'; P.x3 = `Hazlo en menos de ${P.par} s`;
+  P.mods = { spawn: 0, noActive: true };
+  P.start = puzStart;
+  P.kill = e => { if (!P.count || P.count(e)) misGoal(e); };
+  P.x3ok = () => S.puzWinT > 0 && S.puzWinT <= P.par;
+  P.hud = () => {
+    const left = S.puzTides, tl = P.time - S.t;
+    return [[P.gico, `${S.mg}/${P.need}`, S.mg >= P.need], ['i_marea', P.tides ? `Mareas: ${left}` : 'Sin mareas', false, P.tides > 0 && left === 0],
+      ['i_estrella', S.t < P.par ? `${Math.ceil(P.par - S.t)} s para el reto` : `Quedan ${Math.max(0, Math.ceil(tl))} s`, false, tl < 8]];
+  };
+});
+const puzRec = k => (save.puz || {})[k] || { s: [0, 0, 0] };
+const puzStars = () => PUZZLES.reduce((a, P) => a + puzRec(P.k).s.reduce((b, v) => b + (v ? 1 : 0), 0), 0);
+const puzWon = () => PUZZLES.filter(P => puzRec(P.k).s[0]).length;
+// the first opens after the first mission; each one after the one before
+const puzOpen = k => misDone(0) && (k === 0 || !!puzRec(k - 1).s[0]);
+const puzBase = P => 40 + 15 * P.k;
+
+// ---- the run: a fixed island, no weapons, the sea frozen where the last tide left it
+function puzStart() {
+  const P = S.mis;
+  S.puz = P; S.isl = { ...S.isl, hp: 1, spd: 1, tide: 1, hazard: null, coin: 1 }; S.spdMul = 1; S.danger = 0;
+  S.weapons = []; S.ents = []; S.relic = null; S.revives = 0; S.regen = 0;
+  S.maxHp = S.hp = P.hp || 100; S.need = 1e9; S.charge = 0;
+  S.reefOn = []; S.reefT = 0;
+  recompute();
+  Object.assign(S.st, { dmg: 1, reef: 1, crit: 0, cc: 1, cd: 1, taken: 1, kb: 1, poison: 0 });
+  S.puzTides = P.tides; S.puzL = S.puzTo = P.from === 'lo' ? TIDE_LO : TIDE_HI; S.level = S.puzL; S.puzSw = 0;
+  S.puzQ = P.fleet.map(f => ({ t: f[0], type: f[1], side: f[2], n: f[3] || 1, gap: f[4] || 18, o: f[5] || {} }));
+  S.puzWinT = 0;
+  // the moon waits high over the castle, where it pulls at nothing
+  const B = moonBounds(); S.mx = W / 2; S.my = B.y0;
+  syncEnts();
+}
+// the water level eases towards where the last tide sent it
+function puzLevel(dt) {
+  S.puzSw = Math.max(0, S.puzSw - dt);
+  S.puzL += clamp(S.puzTo - S.puzL, -dt * (TIDE_HI - TIDE_LO) / PUZ_TIDE_T, dt * (TIDE_HI - TIDE_LO) / PUZ_TIDE_T);
+  return S.puzL;
+}
+function puzTide() {
+  if (S.puzSw > 0) return;
+  if (S.puzTides <= 0) { sfx('card'); vib(12); banner(S.puz.tides ? 'No quedan mareas' : 'Hoy no hay mareas', S.puz.tides ? 'Usa la luna' : 'La luna mueve el agua', 1); return; }
+  S.puzTides--; S.puzSw = PUZ_TIDE_T + 0.1;
+  const up = S.puzTo < (TIDE_LO + TIDE_HI) / 2;
+  S.puzTo = up ? TIDE_HI : TIDE_LO;
+  banner(up ? '¡Pleamar!' : '¡Bajamar!', S.puzTides ? `Quedan ${S.puzTides}` : 'Era la última', 1);
+  sfx('tsunami'); vib([30, 40, 60]); S.shake = Math.max(S.shake, 0.25);
+  for (let i = 0; i < 18; i++) { const x = rand(0, W); splash(x, waveY(x), 3); }
+}
+// the fleet arrives on its own schedule; time runs out, or a fire ship reaches the island
+function puzTick(dt) {
+  const P = S.puz;
+  for (const q of S.puzQ) {
+    if (q.done || S.t < q.t) continue;
+    q.done = true;
+    for (let i = 0; i < q.n; i++) {
+      // each one starts just out of view
+      const off = (EN[q.type].r + 4) * u, x0 = q.side < 0 ? -off - i * q.gap * u : W + off + i * q.gap * u;
+      const e = spawnEnemy(q.type, q.side, i, x0);
+      e.spd = e.def.spd; if (q.o.hp) { e.hp *= q.o.hp; e.maxHp = e.hp; }
+      // nothing drowns or crashes before it comes into view
+      e.invuln = true; e.puzOff = true;
+    }
+  }
+  for (const e of S.enemies) if (e.puzOff && e.x + e.r * u * 0.5 > 0 && e.x - e.r * u * 0.5 < W) { e.puzOff = false; e.invuln = false; }
+  if (S.misWon || S.ended) return;
+  if (P.guard && S.dmgBy[P.guard]) misFail('¡Un brulote tocó la isla!', 'Había que hundirlos todos en el mar.');
+  else if (S.t >= P.time) misFail('Se acabó el tiempo', `${S.mg} de ${P.need} cuando sonó la campana. ${P.goal}.`);
+}
+function puzHud() {
+  const P = S.puz, ready = S.puzTides > 0 && S.puzSw <= 0;
+  setStyle('tideBtn', '--p', ready ? '1' : '0');
+  if (ready !== hudCache.tideReady) { hudCache.tideReady = ready; $('tideBtn').classList.toggle('ready', ready); }
+  setText('tideLbl', P.tides ? `Marea ×${S.puzTides}` : 'Marea');
+}
+// the result: stars, coins the first time, and the next challenge
+function puzEnd(won) {
+  const P = S.mis, rec = (save.puz = save.puz || {})[P.k] || (save.puz[P.k] = { s: [0, 0, 0] });
+  if (won && !S.puzWinT) S.puzWinT = S.t;
+  const st = [won, won && (S.dmgBy ? Object.values(S.dmgBy).reduce((a, v) => a + v, 0) < 0.5 : true), won && S.puzWinT <= P.par];
+  const first = won && !rec.s[0], base = puzBase(P), wasOpen = PUZZLES.map(x => puzOpen(x.k));
+  S.stars = st; S.newStars = st.map((v, k) => v && !rec.s[k]);
+  const rows = [], unlocks = [];
+  if (won) rows.push([first ? 'Desafío superado' : 'Desafío repetido', first ? base : Math.round(base * 0.15)]);
+  const ns = S.newStars.slice(1).filter(Boolean).length;
+  if (ns) rows.push([ns > 1 ? 'Estrellas nuevas' : 'Estrella nueva', ns * Math.round(base * 0.3)]);
+  rec.s = rec.s.map((v, k) => (v || st[k]) ? 1 : 0);
+  PUZZLES.forEach(x => { if (!wasOpen[x.k] && puzOpen(x.k)) unlocks.push(`Nuevo desafío: «${x.name}»`); });
+  if (won) missionProgress('puzzle', 1);
+  if (won && st.every(Boolean)) missionProgress('puz3', 1);
+  return { rows, unlocks, coins: rows.reduce((a, r) => a + r[1], 0) };
+}
+const puzNext = k => PUZZLES[k + 1] && puzOpen(k + 1) ? PUZZLES[k + 1] : null;
+
+// ---- the challenges screen
+function openPuzzles() {
+  refreshCoins();
+  const list = $('puzList'); list.innerHTML = '';
+  const got = puzStars();
+  hostSay($('puzHost'), folkOpen('mara') ? 'mara' : 'marina', !misDone(0) ? 'Supera «El despertar» y te enseño mis desafíos.' : got >= PUZZLES.length * 3 ? '¡Las 36 estrellas! Ya sabes más del mar que yo.' : folkOpen('mara') ? 'Pocas mareas y ningún arma: aquí gana quien piensa antes de mover el mar.' : 'Pocas mareas y ningún arma. ¡Piensa antes de mover el mar!');
+  $('puzStarsN').innerHTML = `${ico('i_estrella', 18)}<span>${got} / ${PUZZLES.length * 3}</span>`;
+  for (const P of PUZZLES) {
+    const rec = puzRec(P.k), open = puzOpen(P.k), el = document.createElement('div');
+    el.className = 'lc puz' + (open ? '' : ' locked');
+    el.innerHTML = `<span class="ico" aria-hidden="true">${ico(open ? `i_isla${P.ch}` : 'i_candado', 40)}</span><span><span class="eyebrow">${P.n} · ${ISLANDS[P.ch].name}</span><b>${open ? P.name : '???'}</b><span class="d">${open ? `${P.goal} · ${P.cond}` : P.k ? `Supera «${PUZZLES[P.k - 1].name}» para abrirlo` : 'Supera «El despertar» para abrirlo'}</span>${open ? `<span class="nst">${starsHtml(rec.s, 15)}</span>` : ''}</span>`;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !open;
+    b.innerHTML = open ? 'Jugar' : ico('i_candado', 22);
+    b.onclick = () => { sfx('card'); openPuzBrief(P.k); };
+    el.appendChild(b); list.appendChild(el);
+  }
+  show('scrPuzzles');
+}
+// before a challenge: who explains it, the goal and the three stars
+function openPuzBrief(k) {
+  const P = PUZZLES[k], who = folkOpen('mara') ? 'mara' : 'marina';
+  openTalk(who, `${P.n} · ${P.name}`, P.intro, [{ name: 'Empezar', good: `${P.goal}. ${P.cond}. Estrellas: superarlo, ${P.x2.toLowerCase()} y ${P.x3.toLowerCase()}.`, ico: 'i_marea', pick: () => startRun('puzzle', k) }], () => {}, 'Ahora no');
+  talkSkipTo = () => openPuzzles();
+}
+$('goPuz').onclick = () => { audioInit(); openPuzzles(); };
+$('puzBack').onclick = () => openTitle();
+// =====================================================================
+// MOON MASTERY AND CORRUPTED MOONS: five challenges per moon, kept across runs. Each one done is a
+// mastery level with its reward; level 3 wakes the moon's corrupted version, stronger and with a
+// bigger weakness, switched on or off from the moon's card. Neither counts in the tide challenges.
+// =====================================================================
+const MAST_SIG = {
+  llena: { src: 'reef', goal: 200, txt: 'Hunde 200 barcos contra el arrecife' },
+  roja: { src: 'furia', goal: 300, txt: 'Hunde 300 enemigos durante la Furia' },
+  hielo: { src: 'frz', goal: 500, txt: 'Congela a 500 enemigos' },
+  nueva: { src: 'ecl', goal: 1000, txt: 'Para 1.000 de daño con el Eclipse' },
+  tormenta: { src: 'dil', goal: 50000, txt: 'Haz 50.000 de daño con el Diluvio' },
+  dorada: { src: 'pearl', goal: 3000, txt: 'Recoge 3.000 perlas' },
+};
+const MAST_REW = ['Aura plateada alrededor de la luna', 'La habilidad empieza cargada al 30%', 'Despierta su versión corrupta', '+5% de daño', 'Aura dorada de Maestra y la habilidad carga un 10% más rápido'];
+const CORR = {
+  llena: { plus: 'El botón de marea carga el doble y el Tsunami es mucho más grande', weak: '-15% de daño' },
+  roja: { plus: 'Furia de 12 s que pega un 40% más fuerte', weak: 'La isla recibe un 25% más de daño' },
+  hielo: { plus: 'Ventisca de 6 s y, al deshelarse, los enemigos estallan', weak: '-40% de perlas y de monedas' },
+  nueva: { plus: 'Eclipse de 9 s y +40% de experiencia', weak: 'El mar se queda a oscuras toda la partida' },
+  tormenta: { plus: 'Lleva 7 armas y el Diluvio dura 8 s', weak: 'Cada 12 s cae un rayo perdido sobre la isla: tápalo con la luna' },
+  dorada: { plus: 'Perlas y monedas x2 y Fiebre del oro de 11 s', weak: 'La isla tiene un 45% menos de vida' },
+};
+CAUSE.rayo = 'los rayos perdidos';
+const mastTasks = id => {
+  const M = MOONS.find(m => m.id === id) || MOONS[0];
+  return [
+    { k: 'use', goal: 25, txt: `Usa ${M.active} 25 veces` },
+    { k: 'kills', goal: 1500, txt: 'Hunde 1.500 enemigos' },
+    { k: 'wins', goal: 5, txt: 'Gana 5 misiones o expediciones' },
+    { k: 'sig', goal: MAST_SIG[id].goal, txt: MAST_SIG[id].txt },
+    { k: 'wave', goal: 30, txt: 'Llega a la oleada 30 de la marea sin fin' },
+  ];
+};
+const mastRec = id => (save.mst || {})[id] || {};
+const mastLv = id => mastTasks(id).filter(t => (mastRec(id)[t.k] || 0) >= t.goal).length;
+const mastMax = () => Math.max(...MOONS.map(m => mastLv(m.id)));
+const corrOn = id => !!(save.corr && save.corr[id]) && mastLv(id) >= 3;
+// a mastery sigil under the moon's name: five little moons, lit for each level
+const mastPips = (lv, sz = 12) => `<span class="mpips" aria-label="Maestría ${lv} de 5">${[0, 1, 2, 3, 4].map(i => `<i class="${i < lv ? (lv >= 5 ? 'gold' : 'on') : ''}" style="width:${sz}px;height:${sz}px"></i>`).join('')}</span>`;
+
+// ---- in the run
+function mastStart() {
+  S.mst = null; S.corr = null; S.mLv = 0;
+  if (S.lab || (S.mis && (S.mis.tut || S.mis.puz))) return;
+  const id = S.moon.id, lv = mastLv(id);
+  S.mst = { use: 0, reef: 0, furia: 0, ecl: 0 }; S.mLv = lv;
+  if (lv >= 2) S.charge = Math.max(S.charge, 0.3);
+  if (lv >= 4) S.runDmg *= 1.05;
+  if (lv >= 5) S.chargeMul *= 1.1;
+  if (corrOn(id)) {
+    S.corr = id;
+    if (id === 'llena') { S.tideMul = (S.tideMul || 1) * 2; S.runDmg *= 0.85; }
+    else if (id === 'roja') S.runTaken *= 1.25;
+    else if (id === 'hielo') S.coinMul *= 0.6;
+    else if (id === 'nueva') S.runXp *= 1.4;
+    else if (id === 'tormenta') { S.slots = 7; S.corrBoltT = 12; }
+    else if (id === 'dorada') { S.coinMul *= 2 / 1.5; S.maxHp *= 0.55 / 0.7; S.hp = S.maxHp; }
+  }
+  recompute();
+}
+function mastKill(e) {
+  if (!S.mst) return;
+  if (S.furia > 0) S.mst.furia++;
+  if (e.def.kind === 'ship' && SRC === 'mar' && inReef(e.x, e.r * u * 0.4)) S.mst.reef++;
+}
+// the corrupted storm moon: a stray bolt aims at the island every 12 s; the moon over the castle stops it
+function mastTick(dt) {
+  if (S.corr !== 'tormenta' || S.ended) return;
+  const I = ISL();
+  if (!S.corrBolt) {
+    S.corrBoltT -= dt;
+    if (S.corrBoltT <= 0) { S.corrBolt = { x: W / 2 + rand(-0.6, 0.6) * (I.r - I.l) / 2, t: 0 }; sfx('warn'); }
+    return;
+  }
+  const b = S.corrBolt; b.t += dt;
+  if (b.t < 2) return;
+  S.corrBolt = null; S.corrBoltT = 12;
+  const m = moonPos(), safe = Math.abs(m.x - b.x) < MOON_R() * 1.4 && m.y < I.top;
+  const y2 = safe ? m.y - MOON_R() * 0.6 : I.top + 2 * u;
+  S.fx.push({ type: 'bolt', x1: b.x + rand(-20, 20) * u, y1: -10, x2: b.x, y2, t: 0, life: 0.3, pts: zig(b.x + rand(-20, 20) * u, -10, b.x, y2) });
+  sfx('thunder'); S.shake = Math.max(S.shake, 0.3);
+  if (safe) { sparks(b.x, y2); S.nums.push({ x: b.x, y: y2 - 16 * u, v: '¡Parado!', txt: true, col: '#cfe0ff', t: 0 }); }
+  else { islandDamage(S.maxHp * 0.05, false, 'rayo'); burst(b.x, y2, 14, '#cfe0ff', 160); }
+}
+function mastDraw() {
+  if (!S.corrBolt) return;
+  const b = S.corrBolt, I = ISL(), k = b.t / 2, a = 0.5 + 0.5 * Math.sin(T * (8 + 10 * k));
+  ctx.save();
+  ctx.strokeStyle = `rgba(200,220,255,${0.5 + 0.4 * a})`; ctx.lineWidth = 2.5 * u; ctx.setLineDash([5 * u, 4 * u]);
+  ctx.beginPath(); ctx.ellipse(b.x, I.top + 2 * u, (16 - 8 * k) * u + 6 * u, 5 * u, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  // the cloud gathering over the target
+  ctx.fillStyle = `rgba(70,80,120,${0.55 + 0.3 * k})`;
+  for (const [dx, dy, r] of [[-12, 0, 11], [0, -5, 14], [13, 1, 10]]) { ctx.beginPath(); ctx.arc(b.x + dx * u, H * 0.13 + dy * u, r * u, 0, TAU); ctx.fill(); }
+  ctx.fillStyle = '#fff'; ctx.font = `900 ${14 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(Math.max(1, Math.ceil(2 - b.t))), b.x, H * 0.13);
+  ctx.restore();
+}
+// the corrupted look: a violet bruise over the moon and cracks that glow
+const CRACKS = [[[-0.1, -0.95], [-0.05, -0.55], [-0.22, -0.3], [-0.12, 0.05]], [[0.92, -0.3], [0.55, -0.18], [0.4, 0.12], [0.18, 0.2]], [[-0.85, 0.45], [-0.5, 0.38], [-0.38, 0.62]], [[0.2, 0.96], [0.25, 0.62], [0.05, 0.45]]];
+function corrPaint(g, x, y, r) {
+  g.save();
+  g.beginPath(); g.arc(x, y, r * 0.99, 0, TAU); g.clip();
+  const gr = g.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+  gr.addColorStop(0, 'rgba(120,40,170,0.12)'); gr.addColorStop(1, 'rgba(70,10,110,0.55)');
+  g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const pass of [[r * 0.11, 'rgba(40,0,60,0.75)'], [r * 0.045, `rgba(230,120,255,${0.65 + 0.3 * Math.sin(T * 3)})`]]) {
+    g.lineWidth = pass[0]; g.strokeStyle = pass[1];
+    for (const c of CRACKS) { g.beginPath(); c.forEach(([dx, dy], i) => i ? g.lineTo(x + dx * r, y + dy * r) : g.moveTo(x + dx * r, y + dy * r)); g.stroke(); }
+  }
+  g.restore();
+}
+// mastery auras: silver from level 1, gold at level 5
+function mastAura(g, x, y, r, lv) {
+  if (!lv) return;
+  const gold = lv >= 5, c = gold ? '255,211,107' : '220,228,245';
+  g.save();
+  g.strokeStyle = `rgba(${c},${0.35 + 0.15 * Math.sin(T * 2)})`; g.lineWidth = Math.max(1.5, r * 0.06);
+  g.beginPath(); g.arc(x, y, r * 1.22, 0, TAU); g.stroke();
+  g.fillStyle = `rgba(${c},0.9)`;
+  const n = gold ? 5 : 3;
+  for (let i = 0; i < n; i++) { const a = T * 0.8 + i * TAU / n; g.beginPath(); g.arc(x + Math.cos(a) * r * 1.22, y + Math.sin(a) * r * 1.22, Math.max(1.5, r * 0.07), 0, TAU); g.fill(); }
+  g.restore();
+}
+function moonExtras(g, id, x, y, r, inRun) {
+  if (inRun ? S.corr : corrOn(id)) corrPaint(g, x, y, r);
+}
+function moonAura(g, id, x, y, r) { mastAura(g, x, y, r, S ? S.mLv : mastLv(id)); }
+
+// ---- at the end of a run: what it counted for the moon's challenges
+function mastEnd(won, unlocks) {
+  if (!S.mst) return;
+  const id = S.moon.id, M = S.moon, R = (save.mst = save.mst || {})[id] || (save.mst[id] = {});
+  const tasks = mastTasks(id), was = tasks.map(t => (R[t.k] || 0) >= t.goal), lv0 = mastLv(id);
+  R.use = (R.use || 0) + S.mst.use;
+  R.kills = (R.kills || 0) + S.kills;
+  if (won && (S.mis || S.mode === 'island')) R.wins = (R.wins || 0) + 1;
+  const sig = { reef: S.mst.reef, furia: S.mst.furia, frz: S.frozenN || 0, ecl: S.mst.ecl, dil: S.dmgDone.luna || 0, pearl: S.pearlsGot }[MAST_SIG[id].src];
+  R.sig = (R.sig || 0) + Math.round(sig);
+  if (S.mode === 'endless') R.wave = Math.max(R.wave || 0, S.wave);
+  tasks.forEach((t, i) => { if (!was[i] && (R[t.k] || 0) >= t.goal) unlocks.push(`Reto de ${M.name}: ${t.txt.charAt(0).toLowerCase() + t.txt.slice(1)}`); });
+  const lv = mastLv(id);
+  if (lv > lv0) unlocks.push(`${M.name}: maestría ${lv}. ${MAST_REW[lv - 1]}`);
+}
+
+// ---- the mastery sheet, from each moon's card
+let mastIdx = 0;
+function mastRow(i) {
+  const M = MOONS[i], lv = mastLv(M.id), R = mastRec(M.id), nx = mastTasks(M.id).find(t => (R[t.k] || 0) < t.goal);
+  return `<button class="mast" type="button" data-i="${i}">${mastPips(lv)}<span><b>Maestría ${lv}/5${corrOn(M.id) ? '<span class="ctag">Corrupta</span>' : ''}</b><small>${nx ? `Siguiente: ${nx.txt.charAt(0).toLowerCase() + nx.txt.slice(1)}` : '¡Maestra! Todos los retos hechos'}</small></span><span class="go" aria-hidden="true">›</span></button>`;
+}
+function mastRefresh(i) {
+  const c = $('moonTrack').children[i], b = c && c.querySelector('.mast'); if (!b) return;
+  b.outerHTML = mastRow(i);
+  c.querySelector('.mast').onclick = () => { sfx('card'); openMastSheet(i); };
+}
+function openMastSheet(i) {
+  mastIdx = i;
+  const M = MOONS[i], id = M.id, R = mastRec(id), lv = mastLv(id), own = save.moons.includes(id);
+  $('mastTitle').textContent = M.name;
+  $('mastLede').innerHTML = `${mastPips(lv, 16)}<span>Maestría ${lv} de 5${own ? '' : ' · Cómprala para empezar'}</span>`;
+  $('mastTasks').innerHTML = mastTasks(id).map(t => {
+    const v = Math.min(t.goal, R[t.k] || 0), done = v >= t.goal;
+    return `<div class="lc mtask${done ? ' done' : ''}"><span class="ico" aria-hidden="true">${done ? ico('i_estrella', 30) : ico(M.ico, 30)}</span><span><b>${t.txt}</b><span class="d">${done ? 'Hecho' : `${Math.floor(v).toLocaleString('es')} / ${t.goal.toLocaleString('es')}`}</span><span class="prog-mini"><i style="width:${(v / t.goal * 100).toFixed(1)}%"></i></span></span></div>`;
+  }).join('');
+  $('mastRew').innerHTML = MAST_REW.map((r, k) => `<li class="${k < lv ? 'on' : ''}"><b>${k + 1}</b><span>${r}</span></li>`).join('');
+  const C = CORR[id], open = lv >= 3, on = corrOn(id);
+  $('mastCorr').classList.toggle('locked', !open);
+  $('mastCorr').innerHTML = `<canvas class="mcv" width="120" height="120" aria-hidden="true"></canvas><span><b>${M.name} corrupta</b><span class="plus">✓ ${C.plus}</span><span class="weak">✗ ${C.weak}</span>${open ? '' : '<span class="d">Se despierta con la maestría 3.</span>'}</span>`;
+  const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy sw' + (on ? ' on' : ''); btn.disabled = !open || !own;
+  btn.textContent = !open ? 'Dormida' : on ? 'Activada' : 'Apagada'; btn.setAttribute('aria-pressed', on);
+  btn.onclick = () => { (save.corr = save.corr || {})[id] = on ? 0 : 1; persist(); sfx(on ? 'card' : 'evo'); vib(on ? 12 : [30, 30, 60]); openMastSheet(i); mastRefresh(i); };
+  $('mastCorr').appendChild(btn);
+  const cv = $('mastCorr').querySelector('canvas');
+  const paint = () => { if ($('mastSheet').hidden || !cv.isConnected) return; moonPortrait(cv, id, open ? 'angry' : 'calm', 1, 0, 0, true); requestAnimationFrame(paint); };
+  $('mastSheet').hidden = false; paint();
+}
+function closeMastSheet() { $('mastSheet').hidden = true; }
+$('mastClose').onclick = closeMastSheet;
+$('mastSheet').addEventListener('click', e => { if (e.target.id === 'mastSheet') closeMastSheet(); });
+// =====================================================================
+// CASTLE DEFENCES: two of five, chosen before the run and kept for the next ones. They open after the
+// second mission and stand on the island's two corners. Not in the tutorial or the tide challenges.
+// =====================================================================
+const DEFS = {
+  canon: { name: 'Cañón del castillo', ico: 'i_canon', desc: 'Cada 4 s dispara al enemigo más cercano a la isla.' },
+  campana: { name: 'Campana de alarma', ico: 'i_peligro', desc: 'Suena cuando llega una horda, un brulote o un capitán y frena a toda la flota 3 s.' },
+  barrera: { name: 'Empalizada', ico: 'i_murallas', desc: 'En cada oleada para el primer 15% de daño que recibiría la isla.' },
+  torre: { name: 'Torre de curación', ico: 'i_vida', desc: 'Cada 25 enemigos hundidos cura un 4% de la vida de la isla.' },
+  arpon: { name: 'Arponera', ico: 'i_ancla', desc: 'Cada 6 s arponea al enemigo más grande y lo deja casi quieto 2 s.' },
+};
+const DEF_IDS = Object.keys(DEFS);
+const defsOpen = () => misDone(1);
+const defsOf = () => defsOpen() ? (save.defs || ['canon', 'barrera']).filter(id => DEFS[id]).slice(0, 2) : [];
+// the two corners of the island where they stand
+const defSpot = k => { const I = ISL(); return k ? { x: I.r - 13 * u, y: I.top + 1.5 * u, d: 1 } : { x: I.l + 25 * u, y: I.top + 1.5 * u, d: -1 }; };
+
+function defStart() {
+  S.defs = [];
+  if (S.lab || (S.mis && (S.mis.tut || S.mis.puz))) return;
+  S.defs = defsOf().map((id, k) => ({ id, k, t: id === 'canon' ? 2 : id === 'arpon' ? 4 : 0, cd: 0, act: 0, kills: 0 }));
+  S.dfWave = 0; S.dfShield = 0; S.dfSeen = new WeakSet(); S.dfHorde = false; S.dfRope = null;
+}
+const hasDef = id => S.defs && S.defs.find(d => d.id === id);
+// the palisade soaks up a share of the damage each wave
+function defAbsorb(d) {
+  if (!S.dfShield || d <= 0) return d;
+  const a = Math.min(S.dfShield, d); S.dfShield -= a;
+  const D = hasDef('barrera'); if (D) D.act = 0.4;
+  if (S.dfShield <= 0) { S.nums.push({ x: W / 2, y: ISL().top - 30 * u, v: '¡Empalizada rota!', txt: true, col: '#e8c48a', t: 0 }); sfx('crash'); }
+  return d - a;
+}
+function defTarget(far) {
+  let best = null, bv = far ? -1 : 1e9;
+  for (const e of S.enemies) {
+    if (e.dead || e.phased || e.def.kind === 'fly' || e.x < 0 || e.x > W || e.invuln) continue;
+    const v = far ? e.maxHp : Math.abs(e.x - W / 2);
+    if (far ? v > bv : v < bv) { bv = v; best = e; }
+  }
+  return best;
+}
+function defTick(dt) {
+  if (!S.defs || !S.defs.length || S.ended) return;
+  if (S.dfWave !== S.wave) { S.dfWave = S.wave; if (hasDef('barrera')) S.dfShield = S.maxHp * 0.15; }
+  for (const D of S.defs) {
+    D.act = Math.max(0, D.act - dt); D.cd = Math.max(0, D.cd - dt);
+    const P = defSpot(D.k);
+    if (D.id === 'canon' && (D.t -= dt) <= 0) {
+      const e = defTarget(false); D.t = e ? 4 : 0.5; if (!e) continue;
+      const sx = P.x, sy = P.y - 12 * u, Tf = 0.5 + Math.abs(e.x - sx) / W * 0.5, lead = e.atIsland || e.frozen > 0 ? 0 : e.dir * e.spd * u * S.spdMul * Tf * 0.8, g = 900 * u;
+      S.proj.push({ type: 'ball', x0: sx, y0: sy, x: sx, y: sy, vx: (e.x + lead - sx) / Tf, vy: (e.y - sy) / Tf - 0.5 * g * Tf, g, t: 0, T: Tf, dmg: 45 * tideW(), r: 30 * u, src: 'def' });
+      S.fx.push({ type: 'muzzle', x: sx, y: sy, t: 0, life: 0.15 }); D.act = 0.3; sfx('boom');
+    } else if (D.id === 'campana') {
+      // rings for a horde on its way, a fire ship or a captain coming into the sea
+      let why = null;
+      if (S.horde && !S.dfHorde) why = '¡Horda!';
+      S.dfHorde = !!S.horde;
+      for (const e of S.enemies) if (!S.dfSeen.has(e) && (e.def.fuse || e.cap)) { S.dfSeen.add(e); why = why || (e.cap ? '¡Capitán!' : '¡Brulote!'); }
+      if (why && D.cd <= 0) {
+        D.cd = 12; D.act = 1.6; D.ring = 1.6;
+        for (const e of S.enemies) if (!e.dead && !e.isBoss) slowE(e, 3, 0.5);
+        S.fx.push({ type: 'ring', x: P.x, y: P.y - 10 * u, t: 0, life: 0.9, r1: W * 0.9, c: '#ffe7a3' });
+        S.nums.push({ x: P.x, y: P.y - 34 * u, v: why, txt: true, col: '#ffe7a3', t: 0 }); sfx('card'); sfx('warn'); vib(20);
+      }
+      D.ring = Math.max(0, (D.ring || 0) - dt);
+    } else if (D.id === 'torre') {
+      if (S.kills - D.kills >= 25) {
+        D.kills = S.kills; const h = Math.min(S.maxHp * 0.04, S.maxHp - S.hp); D.act = 1;
+        if (h >= 0.5) { S.hp += h; S.nums.push({ x: P.x, y: P.y - 30 * u, v: `+${Math.round(h)}`, txt: true, col: '#9be15d', t: 0 }); burst(P.x, P.y - 16 * u, 10, '#9be15d', 120); sfx('coin'); }
+      }
+    } else if (D.id === 'arpon' && (D.t -= dt) <= 0) {
+      const e = defTarget(true); D.t = e ? 6 : 0.5; if (!e) continue;
+      SRC = 'def'; hit(e, 30 * tideW()); SRC = 'mar';
+      if (!e.isBoss) slowE(e, 2, 0.92);
+      S.dfRope = { e, x: P.x, y: P.y - 10 * u, t: 0, T: 2 }; D.act = 0.4; sfx('crash'); sparks(e.x, e.y);
+    }
+  }
+  if (S.dfRope) { const R = S.dfRope; R.t += dt; if (R.t >= R.T || R.e.dead) S.dfRope = null; }
+}
+// ---- drawn on the island's corners
+function drawDefs() {
+  if (!S.defs || !S.defs.length) return;
+  const I = ISL();
+  if (S.dfShield > 0) {
+    // the palisade: sharpened stakes along both edges of the plateau
+    const a = 0.6 + 0.4 * Math.min(1, S.dfShield / (S.maxHp * 0.15)), D = hasDef('barrera'), fl = D && D.act > 0 ? D.act * 2 : 0;
+    for (const [x0, dir] of [[I.l + 1 * u, 1], [I.r - 1 * u, -1]]) for (let i = 0; i < 4; i++) {
+      const x = x0 + dir * i * 4.2 * u, h = (11 - i * 1.2) * u, y = I.top + 3 * u;
+      ctx.fillStyle = fl ? `rgba(255,236,190,${a})` : `rgba(150,104,58,${a})`; ctx.strokeStyle = `rgba(40,22,10,${a})`; ctx.lineWidth = 1.2 * u;
+      ctx.beginPath(); ctx.moveTo(x - 1.8 * u, y); ctx.lineTo(x - 1.8 * u, y - h); ctx.lineTo(x, y - h - 3 * u); ctx.lineTo(x + 1.8 * u, y - h); ctx.lineTo(x + 1.8 * u, y); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+  if (S.dfRope) {
+    const R = S.dfRope, e = R.e, k = Math.min(1, R.t / 0.15);
+    ctx.strokeStyle = 'rgba(232,214,170,0.9)'; ctx.lineWidth = 1.6 * u;
+    ctx.beginPath(); ctx.moveTo(R.x, R.y); ctx.quadraticCurveTo((R.x + e.x) / 2, Math.max(R.y, e.y) + 18 * u * (1 - R.t / R.T), R.x + (e.x - R.x) * k, R.y + (e.y - 6 * u - R.y) * k); ctx.stroke();
+  }
+  for (const D of S.defs) {
+    const P = defSpot(D.k), s = u, d = P.d, x = P.x, y = P.y;
+    ctx.save(); ctx.translate(x, y); ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 1.4 * s;
+    if (D.id === 'canon') {
+      const e = defTarget(false), ang = e ? Math.atan2(e.y - (y - 12 * u), (e.x - x)) : (d < 0 ? Math.PI + 0.5 : -0.5), kick = D.act > 0 ? D.act * 8 : 0;
+      ctx.fillStyle = '#6f5a44'; ctx.beginPath(); ctx.rect(-7 * s, -7 * s, 14 * s, 7 * s); ctx.fill(); ctx.stroke();
+      ctx.save(); ctx.translate(0, -10 * s); ctx.rotate(ang);
+      ctx.fillStyle = '#3c3f4a'; ctx.beginPath(); ctx.rect(-3 * s - kick * s * 0.2, -3.2 * s, 14 * s, 6.4 * s); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = '#2b2f3a'; ctx.beginPath(); ctx.arc(0, -9 * s, 4.2 * s, 0, TAU); ctx.fill(); ctx.stroke();
+    } else if (D.id === 'campana') {
+      const sw = Math.sin(T * 14) * 0.5 * Math.min(1, (D.ring || 0));
+      ctx.fillStyle = '#7a5532'; ctx.fillRect(-8 * s, -20 * s, 2.4 * s, 20 * s); ctx.fillRect(5.6 * s, -20 * s, 2.4 * s, 20 * s); ctx.fillRect(-9 * s, -22 * s, 18 * s, 2.6 * s);
+      ctx.save(); ctx.translate(0, -19 * s); ctx.rotate(sw);
+      ctx.fillStyle = D.cd > 0 ? '#b8923a' : '#f0c24a'; ctx.beginPath(); ctx.moveTo(-3 * s, 1 * s); ctx.quadraticCurveTo(-4 * s, 8 * s, -7 * s, 11 * s); ctx.lineTo(7 * s, 11 * s); ctx.quadraticCurveTo(4 * s, 8 * s, 3 * s, 1 * s); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#5a3d10'; ctx.beginPath(); ctx.arc(0, 12 * s, 1.6 * s, 0, TAU); ctx.fill();
+      ctx.restore();
+      if (D.ring > 0) { ctx.strokeStyle = `rgba(255,231,163,${D.ring / 1.6})`; ctx.lineWidth = 1.5 * s; for (const r of [14, 20]) { ctx.beginPath(); ctx.arc(0, -13 * s, (r + (1.6 - D.ring) * 10) * s, -2.6, -0.5); ctx.stroke(); } }
+    } else if (D.id === 'barrera') {
+      ctx.fillStyle = S.dfShield > 0 ? '#9a6b3a' : '#5c4630'; ctx.beginPath(); ctx.moveTo(-6 * s, 0); ctx.lineTo(-6 * s, -12 * s); ctx.lineTo(0, -17 * s); ctx.lineTo(6 * s, -12 * s); ctx.lineTo(6 * s, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = 'rgba(40,22,10,0.8)'; ctx.beginPath(); ctx.moveTo(0, -15 * s); ctx.lineTo(0, -1 * s); ctx.moveTo(-5 * s, -8 * s); ctx.lineTo(5 * s, -8 * s); ctx.stroke();
+    } else if (D.id === 'torre') {
+      ctx.fillStyle = '#8b8f9a'; ctx.beginPath(); ctx.rect(-5 * s, -18 * s, 10 * s, 18 * s); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#6d717c'; for (const bx of [-5, -1.5, 2]) { ctx.beginPath(); ctx.rect(bx * s, -21 * s, 3 * s, 3 * s); ctx.fill(); ctx.stroke(); }
+      const gl = 0.5 + 0.5 * Math.sin(T * 3) + D.act;
+      softGlow(0, -11 * s, 9 * s, '#9be15d', Math.min(1, 0.25 + 0.25 * gl));
+      ctx.fillStyle = '#9be15d'; ctx.fillRect(-1.2 * s, -14 * s, 2.4 * s, 7 * s); ctx.fillRect(-3.5 * s, -11.7 * s, 7 * s, 2.4 * s);
+    } else if (D.id === 'arpon') {
+      const e = S.dfRope ? S.dfRope.e : defTarget(true), ang = e ? Math.atan2(e.y - (y - 10 * u), e.x - x) : (d < 0 ? Math.PI + 0.3 : -0.3);
+      ctx.fillStyle = '#6f5a44'; ctx.beginPath(); ctx.rect(-4 * s, -8 * s, 8 * s, 8 * s); ctx.fill(); ctx.stroke();
+      ctx.save(); ctx.translate(0, -10 * s); ctx.rotate(ang);
+      ctx.strokeStyle = '#3a2412'; ctx.lineWidth = 2 * s; ctx.beginPath(); ctx.moveTo(2 * s, -8 * s); ctx.quadraticCurveTo(-3 * s, 0, 2 * s, 8 * s); ctx.stroke();
+      if (!S.dfRope) { ctx.strokeStyle = '#cfd6e6'; ctx.lineWidth = 1.6 * s; ctx.beginPath(); ctx.moveTo(-4 * s, 0); ctx.lineTo(12 * s, 0); ctx.stroke(); ctx.fillStyle = '#cfd6e6'; ctx.beginPath(); ctx.moveTo(14 * s, 0); ctx.lineTo(10 * s, -2.5 * s); ctx.lineTo(10 * s, 2.5 * s); ctx.fill(); }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+}
+
+// ---- the picker (prep screen and map): tap two
+let defBack = null, defPick = [];
+function openDefSheet(back) {
+  defBack = back; defPick = defsOf().slice();
+  defRender(); $('defSheet').hidden = false;
+}
+function defRender() {
+  const list = $('defList'); list.innerHTML = '';
+  for (const id of DEF_IDS) {
+    const D = DEFS[id], on = defPick.includes(id), b = document.createElement('button');
+    b.type = 'button'; b.className = 'lc gopt' + (on ? ' sel' : ''); b.setAttribute('aria-pressed', on);
+    b.innerHTML = `<span class="ico">${ico(D.ico, 34)}</span><span><b>${D.name}</b><span class="d">${D.desc}</span></span><span class="gdot">${on ? ico('i_check', 24) : ''}</span>`;
+    b.onclick = () => {
+      if (on) defPick = defPick.filter(x => x !== id); else { defPick.push(id); if (defPick.length > 2) defPick.shift(); }
+      sfx('card'); vib(12); defRender();
+    };
+    list.appendChild(b);
+  }
+  $('defCount').textContent = `${defPick.length} de 2`;
+  $('defDone').disabled = defPick.length !== 2;
+}
+function closeDefSheet(keep) {
+  if (keep && defPick.length === 2) { save.defs = defPick.slice(); persist(); }
+  $('defSheet').hidden = true; const f = defBack; defBack = null; if (f) f();
+}
+$('defDone').onclick = () => { sfx('evo'); closeDefSheet(true); };
+$('defClose').onclick = () => closeDefSheet(false);
+$('defSheet').addEventListener('click', e => { if (e.target.id === 'defSheet') closeDefSheet(false); });
+// the little "Defensas: X + Y · Cambiar" row
+function defRow(el, back) {
+  if (!el) return;
+  el.hidden = !defsOpen(); if (el.hidden) return;
+  const d = defsOf();
+  el.querySelector('.gdot').innerHTML = d.map(id => ico(DEFS[id].ico, 22)).join('');
+  el.querySelector('.gname').textContent = d.map(id => DEFS[id].name).join(' + ');
+  el.querySelector('button').onclick = () => openDefSheet(back);
+}
+// =====================================================================
+// THE SEA FLOOR SHIFTS: in expeditions from wave 8 and in the endless sea from wave 12, now and then a
+// sandbar rises on one side (ships crash on it at low tide) or a reef sinks (ships sail over it), for
+// two waves. Each change is announced: a banner, a dashed outline where it happens and a countdown.
+// THE EXTREME ENDLESS SEA: from wave 61, black stars fall on the castle (the moon stops them),
+// waterspouts walk up to the island (the moon over one undoes it) and every wave brings an anomaly.
+// =====================================================================
+const BAR_TOP = 0.5, BAR_HW = 17;
+CAUSE.meteoro = 'las estrellas negras'; CAUSE.tromba = 'las trombas';
+const terrOk = () => S && !S.mis && !S.lab && ((S.mode === 'island' && S.wave >= 8) || (S.mode === 'endless' && S.wave >= 12));
+function terrStart() { S.terr = null; S.terrLast = 0; S.bars = []; S.xtr = null; }
+// at the start of every wave: the change that was there ends, or a new one is announced
+function terrWave(busy) {
+  const t = S.terr;
+  if (t && S.wave >= t.until) {
+    S.terr = null; S.bars = [];
+    banner(t.kind === 'bar' ? 'El banco de arena se hunde' : 'El arrecife vuelve a subir', '', 1.6);
+    return;
+  }
+  if (t || !terrOk() || isBossWave(S.wave) || S.wave - S.terrLast < 3 || Math.random() > 0.35) return;
+  const side = Math.random() < 0.5 ? -1 : 1, kind = Math.random() < 0.55 ? 'bar' : 'sink';
+  const x = side < 0 ? W * 0.07 : W * 0.93, rc = side < 0 ? W * 0.19 : W * 0.81;
+  S.terr = { kind, side, x: kind === 'bar' ? x : rc, t: -3, until: S.wave + 2 };
+  S.terrLast = S.wave;
+  setTimeout(() => { if (!S || S.ended || !S.terr) return; sfx('warn'); banner(kind === 'bar' ? '¡Sube un banco de arena!' : '¡Se hunde un arrecife!', kind === 'bar' ? `A la ${side < 0 ? 'izquierda' : 'derecha'}: con marea baja los barcos encallan en él` : `El de la ${side < 0 ? 'izquierda' : 'derecha'}, durante dos oleadas`, 2.4, true); }, busy ? 2600 : 700);
+}
+function terrTick(dt) {
+  const t = S.terr;
+  if (t) {
+    const was = t.t; t.t += dt;
+    if (was < 0 && t.t >= 0) {
+      if (t.kind === 'bar') S.bars = [{ x: t.x, hw: BAR_HW * u }];
+      sfx('crash'); S.shake = Math.max(S.shake, 0.3);
+      for (let i = 0; i < 10; i++) { const x = t.x + rand(-1, 1) * (t.kind === 'bar' ? BAR_HW : REEF_HW) * u; splash(x, waveY(x), 4); }
+    }
+  }
+  xtrTick(dt);
+}
+// a sunk reef no longer catches ships; how far it has gone down, in pixels, for drawing
+const reefSunk = x => !!(S && S.terr && S.terr.kind === 'sink' && S.terr.t >= 0 && Math.abs(x - S.terr.x) < REEF_HW * u * 2);
+const reefDrop = c => S && S.terr && S.terr.kind === 'sink' && Math.abs(c - S.terr.x) < 2 * u ? Math.min(1, Math.max(0, S.terr.t) / 1.2) * 26 * u : 0;
+// ships over a sandbar at low water crash on it like on a reef, a little softer
+function barShip(e, lvl, dt) {
+  for (const b of S.bars) {
+    if (Math.abs(e.x - b.x) > b.hw + e.r * u * 0.4 || lvl - BAR_TOP >= e.def.draft + (e.deep || 0)) continue;
+    e.aground = true; hit(e, reefDps() * 0.6 * dt, { dot: true, col: '#ffe1a8' });
+    if (Math.random() < dt * 5) { sparks(e.x, e.y + 6 * u); sfx('crash'); }
+    return 0.4;
+  }
+  return 1;
+}
+function drawBars() {
+  const t = S && S.terr; if (!t) return;
+  const fy = floorY(), top = levelY(BAR_TOP);
+  if (t.kind === 'bar') {
+    const k = t.t < 0 ? 0 : Math.min(1, t.t / 0.8), hw = BAR_HW * u, h = (fy - top) * k;
+    if (k > 0) {
+      const g = ctx.createLinearGradient(0, fy - h, 0, fy); g.addColorStop(0, '#e9cf96'); g.addColorStop(1, '#b58f57');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(t.x - hw * 1.8, fy + 2 * u);
+      ctx.bezierCurveTo(t.x - hw * 1.1, fy - h * 0.2, t.x - hw * 0.8, fy - h, t.x, fy - h);
+      ctx.bezierCurveTo(t.x + hw * 0.8, fy - h, t.x + hw * 1.1, fy - h * 0.2, t.x + hw * 1.8, fy + 2 * u); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(80,50,20,0.35)'; ctx.lineWidth = 1.5 * u; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'; for (const dx of [-0.5, 0.1, 0.55]) { ctx.beginPath(); ctx.arc(t.x + dx * hw, fy - h * 0.55 + Math.abs(dx) * h * 0.2, 1.6 * u, 0, TAU); ctx.fill(); }
+    }
+  }
+  if (t.kind === 'sink' && t.t >= 0 && Math.random() < 0.3) bubbles(t.x + rand(-1, 1) * REEF_HW * u, levelY(REEF - 0.1), 1);
+}
+// the announcement, drawn over the water: a dashed outline of what is coming, with the seconds left
+function drawTerrMark() {
+  const t = S.terr; if (!t || t.t >= 0) return;
+  const fy = floorY(), top = levelY(BAR_TOP);
+  {
+    const hw = (t.kind === 'bar' ? BAR_HW * 1.4 : REEF_HW * 1.1) * u, y0 = t.kind === 'bar' ? top : levelY(REEF), a = 0.55 + 0.45 * Math.sin(T * 10);
+    ctx.save(); ctx.setLineDash([6 * u, 5 * u]); ctx.lineWidth = 2.2 * u; ctx.strokeStyle = t.kind === 'bar' ? `rgba(255,225,168,${a})` : `rgba(255,120,120,${a})`;
+    ctx.beginPath(); ctx.moveTo(t.x - hw, fy); ctx.quadraticCurveTo(t.x, y0 - 10 * u, t.x + hw, fy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 3; ctx.font = `900 ${18 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const n = String(Math.ceil(-t.t)), ty = levelY(0.98);
+    ctx.strokeText(n, t.x, ty); ctx.fillText(n, t.x, ty);
+    if (t.kind === 'sink') { ctx.fillStyle = `rgba(255,120,120,${a})`; ctx.beginPath(); ctx.moveTo(t.x - 6 * u, ty + 14 * u); ctx.lineTo(t.x + 6 * u, ty + 14 * u); ctx.lineTo(t.x, ty + 22 * u); ctx.fill(); }
+    ctx.restore();
+  }
+}
+
+// ---- the extreme endless sea
+function xtrTick(dt) {
+  if (S.mode !== 'endless' || S.wave < 61 || S.ended || S.lab) return;
+  const X = S.xtr || (S.xtr = { starT: 9, spT: 22, stars: [], sp: null });
+  if (!X.on) { X.on = true; banner('Supervivencia extrema', 'Estrellas negras, trombas y una anomalía en cada oleada', 2.8, true); sfx('roar'); vib([60, 40, 120]); }
+  const I = ISL(), m = moonPos();
+  // black stars: three marks on the castle, 3-2-1, then they fall; the moon in their way stops them
+  if ((X.starT -= dt) <= 0) {
+    X.starT = rand(13, 17); sfx('warn');
+    const xs = [-0.7, 0, 0.7].sort(() => Math.random() - 0.5);
+    xs.forEach((f, i) => X.stars.push({ x: W / 2 + f * (I.r - I.l) / 2 + rand(-4, 4) * u, t: -3 - i * 0.7, dx: rand(-60, 60) * u }));
+  }
+  for (const s of X.stars) {
+    s.t += dt;
+    if (s.t < -0.9) continue;
+    const f = clamp((s.t + 0.9) / 0.9, 0, 1);
+    s.px = s.x + s.dx * (1 - f); s.py = -20 * u + (I.top - 4 * u + 20 * u) * f * f;
+    if (Math.hypot(s.px - m.x, s.py - m.y) < MOON_R() + 9 * u) {
+      s.done = true; S.intercepts++; missionProgress('intercept', 1); S.moonKick = 0.15;
+      burst(s.px, s.py, 18, '#b08cff', 200); sfx('boom'); vib(15);
+      S.nums.push({ x: s.px, y: s.py - 14 * u, v: '¡Bloqueada!', txt: true, col: '#cdb6ff', t: 0 });
+    } else if (s.t >= 0) {
+      s.done = true; islandDamage(S.maxHp * 0.12, false, 'meteoro');
+      boomFx(s.x, I.top, 34 * u, '#9b6cff'); sfx('bigboom'); S.shake = Math.max(S.shake, 0.6); vib([50, 30, 80]);
+    }
+  }
+  X.stars = X.stars.filter(s => !s.done);
+  // waterspouts: one walks in from a side; the moon held over it for 2 s undoes it
+  if (!X.sp && (X.spT -= dt) <= 0) {
+    const side = Math.random() < 0.5 ? -1 : 1;
+    X.sp = { side, x: side < 0 ? -20 * u : W + 20 * u, hold: 0 }; X.spT = rand(22, 30);
+    banner('¡Tromba marina!', 'Ponle la luna encima para deshacerla', 1.8, true); sfx('warn');
+  }
+  if (X.sp) {
+    const p = X.sp, edge = p.side < 0 ? I.l - 6 * u : I.r + 6 * u;
+    if (Math.abs(m.x - p.x) < MOON_R() * 1.3) { p.hold += dt; if (Math.random() < dt * 8) splash(p.x, waveY(p.x), 3); }
+    else p.hold = Math.max(0, p.hold - dt * 0.5);
+    if (p.hold >= 2) { X.sp = null; for (let i = 0; i < 14; i++) splash(p.x + rand(-20, 20) * u, waveY(p.x), 5); sfx('tsunami'); S.nums.push({ x: p.x, y: levelY(1.1), v: '¡Deshecha!', txt: true, col: '#cfe6ff', t: 0 }); }
+    else {
+      p.x += -p.side * 24 * u * dt * (p.hold > 0 ? 0.4 : 1);
+      if ((p.side < 0 && p.x >= edge) || (p.side > 0 && p.x <= edge)) { X.sp = null; islandDamage(S.maxHp * 0.15, false, 'tromba'); boomFx(edge, I.top, 30 * u, '#cfe6ff'); sfx('bigboom'); S.shake = Math.max(S.shake, 0.6); }
+    }
+  }
+}
+function drawXtr() {
+  const X = S && S.xtr; if (!X) return;
+  const I = ISL();
+  if (X.sp) {
+    const p = X.sp;
+    drawWhirl({ x: p.x, r: 26 * u, t: 1, life: 99, perm: true, spout: true });
+    if (p.hold > 0) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(p.x, waveY(p.x) - 60 * u, 12 * u, -Math.PI / 2, -Math.PI / 2 + TAU * p.hold / 2); ctx.stroke(); }
+  }
+  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const s of X.stars) {
+    const a = 0.55 + 0.45 * Math.sin(T * 12);
+    ctx.strokeStyle = `rgba(176,140,255,${a})`; ctx.lineWidth = 2.2 * u; ctx.setLineDash([4 * u, 3 * u]);
+    ctx.beginPath(); ctx.ellipse(s.x, I.top + 1 * u, 13 * u, 4.5 * u, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    if (s.t < -0.9) {
+      ctx.font = `900 ${15 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.fillStyle = '#e6dcff';
+      const n = String(Math.min(3, Math.ceil(-s.t - 0.9))); ctx.strokeText(n, s.x, I.top - 16 * u); ctx.fillText(n, s.x, I.top - 16 * u);
+    } else if (s.px !== undefined) {
+      // a dark star with a violet tail
+      const g = ctx.createLinearGradient(s.px - s.dx * 0.3, s.py - 60 * u, s.px, s.py);
+      g.addColorStop(0, 'rgba(120,70,220,0)'); g.addColorStop(1, 'rgba(160,110,255,0.8)');
+      ctx.strokeStyle = g; ctx.lineWidth = 7 * u; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(s.px + s.dx * 0.25, s.py - 60 * u); ctx.lineTo(s.px, s.py); ctx.stroke();
+      softGlow(s.px, s.py, 16 * u, '#9b6cff', 0.7);
+      ctx.fillStyle = '#1b0d33'; ctx.strokeStyle = '#cdb6ff'; ctx.lineWidth = 1.6 * u; ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const r = (i % 2 ? 4 : 9) * u, an = i * Math.PI / 5 + T * 4; i ? ctx.lineTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r) : ctx.moveTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+// =====================================================================
+// SPECIAL MISSIONS: six that never expire, each one a feat inside a single run.
+// CHAINS: three islanders ask for three things in order; the last one pays a keepsake.
+// SHARE CARD: a picture of the run to send from the result screen.
+// And the phase 7 hooks the rest of the game calls.
+// =====================================================================
+const SPECIALS = [
+  { id: 'dominio', name: 'Dominio del océano', ico: 'i_marea', txt: 'Hunde 10 barcos solo con el mar en una partida', reward: 250 },
+  { id: 'cazador', name: 'Cazador de tormentas', ico: 'i_tormenta', txt: 'Supera una oleada con anomalía sin que te dañen la isla', reward: 250 },
+  { id: 'ultima', name: 'Última defensa', ico: 'i_vida', txt: 'Baja del 20% de vida en una oleada y aguántala entera', reward: 300 },
+  { id: 'capitan', name: 'Capitán imprudente', ico: 'i_calavera', txt: 'Hunde a un capitán pirata', reward: 300 },
+  { id: 'prohibido', name: 'Poder prohibido', ico: 'i_sangre', txt: 'Gana una partida después de sellar un pacto', reward: 350 },
+  { id: 'escape', name: 'El gran escape', ico: 'i_barco', txt: 'Retírate en la marea sin fin con el Holandés Errante a la vista', reward: 400 },
+];
+const CHAINS = [
+  { id: 'marina', who: 'marina', name: 'El cuento del faro', end: 'Un cuento de Marina', steps: [
+    { k: 'tide', goal: 10, txt: 'Usa el botón de marea 10 veces', reward: 60 },
+    { k: 'reefRun', goal: 30, run: true, txt: 'Hunde 30 barcos contra el arrecife en una partida', reward: 120 },
+    { k: 'puz3', goal: 1, txt: 'Supera un desafío de marea con 3 estrellas', reward: 250 }] },
+  { id: 'salina', who: 'salina', name: 'El rastro de perlas', end: 'Estela de perlas detrás de la luna', steps: [
+    { k: 'gold', goal: 3, txt: 'Hunde 3 barcos del tesoro', reward: 60 },
+    { k: 'treasRun', goal: 3, run: true, txt: 'Saca 3 tesoros del fondo en una partida', reward: 120 },
+    { k: 'pearlEnd', goal: 300, run: true, txt: 'Termina una partida con 300 perlas sin gastar', reward: 250 }] },
+  { id: 'boro', who: 'boro', name: 'La bandera del herrero', end: 'Bandera dorada en el castillo', steps: [
+    { k: 'defWin', goal: 1, txt: 'Gana una partida con dos defensas', reward: 60 },
+    { k: 'armorRun', goal: 20, run: true, txt: 'Rompe 20 corazas en una partida', reward: 120 },
+    { k: 'danger2', goal: 1, txt: 'Supera una expedición en Peligro 2 o más', reward: 250 }] },
+];
+const MARINA_TALE = 'Cuando era pequeña, mi abuela encendía el faro cada noche. Decía que la Luna nos miraba y movía el mar para traer a los pescadores a casa. Una noche de tormenta el farol se apagó, y el mar se quedó quieto, como esperando. Subí a oscuras y lo encendí con las manos temblando. Entonces la marea volvió a moverse. Desde aquel día sé que la Luna y yo hacemos el mismo trabajo: que todos vuelvan a casa.';
+const specRec = () => save.spec || (save.spec = {});
+const chainRec = id => (save.chain || (save.chain = {}))[id] || (save.chain[id] = { s: 0, p: 0, done: false });
+const chainOpen = C => folkOpen(C.who);
+const specReady = () => SPECIALS.filter(M => specRec()[M.id] === 1).length + CHAINS.filter(C => chainOpen(C) && chainRec(C.id).done).length;
+const runCounts = () => S && !S.lab && !(S.mis && (S.mis.tut || S.mis.puz));
+function specDone(id) {
+  const R = specRec(); if (R[id]) return;
+  R[id] = 1; persist();
+  const M = SPECIALS.find(x => x.id === id);
+  setTimeout(() => { if (S && !S.ended) banner('¡Misión especial!', M.name, 1.8); sfx('evo'); }, 300);
+}
+// progress on the step a chain is waiting on (cumulative steps here; per-run steps at the end of the run)
+function chainProg(k, v, isMax) {
+  if (!CHAINS) return;
+  for (const C of CHAINS) {
+    if (!chainOpen(C)) continue;
+    const R = chainRec(C.id), st = C.steps[R.s];
+    if (!st || R.done || st.k !== k || st.run) continue;
+    R.p = Math.min(st.goal, isMax ? Math.max(R.p, v) : R.p + v);
+    if (R.p >= st.goal) { R.done = true; persist(); if (S && !S.ended) banner(`${FOLK[C.who].name}: ¡hecho!`, st.txt, 1.6); }
+  }
+}
+function chainRun(k, v) {
+  for (const C of CHAINS) {
+    if (!chainOpen(C)) continue;
+    const R = chainRec(C.id), st = C.steps[R.s];
+    if (!st || R.done || st.k !== k) continue;
+    R.p = Math.max(R.p, Math.min(st.goal, v));
+    if (R.p >= st.goal) R.done = true;
+  }
+}
+// ---- the missions screen: specials and chains under the daily and weekly ones
+function specInto(list) {
+  const sect = t => { const h = document.createElement('h3'); h.className = 'sect'; h.textContent = t; list.appendChild(h); };
+  const row = (icoHtml, html, btnHtml, can, onClaim, cls) => {
+    const el = document.createElement('div'); el.className = 'lc' + (cls ? ' ' + cls : '');
+    el.innerHTML = `<span class="ico" aria-hidden="true">${icoHtml}</span><span>${html}</span>`;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'buy' + (can ? ' claim' : ''); b.innerHTML = btnHtml; b.disabled = !can && !cls?.includes('replay');
+    b.onclick = onClaim; el.appendChild(b); list.appendChild(el);
+  };
+  sect('Especiales · no caducan');
+  const R = specRec();
+  for (const M of SPECIALS) {
+    const st = R[M.id] || 0;
+    row(ico(st === 2 ? 'i_check' : M.ico, 36), `<b>${M.name}</b><span class="d">${M.txt}</span>`, st === 2 ? 'Cobrada' : coinBtn(M.reward), st === 1,
+      () => { R[M.id] = 2; save.coins += M.reward; persist(); sfx('evo'); vib(40); openMissions(); }, st === 2 ? 'locked' : '');
+  }
+  sect('Encargos de la isla');
+  for (const C of CHAINS) {
+    const F = FOLK[C.who], open = chainOpen(C), cr = chainRec(C.id), st = C.steps[cr.s];
+    const steps = C.steps.map((x, k) => `<i class="${k < cr.s || (k === cr.s && cr.done) ? 'on' : ''}"></i>`).join('');
+    if (!open) { row(ico('i_candado', 30), `<b>${C.name}</b><span class="d">${F.name} te pedirá algo cuando se una a la isla.</span>`, ico('i_candado', 22), false, null, 'locked'); continue; }
+    if (!st) {
+      const replay = C.id === 'marina';
+      row('', `<b>${C.name}</b><span class="d">Completado: ${C.end.toLowerCase()}.</span><span class="csteps">${steps}</span>`, replay ? 'Leer' : 'Hecho', false,
+        replay ? () => { sfx('card'); openTalk('marina', 'Un cuento de Marina', MARINA_TALE, [{ name: 'Gracias, Marina', ico: 'i_faro', pick: () => {} }], openMissions); } : null, replay ? 'replay' : 'locked');
+    } else {
+      const last = cr.s === C.steps.length - 1;
+      row('', `<b>${C.name} · ${cr.s + 1} de ${C.steps.length}</b><span class="d">${st.txt}${last ? ` · Premio: ${C.end.toLowerCase()}` : ''}</span><span class="prog-mini"><i style="width:${cr.p / st.goal * 100}%"></i></span><span class="meta">${Math.floor(cr.p).toLocaleString('es')} / ${st.goal.toLocaleString('es')}${st.run ? ' en una partida' : ''}</span><span class="csteps">${steps}</span>`,
+        coinBtn(st.reward), cr.done, () => chainClaim(C));
+    }
+    list.lastChild.querySelector('.ico').appendChild(folkCanvas(C.who, 44));
+  }
+}
+function chainClaim(C) {
+  const R = chainRec(C.id), st = C.steps[R.s]; if (!st || !R.done) return;
+  save.coins += st.reward; R.s++; R.p = 0; R.done = false; sfx('evo'); vib(40);
+  if (R.s >= C.steps.length) {
+    if (C.id === 'salina') save.trail = 1;
+    if (C.id === 'boro') save.goldFlag = 1;
+    persist();
+    const say = { marina: MARINA_TALE, salina: '¡Toma! Una estela de perlas para tu luna. Así todos sabrán quién manda en el mar.', boro: 'La he forjado yo mismo: una bandera de oro para el castillo. Que se vea desde lejos.' }[C.id];
+    openTalk(C.who, C.id === 'marina' ? 'Un cuento de Marina' : C.name, say, [{ name: C.id === 'marina' ? 'Gracias, Marina' : '¡Gracias!', ico: C.id === 'marina' ? 'i_faro' : C.id === 'salina' ? 'i_perla' : 'i_trofeo', good: C.id === 'marina' ? '' : C.end, pick: () => {} }], openMissions);
+    return;
+  }
+  persist(); openMissions();
+}
+
+// ---- the share card: a 1080×1350 picture of the run
+function shareCanvas(withArt) {
+  const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+  const g = cv.getContext('2d'), M = S.mis, won = !!(S.stars ? S.stars[0] : S.wave >= (waveMax() || 1e9));
+  const bg = g.createLinearGradient(0, 0, 0, 1350); bg.addColorStop(0, '#0b0820'); bg.addColorStop(0.62, '#1b2a5a'); bg.addColorStop(1, '#0e4a66');
+  g.fillStyle = bg; g.fillRect(0, 0, 1080, 1350);
+  // a few stars and the sea along the bottom
+  const r0 = seeded(S.kills + 7); g.fillStyle = 'rgba(255,255,255,0.7)';
+  for (let i = 0; i < 70; i++) { g.beginPath(); g.arc(r0() * 1080, r0() * 620, r0() * 2.2 + 0.4, 0, TAU); g.fill(); }
+  g.fillStyle = 'rgba(30,140,170,0.55)'; g.beginPath(); g.moveTo(0, 1350);
+  for (let x = 0; x <= 1080; x += 20) g.lineTo(x, 1240 + Math.sin(x * 0.02) * 12); g.lineTo(1080, 1350); g.fill();
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+  g.fillStyle = '#ffd36b'; g.font = '400 64px "Young Serif", Georgia, serif'; g.fillText('LUNA', 540, 104);
+  g.fillStyle = 'rgba(255,243,209,0.8)'; g.font = '700 30px Figtree, system-ui, sans-serif'; g.fillText($('rEyebrow').textContent || '', 540, 150);
+  // the moon
+  if (withArt) {
+    const mc = document.createElement('canvas'); mc.width = mc.height = 420;
+    moonPortrait(mc, S.moon.id, won ? 'cheer' : 'calm', 1, 0, 0, !!S.corr);
+    g.drawImage(mc, 330, 160);
+  } else {
+    // without the sprites (a page that can't read its own pictures back): a painted moon with craters
+    const mg = g.createRadialGradient(490, 320, 20, 540, 370, 150); mg.addColorStop(0, '#ffffff'); mg.addColorStop(0.35, S.moon.color); mg.addColorStop(1, 'rgba(0,0,0,0.35)');
+    g.fillStyle = mg; g.beginPath(); g.arc(540, 370, 140, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(0,0,0,0.12)'; for (const [x, y, r] of [[480, 330, 26], [590, 420, 34], [600, 310, 16], [500, 440, 18]]) { g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); }
+    if (S.corr) corrPaint(g, 540, 370, 140);
+  }
+  g.fillStyle = '#ffffff'; g.font = '400 72px "Young Serif", Georgia, serif'; g.fillText($('rTitle').textContent || '', 540, 660);
+  g.fillStyle = 'rgba(255,243,209,0.85)'; g.font = '700 32px Figtree, system-ui, sans-serif'; g.fillText(`${S.moon.name}${S.corr ? ' corrupta' : ''}`, 540, 712);
+  // the numbers
+  const wm = waveMax(), cells = [[M && M.puz ? 'Desafío' : 'Oleada', M && M.puz ? M.n.replace('Desafío ', '') : wm ? `${Math.min(S.wave, wm)}/${wm}` : String(S.wave)], ['Tiempo', fmtT(S.t)], ['Hundidos', S.kills.toLocaleString('es')], ['Racha', String(S.maxCombo)]];
+  cells.forEach(([a, b], i) => {
+    const x = 150 + i * 260;
+    g.fillStyle = 'rgba(255,255,255,0.08)'; rrOn(g, x - 115, 750, 230, 130, 26); g.fill();
+    g.fillStyle = '#ffffff'; g.font = '900 52px Figtree, system-ui, sans-serif'; g.fillText(b, x, 830);
+    g.fillStyle = 'rgba(255,243,209,0.7)'; g.font = '700 24px Figtree, system-ui, sans-serif'; g.fillText(a, x, 862);
+  });
+  if (S.stars) {
+    // a mission's three stars
+    S.stars.forEach((on, i) => { starOn(g, 450 + i * 90, 935, 34, on ? '#ffd36b' : 'rgba(255,255,255,0.18)'); });
+  }
+  const dr = dmgRows().slice(0, 4), top = dr[0]?.v || 1, y0 = S.stars ? 1000 : 940;
+  g.textAlign = 'left';
+  if (dr.length) { g.fillStyle = '#ffd36b'; g.font = '700 28px Figtree, system-ui, sans-serif'; g.fillText(`Arma estrella: ${dr[0].name}`, 120, y0); }
+  dr.forEach((r, i) => {
+    const y = y0 + 30 + i * 52, f = FR[r.ico];
+    if (withArt && f && f.img.complete) g.drawImage(f.img, f.x, f.y, f.w, f.h, 120, y, 40, 40);
+    g.fillStyle = 'rgba(255,243,209,0.8)'; g.font = '700 20px Figtree, system-ui, sans-serif'; g.fillText(r.name, 176, y + 2);
+    g.fillStyle = 'rgba(255,255,255,0.12)'; rrOn(g, 176, y + 10, 660, 20, 10); g.fill();
+    g.fillStyle = i ? '#7fd3ff' : '#ffd36b'; rrOn(g, 176, y + 10, Math.max(20, 660 * r.v / top), 20, 10); g.fill();
+    g.fillStyle = '#ffffff'; g.font = '700 24px Figtree, system-ui, sans-serif'; g.fillText(fmtN(r.v), 852, y + 28);
+  });
+  g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,0.75)'; g.font = '700 26px Figtree, system-ui, sans-serif';
+  g.fillText(`${new Date().toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })} · IA Games`, 540, 1310);
+  return cv;
+}
+function rrOn(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+function starOn(g, x, y, r, col) { g.fillStyle = col; g.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } g.closePath(); g.fill(); }
+async function shareRun() {
+  if (!S) return;
+  sfx('card');
+  let url;
+  try { url = shareCanvas(true).toDataURL('image/png'); } catch (e) { url = shareCanvas(false).toDataURL('image/png'); }
+  const text = `${$('rTitle').textContent} · ${$('rSum').textContent}. ¡Juega a Luna!`;
+  // inside the app: Android's own share sheet
+  if (window.LunaShare && window.LunaShare.shareImage) { try { window.LunaShare.shareImage(url.split(',')[1], text); return; } catch (e) {} }
+  try {
+    const blob = await (await fetch(url)).blob(), file = new File([blob], 'luna.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  $('shareImg').src = url; $('shareDl').href = url; $('shareSheet').hidden = false;
+}
+$('rShare').onclick = shareRun;
+$('shareClose').onclick = () => { $('shareSheet').hidden = true; };
+$('shareSheet').addEventListener('click', e => { if (e.target.id === 'shareSheet') $('shareSheet').hidden = true; });
+
+// ---- phase 7 hooks
+function p7Start() {
+  S.p7 = { sea: 0, reef: 0, low: 0 };
+  mastStart(); defStart(); terrStart();
+}
+function p7Tick(dt) {
+  mastTick(dt); defTick(dt); terrTick(dt);
+  if (runCounts() && S.hp < S.maxHp * 0.2 && S.hp > 0) S.p7.low = S.wave;
+  // the pearl trail: a few pearls drift off the moon while it moves
+  if (save.trail && runCounts()) {
+    const m = moonPos(), p = S.p7.last || m, d = Math.hypot(m.x - p.x, m.y - p.y);
+    S.p7.last = { x: m.x, y: m.y };
+    if (d > 1 && Math.random() < Math.min(0.9, d * 0.08)) S.parts.push({ x: m.x + rand(-1, 1) * MOON_R() * 0.6, y: m.y + rand(-1, 1) * MOON_R() * 0.6, vx: rand(-20, 20), vy: rand(10, 40), t: 0, life: 0.7, c: Math.random() < 0.5 ? '#f4e6ff' : '#ffe9b0', s: rand(1.6, 2.8), g: 30 });
+  }
+}
+function p7Draw() { drawDefs(); drawTerrMark(); drawXtr(); mastDraw(); }
+function p7Kill(e) {
+  mastKill(e);
+  if (!runCounts()) return;
+  if (e.def.kind === 'ship') {
+    if (SRC === 'mar' && (e.seaD || 0) >= e.maxHp * 0.9) { S.p7.sea++; if (S.p7.sea >= 10) specDone('dominio'); }
+    if (SRC === 'mar' && inReef(e.x, e.r * u * 0.4)) S.p7.reef++;
+  }
+  if (e.cap && !e.decoy) specDone('capitan');
+}
+// a wave just ended (S.wave already counts the next one)
+function p7WaveEnd() {
+  if (!runCounts() || S.wave < 2) return;
+  if (S.anom && S.waveHurt < 0.5) specDone('cazador');
+  if (S.p7.low === S.wave - 1 && S.hp > 0) specDone('ultima');
+}
+function p7End(won, quit, unlocks) {
+  mastEnd(won, unlocks);
+  if (!runCounts()) return;
+  if (won && S.pacts.length) specDone('prohibido');
+  if (S.retired && S.mode === 'endless' && S.enemies.some(e => e.type === 'ghost' && !e.dead)) specDone('escape');
+  chainRun('reefRun', S.p7.reef); chainRun('treasRun', S.treasures || 0); chainRun('armorRun', S.armorBreaks || 0);
+  if (!quit) chainRun('pearlEnd', Math.floor(S.pearls));
+  if (won && S.defs && S.defs.length === 2) chainProg('defWin', 1);
+  if (won && !S.mis && S.mode === 'island' && S.danger >= 2) chainProg('danger2', 1);
+  const n = specReady(); if (n) unlocks.push(`${n} encargo${n > 1 ? 's' : ''} o misión${n > 1 ? 'es' : ''} especial${n > 1 ? 'es' : ''} para cobrar en Misiones`);
+}
 // =====================================================================
 // LOOP
 // =====================================================================
