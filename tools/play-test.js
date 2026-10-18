@@ -39,7 +39,8 @@ const PRESETS = {
     // FORCEWX=calma (etc.): every forecast brings that weather, to measure one weather at a time
     if (window.__forceWx) window.rollWeather = () => { const S = L.S; S.wx = window.__forceWx; S.wxSide = 1; S.wxFrom = S.wave; return S.wx; };
     window.__log = []; window.__picks = [];
-    const rank = c => /union/.test(c.className) ? 0 : /evo/.test(c.className) ? 1 : /k-wup/.test(c.className) ? 2 : /k-wnew|k-pnew/.test(c.className) ? 3 : 4;
+    // breadth first, as the reference runs were measured: a new weapon or passive before any upgrade
+    const rank = c => /union/.test(c.className) ? 0 : /evo/.test(c.className) ? 1 : /k-wnew|k-pnew/.test(c.className) ? 3 : 4;
     setInterval(() => {
       const md = L.mode, S = L.S;
       if (md === 'levelup') { const cs = [...document.querySelectorAll('#cards .up')]; let best = 0; cs.forEach((c, k) => { if (rank(c) < rank(cs[best])) best = k; }); window.__picks.push((cs[best]?.querySelector('b')?.textContent || '?') + '@' + S.lv); L.pick(best); return; }
@@ -65,6 +66,9 @@ const PRESETS = {
         // get in the way of the shell: aim where it will be a moment from now
         bombs.sort((a, b) => Math.hypot(a.x - mx, a.y - my) - Math.hypot(b.x - mx, b.y - my));
         const q = bombs[0], k = 0.18; tx = q.x + q.vx * k; ty = q.y + (q.vy + q.g * k / 2) * k;
+      } else if (S.treasure && !S.treasure.got && S.treasure.show > 0.5 && S.enemies.filter(e => !e.dead && Math.abs(e.x - W / 2) < W * 0.18).length < 3) {
+        // phase 4: a treasure showing in the sand at low tide: hold the moon over it
+        tx = S.treasure.x; ty = B.y1;
       } else if (hot.length && !(goal && bd < W * 0.12)) {
         const e = hot[0]; tx = e.x - (e.dir || 0) * 10; ty = e.type === 'nautilo' ? B.y1 : e.def.ghost ? B.y1 - (B.y1 - B.y0) * 0.15 : B.y1 - (B.y1 - B.y0) * 0.3;
       } else if (boats.length && !gulls.length) {
@@ -94,6 +98,8 @@ const PRESETS = {
       if (S.tideCh >= 1 && !S.surge && L.tide && S.enemies.filter(e => !e.dead && Math.abs(e.x - W / 2) < W * 0.3).length >= 4) L.tide();
       if (S.anom && S.anom !== window.__la) (window.__anoms = window.__anoms || []).push(S.anom + '@' + S.wave); window.__la = S.anom;
       if (S.wx && S.wx !== window.__lw) (window.__wx = window.__wx || []).push(S.wx + '@' + S.wave); window.__lw = S.wx;
+      if (S.wrecks) window.__wmax = Math.max(window.__wmax || 0, S.wrecks.length);
+      if (S.mig && S.mig !== window.__lm) (window.__migs = window.__migs || []).push(S.mig.type + '@' + S.wave); window.__lm = S.mig;
       if (S.surge && !window.__ls) window.__tides = (window.__tides || 0) + 1; window.__ls = !!S.surge;
     }, 100);
     setInterval(() => { const S = L.S; if (S) window.__log.push({ t: Math.round(S.t), w: S.wave, hp: Math.round(S.hp), mhp: Math.round(S.maxHp), lv: S.lv, en: S.enemies.length, k: S.kills, c: Math.round(S.pearls), boss: S.boss ? Math.round(S.boss.hp) : null, mode: L.mode }); }, 10000);
@@ -115,6 +121,7 @@ const PRESETS = {
   console.log('PICKS', picks.join(', '));
   console.log('SHOP', JSON.stringify(await p.evaluate(() => window.__shop || [])));
   console.log('OCEAN', JSON.stringify(await p.evaluate(() => ({ pacts: window.__pacts || [], anoms: window.__anoms || [], wx: window.__wx || [], tides: window.__tides || 0 }))));
+  console.log('SEA', JSON.stringify(await p.evaluate(() => ({ wrecksMax: window.__wmax || 0, treasures: window.__luna.S ? window.__luna.S.treasures || 0 : 0, migs: window.__migs || [] }))));
   console.log('ERRORS', errs.slice(0, 10));
   await b.close();
 })();
