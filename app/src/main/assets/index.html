@@ -590,6 +590,53 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 /* while the guide is up, banners drop below it */
 body.guiding #banner { top: 34%; }
 @media (max-height: 700px) { #guide { top: calc(env(safe-area-inset-top, 0px) + 100px); } #banner { top: 28%; } body.guiding #banner { top: 38%; } }
+
+/* ---------- the islanders: hosts that talk, the guardian picker, the Archive, the lab ---------- */
+.host { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; }
+.host canvas.folkc { cursor: pointer; }
+.host.big { grid-template-columns: 112px 1fr; }
+.hsay { position: relative; margin: 0; padding: 9px 13px 10px; background: #fff; color: #1c1430; border: 2.5px solid #1c1430; border-radius: 16px; font: 15px/1.25 var(--comic); }
+.hsay b { display: block; font: 900 11px/1.2 var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: #6a4fa0; margin-bottom: 2px; }
+.hsay::before { content: ""; position: absolute; left: -9px; top: 50%; width: 14px; height: 14px; background: #fff; border-left: 2.5px solid #1c1430; border-bottom: 2.5px solid #1c1430; transform: translateY(-50%) rotate(45deg); }
+.hsay.pop { animation: sayIn 0.22s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.gdot { width: 30px; height: 30px; display: grid; place-items: center; flex: none; color: var(--ink-dim); }
+.sheet { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(4, 8, 20, 0.62); padding: 0 12px max(12px, env(safe-area-inset-bottom, 0px)); }
+.sheet > .in { width: 100%; max-width: 460px; max-height: 84vh; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px; animation: slide 0.25s both; }
+.sh-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sh-h h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 24px; }
+.gopt { width: 100%; text-align: left; font: inherit; color: var(--ink); }
+.gopt .ico.gp { background: none; }
+.gopt small { font-size: 12px; font-weight: 700; color: var(--ink-dim); margin-left: 4px; }
+.seg4 { --tabs: 4; }
+.seg4 button { font-size: 13px; position: relative; }
+.seg4 .badge { position: absolute; top: 2px; right: 4px; }
+.beasts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.beast { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 12px 10px; border-radius: 18px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); }
+.beast .bart { height: 68px; display: grid; place-items: center; }
+.beast b { font-size: 14px; }
+.beast .d { font-size: 12px; color: var(--ink-dim); line-height: 1.3; }
+.beast .meta { font-size: 12px; color: var(--gold); font-weight: 800; font-variant-numeric: tabular-nums; }
+.beast.locked .bart { filter: brightness(0) opacity(0.4); }
+.beast.boss { border-color: color-mix(in srgb, var(--danger) 55%, var(--line)); }
+.beast.cap { border-color: color-mix(in srgb, var(--cc, var(--gold)) 70%, var(--line)); }
+.bart.t-chaman { filter: hue-rotate(230deg) saturate(1.3); }
+.lc .eyebrow { display: block; font-size: 10px; margin-bottom: 2px; }
+.lc .nst { display: flex; gap: 2px; margin-top: 4px; }
+.lc .nst span { opacity: 0.25; } .lc .nst span.on { opacity: 1; }
+.lc.relic { margin: -4px 0 0 22px; width: calc(100% - 22px); }
+.lc.relic.sel { border-color: var(--ice); box-shadow: 0 0 0 1px var(--ice) inset; }
+.lc.lab .ico { background: color-mix(in srgb, #4f9a6a 30%, transparent); }
+#scrTalk { justify-content: center; }
+#scrTalk h2 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; }
+#game.echo { filter: sepia(0.55) saturate(0.85) contrast(1.04); }
+#labBar { position: fixed; z-index: 12; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 118px); display: flex; gap: 6px; pointer-events: auto; }
+#labBar button { min-height: 40px; padding: 6px 9px; white-space: nowrap; border-radius: 12px; border: 1px solid color-mix(in srgb, #4f9a6a 70%, var(--line)); background: color-mix(in srgb, var(--panel) 88%, transparent); font-size: 13px; font-weight: 800; }
+#labBar #labExit { color: var(--danger); }
+#hud.lab .hpbox { opacity: 0.6; }
+.lrow { display: grid; grid-template-columns: 30px 1fr 44px 44px; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+.lrow b { display: block; font-size: 14px; } .lrow small { display: block; font-size: 12px; color: var(--ink-dim); }
+.lrow button { min-height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); font-size: 20px; font-weight: 900; }
+.lrow button:disabled { opacity: 0.35; }
 </style>
 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
@@ -647,7 +694,7 @@ body.guiding #banner { top: 34%; }
         <button class="tile" id="goMoons" type="button"><span data-ico="i_dorada"></span>Lunas</button>
         <button class="tile" id="goShop" type="button"><span data-ico="i_arsenal"></span>Taller<span class="badge" id="shopBadge" hidden>!</span></button>
         <button class="tile" id="goMis" type="button"><span data-ico="i_mision"></span>Misiones<span class="badge" id="misBadge" hidden>!</span></button>
-        <button class="tile" id="goAch" type="button"><span data-ico="i_trofeo"></span>Logros<span class="badge" id="achBadge" hidden>!</span></button>
+        <button class="tile" id="goAch" type="button"><span data-ico="i_libro"></span>Archivo<span class="badge" id="achBadge" hidden>!</span></button>
       </div>
     </div>
   </div>
@@ -688,6 +735,8 @@ body.guiding #banner { top: 34%; }
   <div class="topbar"><button class="icon-btn" data-go="title" type="button" aria-label="Volver">←</button><h2 class="st">Campaña</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
   <div class="inner" style="margin-block: 0 auto">
     <div class="map-head"><div class="moon-pick"><span class="moon-dot" id="pickDot"></span><span id="pickName"></span><button type="button" data-go="moons">Cambiar</button></div><span class="mapstars" id="mapStars" aria-label="Estrellas"></span></div>
+    <div class="host" id="mapHost"><p class="hsay"></p></div>
+    <div class="moon-pick" id="mapGuard" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
     <div class="stack" id="islandList"></div>
   </div>
 </div>
@@ -706,6 +755,7 @@ body.guiding #banner { top: 34%; }
       <div class="pdanger" id="prepDanger" hidden></div>
     </div>
     <div class="moon-pick"><span class="moon-dot" id="prepDot"></span><span id="prepMoonName"></span><button type="button" id="prepMoon">Cambiar</button></div>
+    <div class="moon-pick" id="prepGuard" hidden><span class="gdot"></span><span class="gname"></span><button type="button">Cambiar</button></div>
     <button class="btn primary big" id="prepGo" type="button"><span>Zarpar</span><span aria-hidden="true">→</span></button>
   </div>
 </div>
@@ -728,13 +778,58 @@ body.guiding #banner { top: 34%; }
 <div class="screen" id="scrShop" hidden>
   <div class="topbar"><button class="icon-btn" id="shopBack" type="button" aria-label="Volver">←</button><h2 class="st">Taller</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
   <div class="inner" style="margin-block: 0 auto">
+    <div class="host" id="shopHost"><p class="hsay"></p></div>
     <p class="lede">Mejoras permanentes para todas las partidas. Las monedas se ganan al terminar cada partida: por enemigos hundidos, jefes y oleadas.</p>
+    <div class="lc lab" id="labCard"><span class="ico" aria-hidden="true" id="labIco"></span><span><b>Laboratorio de Mara</b><span class="d" id="labTxt"></span></span><button class="buy" id="labGo" type="button">Entrar</button></div>
     <h3 class="sec">Arrecife</h3>
     <div class="reefs" id="reefList"></div>
     <h3 class="sec">Mejoras</h3>
     <div class="stack" id="shopList"></div>
   </div>
 </div>
+
+<!-- Archive -->
+<div class="screen" id="scrArchive" hidden>
+  <div class="topbar"><button class="icon-btn" id="arcBack" type="button" aria-label="Volver">←</button><h2 class="st">Archivo</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
+  <div class="inner" style="margin-block: 0 auto">
+    <div class="host" id="arcHost"><p class="hsay"></p></div>
+    <div class="seg seg4" role="tablist">
+      <button type="button" role="tab" id="arcT_hist" aria-selected="true">Historia</button>
+      <button type="button" role="tab" id="arcT_beast" aria-selected="false">Bestiario</button>
+      <button type="button" role="tab" id="arcT_sec" aria-selected="false">Secretos</button>
+      <button type="button" role="tab" id="arcT_ach" aria-selected="false">Logros<span class="badge" id="arcAchBadge" hidden>!</span></button>
+    </div>
+    <div class="stack" id="arcBody"></div>
+  </div>
+</div>
+
+<!-- An islander asks: a decision before a mission, or an echo -->
+<div class="screen" id="scrTalk" hidden>
+  <div class="inner">
+    <span class="eyebrow" id="talkEyebrow"></span>
+    <h2 id="talkName"></h2>
+    <div class="host big" id="talkHost"><p class="hsay"></p></div>
+    <div class="cards" id="talkOpts"></div>
+    <button class="btn ghost center" id="talkSkip" type="button" hidden></button>
+  </div>
+</div>
+
+<!-- The guardian picker -->
+<div class="sheet" id="guardSheet" hidden><div class="in">
+  <div class="sh-h"><h3>Guardián de la isla</h3><button class="icon-btn" id="guardClose" type="button" aria-label="Cerrar">✕</button></div>
+  <p class="lede small">Uno de los isleños defiende la isla contigo en cada partida.</p>
+  <div class="stack" id="guardList"></div>
+</div></div>
+
+<!-- Mara's lab: what to try, during the run -->
+<div id="labBar" hidden><button type="button" id="labGear">Armas</button><button type="button" id="labWave">Oleada +1</button><button type="button" id="labBoss">Jefe</button><button type="button" id="labClear">Limpiar</button><button type="button" id="labExit">Salir</button></div>
+<div class="sheet" id="labSheet" hidden><div class="in">
+  <div class="sh-h"><h3>Laboratorio de Mara</h3><button class="icon-btn" id="labDone" type="button" aria-label="Cerrar">✕</button></div>
+  <h3 class="sec2">Armas</h3><div id="labWeap"></div>
+  <h3 class="sec2">Pasivas</h3><div id="labPass"></div>
+  <h3 class="sec2">Fusiones y uniones listas</h3><div class="stack" id="labCombo"></div>
+  <h3 class="sec2" id="labRelicH">Reliquias</h3><div class="stack" id="labRelic"></div>
+</div></div>
 
 <!-- Achievements -->
 <div class="screen" id="scrAch" hidden>
@@ -1102,6 +1197,10 @@ const ACH = [
   { id: 'stars60', name: 'Cielo estrellado', desc: 'Consigue las 60 estrellas de la campaña.', goal: 60, stat: 'stars', reward: 800 },
   { id: 'trueEnd', name: 'El viejo guardián', desc: 'Descubre el final verdadero.', goal: 1, stat: 'trueEnd', reward: 600 },
   { id: 'caps4', name: 'Cazacapitanes', desc: 'Hunde a los 4 capitanes legendarios.', goal: 4, stat: 'capsSunk', reward: 400 },
+  { id: 'echo1', name: 'Eco lejano', desc: 'Encuentra un eco de antiguas mareas.', goal: 1, stat: 'echoes', reward: 200 },
+  { id: 'echo4', name: 'Las cuatro mareas', desc: 'Supera los 4 ecos de antiguas mareas.', goal: 4, stat: 'echoWins', reward: 900 },
+  { id: 'beasts', name: 'Naturalista', desc: 'Descubre las 20 criaturas del bestiario.', goal: 20, stat: 'beastSeen', reward: 500 },
+  { id: 'village', name: 'La aldea crece', desc: 'Haz crecer la aldea superando 10 misiones.', goal: 10, stat: 'village', reward: 300 },
 ];
 // daily missions: four a day from this pool, progress adds up across that day's runs
 const MISSIONS = [
@@ -1432,7 +1531,7 @@ const dangerSel = id => Math.min(save.isl[id]?.dsel || 0, save.isl[id]?.danger |
 
 function newRun(runMode, islIdx) {
   // a campaign mission plays on its chapter's island with its own waves, fleet and objective
-  const mis = runMode === 'mission' ? CAMPAIGN[islIdx] : null;
+  const mis = runMode === 'mission' ? CAMPAIGN[islIdx] : runMode === 'echo' ? ECHOES[islIdx] : null;
   if (mis) { runMode = 'island'; islIdx = mis.ch; }
   const moon = MOONS.find(m => m.id === save.moon) || MOONS[0];
   const mods = {};
@@ -1465,7 +1564,7 @@ function newRun(runMode, islIdx) {
   addWeapon(moon.weapon);
   if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
   recompute();
-  lastRun = mis ? { mode: 'mission', isl: mis.i } : { mode: runMode, isl: islIdx };
+  lastRun = mis ? (mis.echo ? { mode: 'echo', isl: mis.k } : { mode: 'mission', isl: mis.i }) : { mode: runMode, isl: islIdx };
 }
 // how many waves the run has (0: endless)
 const waveMax = () => S.mis ? S.mis.waves : S.mode === 'island' ? 20 : 0;
@@ -1576,7 +1675,7 @@ function spawnEnemy(type, side, k = 0, x0) {
   if (S.mis && S.mis.deep && def.kind === 'ship' && !def.flee && !def.fuse && !def.ghost) { e.deep = S.mis.deep; e.hp *= 1.25; e.maxHp = e.hp; e.spd *= 0.92; }
   if (S.mis && S.mis.spawn) S.mis.spawn(e);
   S.enemies.push(e);
-  if (!S.seen[type]) { S.seen[type] = 1; tipFor(type); }
+  if (!S.seen[type]) { S.seen[type] = 1; tipFor(type); markSeen(type); }
   if (e.elite && !S.seen.eliteTip) { S.seen.eliteTip = 1; tip('elite', '¡Enemigo de élite!', 'Brilla en dorado: aguanta más y suelta perlas y cofres'); }
   if (type === 'brulote') { S.warn.push({ side, t: 0, life: 2.2, c: '#ff8a3d' }); sfx('warn'); }
   return e;
@@ -1687,6 +1786,8 @@ function nextWave() {
 // through their own abilities; each one is announced under the health bar before it lands
 // =====================================================================
 function bossType() {
+  if (S.labBoss) return S.labBoss;
+  if (S.mis && S.mis.bossType) return S.mis.bossType;
   if (S.mis) return S.wave === 5 ? S.isl.mini : S.isl.boss;
   if (S.mode === 'island') return S.wave === 10 ? S.isl.mini : S.isl.boss;
   return ['kraken', 'armada', 'leviatan', 'eclipse'][(S.wave / 10 - 1) % 4];
@@ -1745,7 +1846,7 @@ function spawnBoss() {
   if (type === 'armada') { b.invuln = false; b.x = side < 0 ? -80 * u : W + 80 * u; }
   if (type === 'leviatan') { b.tx = bossPost(b, 0.2); b.y = levelY(0.3); }
   if (type === 'eclipse') { b.x = side < 0 ? -90 * u : W + 90 * u; b.y = levelY(2.1); }
-  S.boss = b; S.lastBoss = name;
+  S.boss = b; S.lastBoss = name; markSeen('b_' + type);
   S.face = 'surprised'; S.faceT = 1.3;   // then angry for the whole fight (see moonFace)
   banner(name, BOSS_INTRO[type], 2.6, true);
   MUS.boss = true; MUS.intensity = 3;
@@ -1954,7 +2055,7 @@ function updBoss(b, dt) {
 }
 function killBoss(b) {
   if (b.dead) return;
-  b.dead = true; S.bossKills++; save.stats.bosses++;
+  b.dead = true; S.bossKills++; save.stats.bosses++; countSink('b_' + b.type);
   b.cast = null; b.wave = null; b.beam = null; b.volley = 0; S.night = Math.min(S.night, 0.6);
   S.slowmo = 1.4; S.shake = 1.2; S.flash = 0.5;
   for (let i = 0; i < 6; i++) setTimeout(() => { if (S) { boomFx(b.x + rand(-50, 50) * u, b.y + rand(-40, 20) * u, 50 * u); } }, i * 120);
@@ -2027,6 +2128,7 @@ function kill(e, silent) {
   if (S.mis && S.mis.kill) S.mis.kill(e, SRC === 'mar' || (e.seaD || 0) >= e.maxHp * 0.4);
   if (S.tut && SRC === 'mar' && e.def.kind === 'walk') S.tutDrown = true;
   S.killsBy[e.type] = (S.killsBy[e.type] || 0) + 1;
+  if (!e.decoy && !e.cap) countSink(e.type);
   missionProgress(e.type, 1); missionProgress('kill', 1);
   if (e.tr) missionProgress('trait', 1);
   if (e.elite) missionProgress('elite', 1);
@@ -2306,8 +2408,9 @@ const WUP = {
       return;
     }
     w.t = L3(w, [1.0, 0.85, 0.62]) * cdm();
-    const ts = nearMoon(L3(w, [1, 2, 3]) + S.st.proj, MOON_RANGE()), dmg = L3(w, [18, 26, 36]);
-    for (const e of ts) { hit(e, dmg); S.fx.push({ type: 'beam', x1: m.x, y1: m.y, x2: e.x, y2: e.y, t: 0, life: 0.14, c: S.moon.color }); }
+    // relic: the echo's conch makes every ray bounce on to another ship, a little weaker at first
+    const echo = S.relic === 'caracola', ts = nearMoon(L3(w, [1, 2, 3]) + S.st.proj, MOON_RANGE()), dmg = L3(w, [18, 26, 36]) * (echo ? 0.85 : 1);
+    for (const e of ts) { hit(e, dmg); S.fx.push({ type: 'beam', x1: m.x, y1: m.y, x2: e.x, y2: e.y, t: 0, life: 0.14, c: S.moon.color }); if (echo) relicBounce(e, dmg * 0.5); }
     if (ts.length) { sfx('zap'); S.moonKick = 0.12; }
   },
   remolino(w, dt) {
@@ -2316,7 +2419,9 @@ const WUP = {
     w.t = L3(w, [6, 5, 4]) * cdm();
     const R = REEFS(), left = S.seaT.filter(e => e.x < W / 2).length, right = S.seaT.length - left;
     const r = left >= right ? R[0] : R[1];
-    S.ents.push({ type: 'whirl', x: r.c + rand(-10, 10) * u, r: L3(w, [40, 54, 70]) * u * S.st.area, life: L3(w, [3, 3.8, 4.4]), t: 0, dps: L3(w, [22, 30, 48]) });
+    // relic: twin whirlpools, one on each reef, smaller and weaker
+    if (S.relic === 'gemelo') for (const q of R) S.ents.push({ type: 'whirl', x: q.c + rand(-10, 10) * u, r: L3(w, [40, 54, 70]) * 0.8 * u * S.st.area, life: L3(w, [3, 3.8, 4.4]), t: 0, dps: L3(w, [22, 30, 48]) * 0.6 });
+    else S.ents.push({ type: 'whirl', x: r.c + rand(-10, 10) * u, r: L3(w, [40, 54, 70]) * u * S.st.area, life: L3(w, [3, 3.8, 4.4]), t: 0, dps: L3(w, [22, 30, 48]) });
     sfx('splash');
   },
   coral(w, dt) {
@@ -2353,7 +2458,9 @@ const WUP = {
     const width = (evo ? 18 : L3(w, [11, 13, 15])) * u * S.st.area;
     w.phase += dt * TAU / period / (S.furia > 0 ? 0.6 : 1);
     const sw = Math.abs(Math.sin(w.phase));
-    lighthouseBeams(w, dt, evo ? [W / 2 + (W / 2) * (0.25 + 0.75 * sw), W / 2 - (W / 2) * (0.25 + 0.75 * sw)] : [W / 2 + (W / 2 + 20 * u) * Math.sin(w.phase)], dps, width, false);
+    // relic: the cracked lens splits the beam in two that sweep opposite sides
+    const split = !evo && S.relic === 'lente', a = (W / 2 + 20 * u) * Math.sin(w.phase);
+    lighthouseBeams(w, dt, evo ? [W / 2 + (W / 2) * (0.25 + 0.75 * sw), W / 2 - (W / 2) * (0.25 + 0.75 * sw)] : split ? [W / 2 + a, W / 2 - a] : [W / 2 + a], split ? dps * 0.6 : dps, width, false);
   },
   canon(w, dt) {
     w.t -= dt; if (w.t > 0) return;
@@ -2395,8 +2502,9 @@ const WUP = {
       }
       return;
     }
-    const s = 0.8 + 0.1 * w.lv, dmg = L3(w, [30, 42, 52]), r = (14 + 3 * w.lv) * u * S.st.area;
-    for (const A of swingAnchors(w, w.lv >= 3 ? [sw * 1.05, -sw * 1.05] : [sw * 1.05], s, 'anchorW')) anchorHits(A, r, 0.5, 26 * u, e => hit(e, dmg));
+    // relic: the guardian's anchor shoves twice as far and hits a little softer
+    const heavy = S.relic === 'ancla', s = 0.8 + 0.1 * w.lv, dmg = L3(w, [30, 42, 52]) * (heavy ? 0.75 : 1), r = (14 + 3 * w.lv) * u * S.st.area;
+    for (const A of swingAnchors(w, w.lv >= 3 ? [sw * 1.05, -sw * 1.05] : [sw * 1.05], s, 'anchorW')) anchorHits(A, r, 0.5, 26 * u * (heavy ? 2 : 1), e => hit(e, dmg));
   },
   medusa(w, dt) {
     w.t -= dt; if (w.t > 0) return;
@@ -3125,6 +3233,7 @@ function update(dt) {
   oceanTick(dt);
   updSea(dt);
   legendsTick(dt);
+  guardTick(dt);
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
@@ -3371,9 +3480,11 @@ function drawLand() {
   if (faro || !S || S.faro) spr('lighthouse', I.r - 30 * u, top, 0.64 * u);
   if (faro) softGlow(I.r - 30 * u, I.top - 58 * u, 22 * u, '#ffd38a', 0.5 + 0.2 * Math.sin(T * 6));
   ctx.save(); ctx.translate(I.l + 12 * u, top); ctx.rotate(Math.sin(T * 1.1) * 0.03); spr(`tree_${b}`, 0, 0, 0.62 * u); ctx.restore();
+  if (!S) drawVillageBack(I, top);
   spr(`vil_${b}`, W / 2 - 6 * u, top, 0.64 * u);
   villageLife(b, W / 2 - 6 * u, top, 0.64 * u);
   drawFolk(b, I, top);
+  if (S) drawGuardian(); else drawVillageFront(I, top);
   if (!S) lighthouseBeam(I.r - 30 * u, I.top - 58 * u);
   const walls = metaLv('muralla');
   if (walls) { spr('wall', I.l + 4 * u, top + 2 * u, (0.55 + walls * 0.03) * u); spr('wall', I.r - 4 * u, top + 2 * u, (0.55 + walls * 0.03) * u, true); }
@@ -4003,8 +4114,10 @@ function drawGauge() {
 function drawDark() {
   const hz = S ? (S.mode === 'island' ? S.isl.hazard : ISLANDS[S.palIdx].hazard) : null;
   const night = S && S.night > 0 ? Math.min(1, S.night * 1.5, (5 - S.night) * 3) : 0;
-  if (hz !== 'dark' && !night) return;
-  const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, k = hz === 'dark' ? Math.max((S.mis && S.mis.dark) || 0.82, 0.93 * night) : 0.93 * night;
+  // a mission or an echo can bring its own night to any sea
+  const md = S && S.mis && S.mis.dark;
+  if (hz !== 'dark' && !night && !md) return;
+  const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, k = hz === 'dark' || md ? Math.max(md || 0.82, 0.93 * night) : 0.93 * night;
   const g = ctx.createRadialGradient(m.x, cy, W * (0.18 - 0.06 * night), m.x, cy, W * (0.8 - 0.35 * night));
   g.addColorStop(0, 'rgba(2,0,10,0)'); g.addColorStop(1, `rgba(2,0,10,${k})`);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
@@ -4036,6 +4149,7 @@ function draw() {
     drawPickups(); drawProj(); drawFx(); drawParts(); drawWarn();
     drawWeather();
     drawLegends();
+    drawGuardSay();
   }
   drawMoon();
   if (S && S.tut && mode === 'play') drawTutHint();
@@ -4172,7 +4286,7 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.concat
 // =====================================================================
 // SCREENS
 // =====================================================================
-const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrChoice', 'scrPause', 'scrRevive', 'scrResult'];
+const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'scrArchive', 'scrTalk', 'levelUp', 'scrMerchant', 'scrChoice', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) {
   SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
   $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant');
@@ -4199,6 +4313,10 @@ function statVal(s) {
   if (s === 'stars') return CAMPAIGN.reduce((a, m) => a + misStars(m.i), 0);
   if (s === 'trueEnd') return save.trueEnd ? 1 : 0;
   if (s === 'capsSunk') return (save.stats.capsSunk || []).length;
+  if (s === 'echoes') return echoesFound();
+  if (s === 'echoWins') return ECHOES.filter(m => echoRec(m.k).s[0]).length;
+  if (s === 'beastSeen') return BEAST.filter(beastSeen).length;
+  if (s === 'village') return villageP();
   return save.stats[s] || 0;
 }
 const achClaimable = () => ACH.filter(a => !save.ach[a.id] && statVal(a.stat) >= a.goal).length;
@@ -4215,7 +4333,7 @@ function openSettings() {
   show('scrSettings');
 }
 function openTitle() {
-  mode = 'menu'; S = null; musicStop(); setAudioGains();
+  mode = 'menu'; S = null; musicStop(); setAudioGains(); $('game').classList.remove('echo');
   refreshCoins();
   const nx = misNext();
   $('playSub').textContent = nx ? `Misión ${nx.n} · ${nx.name}` : 'Campaña y expediciones';
@@ -4421,11 +4539,16 @@ function openShop(from) {
     btn.onclick = () => { save.coins -= cost; save.meta[M.id] = lv + 1; persist(); sfx('coin'); vib(12); openShop(); };
     el.appendChild(btn); list.appendChild(el);
   });
+  // Boro runs the workshop once he has joined; Mara's lab opens after her mission
+  const bh = folkOpen('boro') ? 'boro' : 'marina';
+  hostSay($('shopHost'), bh, bh === 'boro' ? (canBuySomething() ? '¡Tienes monedas! Elige una mejora y me pongo a martillar.' : folkLine('boro')) : 'Boro, el herrero, llegará pronto. Mientras, el taller es todo tuyo.');
+  const lo = labOpen(); $('labIco').innerHTML = ico(lo ? 'i_motor' : 'i_candado', 34);
+  $('labCard').classList.toggle('locked', !lo); $('labGo').disabled = !lo;
+  $('labTxt').textContent = lo ? 'Prueba cualquier arma, fusión, unión o jefe. La isla no cae y no se guarda nada.' : `Mara lo abre al superar «${CAMPAIGN[LAB_NEED].name}».`;
   show('scrShop');
 }
-function openAch() {
-  refreshCoins();
-  const list = $('achList'); list.innerHTML = '';
+// the achievement rows: in their own screen and in the Archive
+function achInto(list, again) {
   ACH.forEach(a => {
     const v = Math.min(statVal(a.stat), a.goal), done = v >= a.goal, claimed = !!save.ach[a.id];
     const el = document.createElement('div'); el.className = 'lc' + (claimed ? ' locked' : '');
@@ -4433,11 +4556,11 @@ function openAch() {
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy' + (done && !claimed ? ' claim' : '');
     btn.innerHTML = claimed ? 'Cobrado' : coinBtn(a.reward);
     btn.disabled = !done || claimed;
-    btn.onclick = () => { save.ach[a.id] = 1; save.coins += a.reward; persist(); sfx('evo'); vib(40); openAch(); };
+    btn.onclick = () => { save.ach[a.id] = 1; save.coins += a.reward; persist(); sfx('evo'); vib(40); again(); };
     el.appendChild(btn); list.appendChild(el);
   });
-  show('scrAch');
 }
+function openAch() { refreshCoins(); const list = $('achList'); list.innerHTML = ''; achInto(list, openAch); show('scrAch'); }
 function openMissions() {
   refreshCoins(); ensureMissions();
   const list = $('misList'); list.innerHTML = '';
@@ -4477,6 +4600,10 @@ function startRun(runMode, islIdx) { audioInit(); curtain(() => beginRun(runMode
 function beginRun(runMode, islIdx) {
   newRun(runMode, islIdx);
   S.intro = 1;
+  // the relic you carry, the islander who guards the island, the answer to their last question
+  S.relic = save.relic && relicOwned(save.relic) ? save.relic : null;
+  guardStart(); applyBoon();
+  $('game').classList.toggle('echo', !!(S.mis && S.mis.echo));
   hudCache = {};
   mode = 'play'; show(null); setAudioGains();
   const m = S.moon;
@@ -4487,6 +4614,7 @@ function beginRun(runMode, islIdx) {
   if (S.mis) { misStart(); banner(S.mis.name, S.mis.goal, 2.4); (S.mis.tips || []).forEach(([k, a, b]) => setTimeout(() => S && tip(k, a, b), 2600)); if (S.mis.tut) tutStart(); }
   else if (runMode === 'island') banner(S.isl.name, S.danger ? DANGER_TXT[S.danger] : ISLANDS[islIdx].sub, 2);
   else if (runMode === 'daily') banner('Reto diario', S.dailyList.map(x => x.name).join(' + '), 2.4);
+  else if (runMode === 'lab') labBegin();
   else banner('Marea sin fin', 'Aguanta todo lo que puedas', 2);
   if (!save.tips.move) setTimeout(() => tip('move', 'Arrastra para mover la luna', 'Dispara a lo que tiene cerca, recoge perlas y levanta el agua'), 2100);
   updateHUD();
@@ -4612,6 +4740,7 @@ function buildHtml() {
 }
 function resume() { audioInit(); mode = 'play'; show(null); setAudioGains(); }
 function onDeath() {
+  if (S.lab) { S.hp = S.maxHp; return; }
   if (S.revives > 0) { mode = 'revive'; show('scrRevive'); setAudioGains(); sfx('hurt'); vib([200, 100, 200]); return; }
   endRun(false);
 }
@@ -4625,6 +4754,7 @@ const CAUSE = { sloop: 'las balandras', galleon: 'los galeones', mortar: 'los mo
 const lowArt = n => n.replace(/^El /, 'el ').replace(/^La /, 'la ').replace(/^(Demonio|Kraken)/, 'el $1');
 let resultFace = 'calm';
 function endRun(won, quit) {
+  if (S.lab) { if (!S.ended) labEnd(); return; }
   if (S.ended) return; S.ended = true;
   S.face = won ? 'cheer' : quit ? 'calm' : 'sad'; S.faceT = 9;
   resultFace = won ? 'cheer' : quit ? 'happy' : 'sad';
@@ -4674,8 +4804,8 @@ function endRun(won, quit) {
   mode = 'result';
   setTimeout(() => {
     const M = S.mis, wm = waveMax();
-    $('rEyebrow').textContent = M ? `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}` : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
-    $('rTitle').textContent = M ? (won ? '¡Misión cumplida!' : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : S.failWhy === 'mission' ? S.failTitle : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
+    $('rEyebrow').textContent = M ? (M.echo ? `${M.n} · ${ISLANDS[M.ch].name}` : `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}`) : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
+    $('rTitle').textContent = M ? (won ? (M.echo ? '¡Eco superado!' : '¡Misión cumplida!') : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : S.failWhy === 'mission' ? S.failTitle : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
     const wv = wm ? `Oleada ${won && !M ? wm : S.wave} de ${wm}` : `Oleada ${S.wave}`;
     $('rSum').textContent = `${wv} · ${fmtT(S.t)} · ${S.kills.toLocaleString('es')} hundidos`;
     // the cause of a defeat: whatever did the most damage to the island
@@ -4702,10 +4832,10 @@ function endRun(won, quit) {
     $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
     $('rBuild').innerHTML = buildHtml();
     $('rUnlocks').innerHTML = unlocks.map(t => `<div class="unlock">${t}</div>`).join('');
-    const nx = M && won ? misNext() : null;
+    const nx = M && won && !M.echo ? misNext() : null;
     $('rNext').hidden = !nx; if (nx) { $('rNext').dataset.m = nx.i; $('rNext').innerHTML = `<span>Siguiente: ${nx.name}</span><span aria-hidden="true">→</span>`; }
     $('rAgain').classList.toggle('primary', !nx); $('rAgain').classList.toggle('ghost', !!nx);
-    $('rMenu').textContent = M ? 'Mapa' : 'Menú';
+    $('rMenu').textContent = M ? (M.echo ? 'Archivo' : 'Mapa') : 'Menú';
     show('scrResult');
     countUp($('rCoins'));
   }, delay);
@@ -4742,7 +4872,8 @@ $('setFx').onclick = () => { save.fxLow = !save.fxLow; persist(); openSettings()
 $('startDaily').onclick = () => startRun('daily', 0);
 $('goMoons').onclick = () => openMoons('title');
 $('goShop').onclick = () => openShop('title');
-$('goAch').onclick = () => openAch();
+$('goAch').onclick = () => { audioInit(); openArchive(achClaimable() ? 'ach' : 'hist'); };
+$('labGo').onclick = () => { if (labOpen()) labStart(); };
 $('goMis').onclick = () => openMissions();
 $('moonsBack').onclick = () => moonsReturn === 'islands' ? openIslands() : moonsReturn === 'prep' ? openPrep(prepIdx) : openTitle();
 $('shopBack').onclick = () => shopReturn === 'result' ? show('scrResult') : openTitle();
@@ -4765,6 +4896,9 @@ $('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
 // app shell hooks: Android back button and backgrounding
 window.lunaPause = () => { if (mode === 'play') pause(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
+  if (!$('guardSheet').hidden) { closeGuardSheet(); return true; }
+  if (mode === 'lab') { labClose(); return true; }
+  if (!$('scrTalk').hidden) { $('talkSkip').click(); return true; }
   if (mode === 'play') { pause(); return true; }
   if (mode === 'paused') { if (!$('pConfirm').hidden) closeConfirm(); else resume(); return true; }
   if (mode === 'fuse') { fuseEnd(); return true; }
@@ -4775,8 +4909,8 @@ window.lunaBack = () => {
 };
 document.addEventListener('visibilitychange', () => { if (document.hidden) window.lunaPause(); else if (AU.ctx && AU.ctx.state === 'suspended' && mode !== 'paused') AU.ctx.resume(); });
 // back from a mission: to the map, or straight to the next mission's briefing
-const toMenu = () => { S = null; mode = 'menu'; musicStop(); setAudioGains(); };
-$('rMenu').onclick = () => storyThen(() => { if (S && S.mis) { const c = S.mis.ch; toMenu(); openIslands(c); } else openTitle(); });
+const toMenu = () => { S = null; mode = 'menu'; musicStop(); setAudioGains(); $('game').classList.remove('echo'); };
+$('rMenu').onclick = () => storyThen(() => { if (S && S.mis && S.mis.echo) { toMenu(); openArchive('sec'); } else if (S && S.mis) { const c = S.mis.ch; toMenu(); openIslands(c); } else openTitle(); });
 $('rNext').onclick = () => storyThen(() => { const i = +$('rNext').dataset.m; toMenu(); openPrep(i); });
 
 // test hooks for automated play-testing
@@ -4887,6 +5021,9 @@ function openIslands(focusCh) {
   $('pickDot').innerHTML = pic(`moon_${m.id}`, 26); $('pickName').textContent = `${m.name} · ${m.active}`;
   $('mapStars').innerHTML = `${ico('i_estrella', 20)}<span>${CAMPAIGN.reduce((a, x) => a + misStars(x.i), 0)} / 60</span>`;
   const next = misNext(), list = $('islandList');
+  const mh = folkOpen('salina') ? 'salina' : 'marina';
+  hostSay($('mapHost'), mh, next ? (mh === 'salina' ? `Según mi mapa, lo próximo es «${next.name}».` : `¡La Luna nos necesita en «${next.name}»!`) : 'Has recorrido todos los mares. Aún quedan estrellas por conseguir.');
+  guardRow($('mapGuard'), () => openIslands(focusCh));
   list.innerHTML = '';
   CHAPTERS.forEach((C, c) => {
     const I = ISLANDS[c], open = chOpen(c), sec = document.createElement('section');
@@ -4925,6 +5062,8 @@ function openIslands(focusCh) {
 // ---- getting ready for a mission
 let prepIdx = 0;
 function openPrep(i) {
+  // a pending question from the islanders comes first
+  if (save.decide && !CAMPAIGN[i].tut) { askDecision(() => openPrep(i)); return; }
   prepIdx = i;
   const M = CAMPAIGN[i], C = CHAPTERS[M.ch], rec = misRec(i), base = misBase(M);
   refreshCoins();
@@ -4934,7 +5073,9 @@ function openPrep(i) {
   $('prepName').textContent = M.name;
   $('prepIntro').textContent = M.intro;
   $('prepGoalIco').innerHTML = ico(M.gico, 38); $('prepGoal').textContent = M.goal;
-  $('prepInfo').innerHTML = [`${M.waves} oleadas`, M.cond].map(t => `<span>${t}</span>`).join('');
+  const bo = M.tut ? null : boonOf(), ek = ECHOES.find(x => x.at === i);
+  $('prepInfo').innerHTML = [`${M.waves} oleadas`, M.cond, bo && `${FOLK[DEC[save.boon.id].who].name}: ${bo.good}`, save.relic && relicOwned(save.relic) && `Reliquia: ${RELICS[save.relic].name}`,
+    ek && !echoRec(ek.k).found && folkOpen('salina') && 'Salina: «algo canta en la arena»'].filter(Boolean).map(t => `<span>${t}</span>`).join('');
   $('prepStars').innerHTML = ['Cumple el objetivo', 'Termina con más de la mitad de vida', M.x3].map((t, k) => `<li class="${rec.s[k] ? 'on' : ''}">${ico('i_estrella', 24)}<span>${t}</span></li>`).join('');
   const star = Math.round(base * 0.25), left = 3 - misStars(i);
   $('prepReward').innerHTML = rec.s[0]
@@ -4948,6 +5089,7 @@ function openPrep(i) {
   }
   const m = MOONS.find(x => x.id === save.moon);
   $('prepDot').innerHTML = pic(`moon_${m.id}`, 26); $('prepMoonName').textContent = `${m.name} · ${m.active}`;
+  guardRow($('prepGuard'), () => openPrep(i));
   show('scrPrep');
 }
 $('prepBack').onclick = () => openIslands(CAMPAIGN[prepIdx].ch);
@@ -4985,6 +5127,7 @@ function misLine() {
 
 // ---- the end of a mission: stars, coins and whatever opens next
 function misEnd(won) {
+  if (S.mis.echo) return echoEnd(won);
   const M = S.mis, base = misBase(M), rec = save.camp[M.i + 1] || (save.camp[M.i + 1] = { s: [0, 0, 0], n: 0 });
   const st = [won, won && S.hp / S.maxHp > 0.5, won && !!(M.x3ok && M.x3ok())];
   const openB = CAMPAIGN.map(m => misPlayable(m.i)), chB = CHAPTERS.map((_, c) => chOpen(c)), endB = endlessOpen();
@@ -5006,6 +5149,7 @@ function misEnd(won) {
     if (!save.moons.includes(g.id)) { save.moons.push(g.id); unlocks.push(`Regalo del capítulo: ${g.name}`); }
     else { rows.push([`${g.name} (ya era tuya)`, g.cost]); unlocks.push(`Ya tenías la ${g.name}: recibes ${g.cost} monedas`); }
   }
+  folkUnlocks(M, first, unlocks);
   return { rows, unlocks, coins: rows.reduce((a, r) => a + r[1], 0) };
 }
 function misResultHtml() {
@@ -5162,7 +5306,7 @@ const tideBtnOn = () => S && !(S.mis && S.mis.tut);
 function tideCharge(e) {
   if (!tideBtnOn() || S.surge) return;
   const before = S.tideCh;
-  S.tideCh = Math.min(1, S.tideCh + (e.def.kind === 'ship' ? 0.05 : e.def.kind === 'walk' ? 0.025 : 0.02) * (e.elite ? 3 : 1));
+  S.tideCh = Math.min(1, S.tideCh + (e.def.kind === 'ship' ? 0.05 : e.def.kind === 'walk' ? 0.025 : 0.02) * (e.elite ? 3 : 1) * (S.tideMul || 1));
   if (before < 1 && S.tideCh >= 1) { sfx('card'); tip('tidebtn', '¡Botón de marea listo!', 'Fuerza una pleamar o una bajamar y aparta la flota de tu lado'); }
 }
 function useTide() {
@@ -5331,7 +5475,7 @@ function updTreasure(dt) {
   const tr = S.treasure;
   if (!tr) {
     if (isBossWave(S.wave) || S.wave < 2 || (S.trT -= dt) > 0) return;
-    S.trT = rand(36, 52);
+    S.trT = rand(36, 52) * (S.trK || 1);
     let x, n = 0;
     do { x = rand(0.07, 0.93) * W; n++; } while (n < 30 && (Math.abs(x - W / 2) < 72 * u || inReef(x, 10 * u) || wreckAt(x, 12 * u)));
     S.treasure = { x, kind: Math.random() < 0.6 ? 'chest' : 'amphora', t: 0, life: 45, hold: 0, show: 0, got: 0, ph: rand(0, TAU) };
@@ -5345,7 +5489,7 @@ function updTreasure(dt) {
   if (tr.show >= 1) tip('treasure', '¡Un tesoro asoma en el fondo!', 'Deja la luna encima un segundo para sacarlo');
   const over = Math.abs(S.mx - tr.x) < 30 * u;
   tr.hold = tr.show > 0.5 && over ? tr.hold + dt : Math.max(0, tr.hold - dt * 1.5);
-  if (tr.hold >= 1) { tr.got = 0.01; raiseTreasure(tr); return; }
+  if (tr.hold >= 1) { tr.got = 0.01; if (tr.kind === 'conch') echoFound(tr.echo); else raiseTreasure(tr); return; }
   if (tr.t > tr.life && tr.show <= 0) S.treasure = null;
 }
 function raiseTreasure(tr) {
@@ -5412,6 +5556,7 @@ function updMig(dt) {
 function updSea(dt) {
   if (!seaExtras()) return;
   if (S.wrecks.length) updWrecks(dt);
+  if (S.mis) echoTick();
   updTreasure(dt);
   updMig(dt);
 }
@@ -5465,8 +5610,9 @@ function drawTreasure(tr) {
   const y = fy + (1 - k) * 18 * u - rise * 30 * u;
   ctx.save(); ctx.globalAlpha = tr.got ? Math.max(0, 1 - (tr.got - 0.7) / 0.6) : 1;
   if (!tr.got) { ctx.beginPath(); ctx.rect(0, 0, W, fy + 2 * u); ctx.clip(); }
-  softGlow(tr.x, y - 10 * u, (26 + 5 * Math.sin(T * 4 + tr.ph)) * u, '#ffd36b', 0.4 * k);
+  softGlow(tr.x, y - 10 * u, (26 + 5 * Math.sin(T * 4 + tr.ph)) * u, tr.kind === 'conch' ? '#9fe3ff' : '#ffd36b', 0.4 * k);
   if (tr.kind === 'chest') spr('chest', tr.x, y - 15 * u, 0.8 * u, false, Math.sin(T * 2 + tr.ph) * 0.04);
+  else if (tr.kind === 'conch') drawConch(tr.x, y - 6 * u, 0.55 * u, -0.25 + Math.sin(T * 1.5 + tr.ph) * 0.06);
   else drawAmphora(tr.x, y - 6 * u, 0.6 * u, -1.15 + Math.sin(T * 1.5 + tr.ph) * 0.03);
   // a glint now and then, so it catches the eye
   const g = (T * 0.7 + tr.ph) % 1.6;
@@ -5598,7 +5744,7 @@ function spawnCaptain(id, o = {}) {
   e.cap = id; e.hp = e.maxHp = EN.galleon.hp * hpMul() * (o.hpK || 8); e.r = EN.galleon.r * 1.22; e.spd = EN.galleon.spd * 0.85;
   e.deep = -0.2;   // it sails light: only a real low tide wrecks it on the reef
   e.capT = 0; e.capCd = 4; e.capLife = o.life || 55; e.capVol = 0; e.capVolT = 0; e.cloak = 0;
-  S.cap = e; save.stats.capsSeen = (save.stats.capsSeen || 0) + 1;
+  S.cap = e; markSeen('c_' + id); save.stats.capsSeen = (save.stats.capsSeen || 0) + 1;
   banner(C.name, C.tip, 2.4, true); sfx('roar'); vib([60, 40, 100]); S.shake = Math.max(S.shake, 0.4);
   const es = capEscort();
   for (let i = 0; i < es.n; i++) { const x = spawnEnemy(es.k, side, i + 3); if (es.armor) { addTrait(x, 'acorazado'); x.armor = x.maxHp * 0.45; } }
@@ -6242,6 +6388,812 @@ function storyThen(fn) {
   else openStory(k, fn);
 }
 // =====================================================================
+// THE ISLANDERS: Marina, Mara, Boro and Salina. They host the menus, one of them guards the island
+// during a run, the village on the title grows with the campaign, and between missions they ask for
+// a decision that changes the next one.
+// =====================================================================
+// need: the campaign mission (index) that has to be beaten before they join
+const FOLK = {
+  marina: { name: 'Marina', role: 'La farolera', col: '#ff6f61', need: 0, ico: 'i_faro',
+    guard: 'Su faro barre el mar: los barcos que alumbra van un 30% más lentos, y avisa de los brulotes.',
+    say: ['¡La Luna nunca falla!', 'Desde el faro se ve toda la bahía.', 'Si veo un brulote, te aviso.', 'Mi abuela encendió el primer farol de la isla.'] },
+  mara: { name: 'Mara', role: 'La inventora', col: '#4f9a6a', need: 2, ico: 'i_motor',
+    guard: 'Sus inventos cargan un 20% más rápido la habilidad de la luna y el botón de marea.',
+    say: ['¡Pasa a mi laboratorio! Aquí nada se rompe… casi.', 'Prueba lo que quieras: aquí no cuesta nada.', '¿Y si juntamos esas dos armas?', 'Apunta: el hielo y el faro se llevan genial.'] },
+  boro: { name: 'Boro', role: 'El herrero', col: '#e2553a', need: 4, ico: 'i_murallas',
+    guard: 'Repara el castillo a martillazos: un 2% de vida cada 10 segundos.',
+    say: ['Un buen muro vale más que cien cañones.', 'Clac, clac. Así suena el progreso.', '¿Mejoras? Para eso tengo pinzas.', 'Mi martillo no descansa. Bueno, a veces.'] },
+  salina: { name: 'Salina', role: 'La cartógrafa', col: '#2f8f9d', need: 9, ico: 'i_tesoro',
+    guard: 'Atrae las perlas hacia la luna, da un 10% más y encuentra más tesoros en el fondo.',
+    say: ['¿A dónde zarpamos hoy?', 'Cada isla esconde algo.', 'Dicen que algunas caracolas cantan con la marea muy baja.', 'Mis mapas nunca mienten. Casi nunca.'] },
+};
+const FOLK_IDS = Object.keys(FOLK);
+const folkOpen = id => misDone(FOLK[id].need);
+const guardOf = () => (save.guard && FOLK[save.guard] && folkOpen(save.guard)) ? save.guard : null;
+
+// ---- drawing: every islander stands with the feet at (0, 0), about 100 units tall; o = { t, face, act, look }
+// face: calm | happy | talk | surprised | wink | grumpy; act 0..1 lifts the lantern, the hammer, the map or the wrench
+function folkEyes(g, xs, y, o, big = 1) {
+  const t = o.t || 0, blink = (t * 0.7 + (o.seed || 0)) % 3.4 < 0.12, f = o.face || 'calm', lk = o.look || 0;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  xs.forEach((x, i) => {
+    if (blink || f === 'happy' || (f === 'wink' && i === 1)) {
+      g.strokeStyle = OUTLINE; g.lineWidth = 2.6; g.beginPath();
+      if (f === 'happy' && !blink) g.arc(x, y + 1.5, 4 * big, Math.PI * 1.15, Math.PI * 1.85); else { g.moveTo(x - 4 * big, y); g.quadraticCurveTo(x, y + 2.5, x + 4 * big, y); }
+      g.stroke(); return;
+    }
+    const r = (f === 'surprised' ? 5.4 : 4.6) * big;
+    g.fillStyle = '#fff'; g.beginPath(); g.ellipse(x, y, r * 0.86, r, 0, 0, TAU); g.fill();
+    g.strokeStyle = OUTLINE; g.lineWidth = 2; g.stroke();
+    g.fillStyle = OUTLINE; g.beginPath(); g.arc(x + lk * 1.4 * big, y + 0.6, r * 0.52, 0, TAU); g.fill();
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x + lk * 1.4 * big + 1.1, y - 0.8, r * 0.18, 0, TAU); g.fill();
+    if (f === 'grumpy') { g.fillStyle = o.skin || '#e8b48a'; g.beginPath(); g.rect(x - r, y - r - 1, r * 2, r * 0.75); g.fill(); g.strokeStyle = OUTLINE; g.lineWidth = 2.2; g.beginPath(); g.moveTo(x - r, y - r * 0.3); g.lineTo(x + r, y - r * 0.3); g.stroke(); }
+  });
+}
+function folkMouth(g, x, y, o, w = 6) {
+  const f = o.face || 'calm', t = o.t || 0;
+  g.strokeStyle = OUTLINE; g.lineWidth = 2.4; g.lineCap = 'round';
+  if (f === 'talk' || f === 'surprised') {
+    const open = f === 'surprised' ? 1 : 0.35 + 0.65 * Math.abs(Math.sin(t * 11));
+    g.fillStyle = '#7a2235'; g.beginPath(); g.ellipse(x, y + 1, w * 0.55, (1.2 + 3.2 * open), 0, 0, TAU); g.fill(); g.stroke();
+    g.fillStyle = '#ff8f9a'; g.beginPath(); g.ellipse(x, y + 1 + 1.6 * open, w * 0.32, 1.1 * open, 0, 0, TAU); g.fill();
+  } else if (f === 'grumpy') { g.beginPath(); g.moveTo(x - w * 0.6, y + 2); g.quadraticCurveTo(x, y - 1, x + w * 0.6, y + 2); g.stroke(); }
+  else { g.beginPath(); g.moveTo(x - w * 0.7, y - 0.5); g.quadraticCurveTo(x, y + (f === 'happy' || f === 'wink' ? 5 : 3.2), x + w * 0.7, y - 0.5); g.stroke(); }
+}
+const blush = (g, x, y, r = 3.4) => { g.fillStyle = 'rgba(255,120,140,0.45)'; g.beginPath(); g.ellipse(x, y, r, r * 0.6, 0, 0, TAU); g.fill(); };
+// outlined shape helper: fill, then the dark contour
+function fs(g, fill, path, lw = 2.6) { g.fillStyle = fill; g.fill(path); g.strokeStyle = OUTLINE; g.lineWidth = lw; g.lineJoin = 'round'; g.stroke(path); }
+const P2 = d => new Path2D(d);
+function limb(g, x1, y1, x2, y2, w, col) {
+  g.lineCap = 'round'; g.strokeStyle = OUTLINE; g.lineWidth = w + 3.4; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+  g.strokeStyle = col; g.lineWidth = w; g.stroke();
+}
+const disc = (g, x, y, r, fill, lw = 2.6) => { g.beginPath(); g.arc(x, y, r, 0, TAU); g.fillStyle = fill; g.fill(); g.strokeStyle = OUTLINE; g.lineWidth = lw; g.stroke(); };
+
+function drawMarina(g, o) {
+  const t = o.t || 0, a = o.act || 0, skin = '#9a6544', b = Math.sin(t * 2.2) * 0.8;
+  // legs and shoes
+  limb(g, -5, -16, -6, -3, 4.5, skin); limb(g, 5, -16, 6, -3, 4.5, skin);
+  fs(g, '#3b2218', P2('M -11 -1 Q -11 -5 -6 -5 Q -2 -5 -2 -1 Z M 2 -1 Q 2 -5 6 -5 Q 11 -5 11 -1 Z'), 2);
+  // the lantern arm goes up as she raises it to the sky
+  const hx = 13 + a * 3, hy = -26 - a * 36;
+  limb(g, 8, -43 + b, hx, hy, 4.2, skin);
+  // dress with white dots
+  const dress = P2(`M -16 -13 Q 0 -9 16 -13 L 10 -46 Q 0 -49 -10 -46 Z`);
+  fs(g, '#ff6f61', dress);
+  g.save(); g.clip(dress); g.fillStyle = '#fff3ea';
+  for (const [x, y] of [[-9, -20], [0, -17], [9, -21], [-5, -29], [5, -31], [-1, -39], [-11, -34], [10, -38]]) { g.beginPath(); g.arc(x, y + b * 0.3, 1.6, 0, TAU); g.fill(); }
+  g.restore();
+  limb(g, -8, -43 + b, -14, -27, 4.2, skin);
+  // the lantern: a little cage with a warm flame
+  g.save(); g.translate(hx, hy); g.rotate(Math.sin(t * 2.6) * 0.12);
+  if (o.glow !== false) { const gr = g.createRadialGradient(0, 8, 0, 0, 8, 22); gr.addColorStop(0, 'rgba(255,214,120,0.55)'); gr.addColorStop(1, 'rgba(255,214,120,0)'); g.fillStyle = gr; g.fillRect(-22, -14, 44, 44); }
+  g.strokeStyle = OUTLINE; g.lineWidth = 2; g.beginPath(); g.arc(0, 0, 3, Math.PI, 0); g.stroke();
+  fs(g, '#ffd36b', P2('M -5 3 L 5 3 L 6 15 L -6 15 Z'), 2);
+  fs(g, '#ff9d3c', P2('M 0 6 Q 3 10 0 13 Q -3 10 0 6 Z'), 1.2);
+  fs(g, '#5a3a2a', P2('M -6 1 L 6 1 L 6 4 L -6 4 Z M -7 15 L 7 15 L 7 18 L -7 18 Z'), 1.6);
+  g.restore();
+  // head: brown skin, dark hair with a bun and a pink flower
+  const hy0 = -63 + b;
+  disc(g, -15, hy0 - 9, 7.5, '#3b2218');
+  disc(g, 0, hy0, 18, skin);
+  fs(g, '#3b2218', P2(`M -18 ${hy0 + 2} Q -20 ${hy0 - 22} 0 ${hy0 - 20} Q 19 ${hy0 - 21} 18 ${hy0 + 1} Q 12 ${hy0 - 10} 2 ${hy0 - 9} Q -8 ${hy0 - 12} -18 ${hy0 + 2} Z`));
+  for (let i = 0; i < 5; i++) { const an = i / 5 * TAU + 0.3; disc(g, 11 + Math.cos(an) * 4, hy0 - 15 + Math.sin(an) * 4, 3.2, '#ff8fc8', 1.4); }
+  disc(g, 11, hy0 - 15, 2, '#ffd36b', 1.2);
+  o.skin = skin; folkEyes(g, [-6.5, 6.5], hy0 + 1, o, 1.08);
+  blush(g, -11, hy0 + 7); blush(g, 11, hy0 + 7);
+  folkMouth(g, 0, hy0 + 9, o, 6);
+}
+
+function drawMara(g, o) {
+  const t = o.t || 0, a = o.act || 0, skin = '#f1c6a0', b = Math.sin(t * 2) * 0.8;
+  limb(g, -5, -17, -6, -4, 5, '#3f7d55'); limb(g, 5, -17, 6, -4, 5, '#3f7d55');
+  fs(g, '#5a3a24', P2('M -12 0 Q -12 -6 -6 -6 Q -1 -6 -1 0 Z M 1 0 Q 1 -6 6 -6 Q 12 -6 12 0 Z'), 2);
+  // the wrench arm twists up and down while she tinkers
+  const wa = -0.6 - a * 1.6 + Math.sin(t * 5) * 0.15 * a, hx = 9 + Math.cos(wa) * 15, hy = -40 + Math.sin(wa) * 15;
+  // cream shirt, green overalls with a pocket and a strap
+  fs(g, '#f3e3c3', P2('M -13 -26 Q -14 -44 -9 -47 L 9 -47 Q 14 -44 13 -26 Z'));
+  fs(g, '#4f9a6a', P2('M -14 -15 L -12 -36 L 12 -36 L 14 -15 Q 0 -12 -14 -15 Z'));
+  fs(g, '#3f7d55', P2('M -5 -31 L 5 -31 L 5 -24 L -5 -24 Z'), 1.6);
+  g.strokeStyle = OUTLINE; g.lineWidth = 2.2; g.beginPath(); g.moveTo(-9, -36); g.lineTo(-7, -46); g.moveTo(9, -36); g.lineTo(7, -46); g.stroke();
+  limb(g, -10, -42 + b, -14, -26, 4.2, skin);
+  limb(g, 9, -42 + b, hx, hy, 4.2, skin);
+  // a big spanner held upright, its open jaw on top
+  g.save(); g.translate(hx, hy); g.rotate(0.35 - a * 0.5 + Math.sin(t * 5) * 0.12 * a);
+  fs(g, '#b9c3d6', P2('M -2 5 L 2 5 L 2 -13 L -2 -13 Z'), 1.8);
+  fs(g, '#b9c3d6', P2('M -6 -12 Q -7 -21 -3 -23 L -2 -17 L 2 -17 L 3 -23 Q 7 -21 6 -12 Q 0 -9 -6 -12 Z'), 1.8);
+  g.restore();
+  // head: freckles, wild orange curls in a bun with a pencil, brass goggles up on the forehead
+  const hy0 = -64 + b;
+  g.strokeStyle = OUTLINE; g.lineWidth = 2.2; g.beginPath(); g.moveTo(6, hy0 - 32); g.lineTo(16, hy0 - 22); g.stroke();
+  fs(g, '#ffd36b', P2(`M 5 ${hy0 - 33} L 8 ${hy0 - 31} L 16 ${hy0 - 22} L 13 ${hy0 - 24} Z`), 1.4);
+  for (const [x, y, r] of [[-2, -24, 8], [-17, -12, 7], [17, -12, 7], [-12, -21, 7.5], [12, -21, 7.5], [-19, -2, 5.5], [19, -2, 5.5]]) disc(g, x, hy0 + y, r, '#d9692e', 2.2);
+  disc(g, 0, hy0, 17.5, skin);
+  fs(g, '#d9692e', P2(`M -17 ${hy0 - 1} Q -16 ${hy0 - 19} 0 ${hy0 - 18} Q 16 ${hy0 - 19} 17 ${hy0 - 1} Q 10 ${hy0 - 12} 0 ${hy0 - 11} Q -10 ${hy0 - 12} -17 ${hy0 - 1} Z`));
+  g.strokeStyle = '#7a4b2a'; g.lineWidth = 3; g.beginPath(); g.moveTo(-17, hy0 - 10); g.lineTo(17, hy0 - 10); g.stroke();
+  for (const x of [-7, 7]) { disc(g, x, hy0 - 11, 5.6, '#d9a441', 2.2); g.fillStyle = '#9fe3ff'; g.beginPath(); g.arc(x, hy0 - 11, 3.4, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,0.8)'; g.beginPath(); g.arc(x - 1.2, hy0 - 12.3, 1.1, 0, TAU); g.fill(); }
+  o.skin = skin; folkEyes(g, [-6, 6], hy0 + 2, o, 1);
+  g.fillStyle = '#c47a4a'; for (const [x, y] of [[-10, 7], [-12.5, 8.5], [-9, 9.5], [10, 7], [12.5, 8.5], [9, 9.5]]) { g.beginPath(); g.arc(x, hy0 + y, 0.8, 0, TAU); g.fill(); }
+  folkMouth(g, 0, hy0 + 10, o, 6);
+}
+
+function drawBoro(g, o) {
+  const t = o.t || 0, a = o.act || 0, red = '#e2553a', b = Math.abs(Math.sin(t * 2.4)) * 1.2;
+  // six little legs that tap
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (let i = 0; i < 3; i++) for (const sd of [-1, 1]) {
+    const x0 = sd * (12 + i * 7), k = Math.sin(t * 6 + i + (sd > 0 ? 1 : 0)) * 1.5;
+    g.strokeStyle = OUTLINE; g.lineWidth = 6.5; g.beginPath(); g.moveTo(x0, -16); g.lineTo(x0 + sd * (5 + i * 2), -10 + k); g.lineTo(x0 + sd * (6 + i * 3), 0); g.stroke();
+    g.strokeStyle = red; g.lineWidth = 3.2; g.stroke();
+  }
+  // shell: wide, with a pale belly and a leather apron
+  const sh = P2(`M -30 ${-18 - b} Q -34 ${-46 - b} 0 ${-50 - b} Q 34 ${-46 - b} 30 ${-18 - b} Q 0 ${-8 - b} -30 ${-18 - b} Z`);
+  fs(g, red, sh, 3);
+  g.save(); g.clip(sh);
+  g.fillStyle = '#f4a07a'; g.beginPath(); g.ellipse(0, -14 - b, 26, 12, 0, 0, TAU); g.fill();
+  g.fillStyle = 'rgba(255,255,255,0.22)'; g.beginPath(); g.ellipse(-8, -42 - b, 14, 4, -0.15, 0, TAU); g.fill();
+  g.restore();
+  fs(g, '#7a4b2a', P2(`M -13 ${-34 - b} L 13 ${-34 - b} L 15 ${-12 - b} Q 0 ${-9 - b} -15 ${-12 - b} Z`), 2.2);
+  g.strokeStyle = '#d9a441'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-8, -28 - b); g.lineTo(8, -28 - b); g.stroke();
+  // the hammer claw: resting on the shoulder, raised over the head to strike
+  const cx = -34, cy = -30 - b;
+  g.save(); g.translate(cx, cy); g.rotate(-0.3 + a * 0.55);
+  fs(g, '#8a5a3c', P2('M -2 0 L 2 0 L 2 -30 L -2 -30 Z'), 2);
+  fs(g, '#8b97ab', P2('M -9 -38 L 9 -38 L 9 -27 L -9 -27 Z'), 2.2);
+  g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(-7, -36, 14, 2.5);
+  fs(g, red, P2('M -8 4 Q -12 -4 -4 -6 L 4 -6 Q 12 -4 8 4 Q 0 9 -8 4 Z'), 2.4);
+  g.restore();
+  // the little claw on the other side
+  fs(g, red, P2(`M 28 ${-30 - b} Q 40 ${-36 - b} 40 ${-26 - b} L 34 ${-27 - b} Q 37 ${-21 - b} 30 ${-21 - b} Z`), 2.4);
+  // eyes on stalks with bushy, stubborn brows
+  const ey = -66 - b + Math.sin(t * 1.7) * 1;
+  for (const x of [-8, 8]) { limb(g, x * 0.7, -46 - b, x, ey + 6, 3, red); }
+  for (const x of [-8, 8]) disc(g, x, ey, 7, '#fff', 2.2);
+  o.skin = red;
+  const f = o.face || 'calm', blink = (t * 0.7 + (o.seed || 0)) % 3.4 < 0.12;
+  for (const x of [-8, 8]) {
+    if (blink || f === 'happy') { g.strokeStyle = OUTLINE; g.lineWidth = 2.4; g.beginPath(); g.moveTo(x - 4, ey + 1); g.quadraticCurveTo(x, ey - (f === 'happy' ? 3 : -1.5), x + 4, ey + 1); g.stroke(); continue; }
+    g.fillStyle = OUTLINE; g.beginPath(); g.arc(x + (o.look || 0) * 1.5, ey + 1, f === 'surprised' ? 2.4 : 3, 0, TAU); g.fill();
+  }
+  const bro = f === 'happy' ? -2 : f === 'surprised' ? -4 : 0;
+  g.strokeStyle = '#3a1a12'; g.lineWidth = 4; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(-14, ey - 7 + bro); g.lineTo(-3, ey - 9 + bro * 1.4 + (f === 'grumpy' ? 4 : f === 'calm' ? 2 : 0)); g.moveTo(14, ey - 7 + bro); g.lineTo(3, ey - 9 + bro * 1.4 + (f === 'grumpy' ? 4 : f === 'calm' ? 2 : 0)); g.stroke();
+  folkMouth(g, 0, -38 - b, o, 7);
+}
+
+function drawSalina(g, o) {
+  const t = o.t || 0, a = o.act || 0, skin = '#c98d5f', b = Math.sin(t * 1.8) * 0.8;
+  limb(g, -5, -18, -6, -5, 5, '#c9a26b'); limb(g, 5, -18, 6, -5, 5, '#c9a26b');
+  fs(g, '#6b4528', P2('M -12 0 Q -12 -9 -8 -9 L -3 -9 L -2 0 Z M 2 0 L 3 -9 L 8 -9 Q 12 -9 12 0 Z'), 2);
+  // the long teal coat with a belt, a yellow scarf
+  fs(g, '#2f8f9d', P2('M -15 -14 Q -15 -40 -10 -47 L 10 -47 Q 15 -40 15 -14 L 4 -16 L 0 -24 L -4 -16 Z'));
+  fs(g, '#5a3a24', P2('M -14 -29 L 14 -29 L 14 -25 L -14 -25 Z'), 1.6);
+  fs(g, '#d9a441', P2('M -2 -29.5 L 2 -29.5 L 2 -24.5 L -2 -24.5 Z'), 1.2);
+  limb(g, -9, -43 + b, -13, -28, 4.4, '#2f8f9d');
+  // the map: rolled at her side, unrolled in front of her when she reads it
+  const mx = 10 + a * 2, my = -30 - a * 12;
+  limb(g, 9, -43 + b, mx, my, 4.4, '#2f8f9d');
+  g.save(); g.translate(mx, my);
+  if (a > 0.5) {
+    fs(g, '#f1e2b8', P2('M -16 -12 L 10 -14 L 12 4 L -14 6 Z'), 2);
+    g.strokeStyle = '#b05a3a'; g.lineWidth = 1.4; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(-10, 1); g.quadraticCurveTo(-2, -10, 6, -4); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = '#d8463a'; g.lineWidth = 2; g.beginPath(); g.moveTo(4, -7); g.lineTo(8, -3); g.moveTo(8, -7); g.lineTo(4, -3); g.stroke();
+  } else {
+    g.rotate(-0.5); fs(g, '#f1e2b8', P2('M -3 -14 L 3 -14 L 3 10 L -3 10 Z'), 2);
+    fs(g, '#d8463a', P2('M -3.5 -3 L 3.5 -3 L 3.5 0 L -3.5 0 Z'), 1.2);
+  }
+  g.restore();
+  fs(g, '#ffd36b', P2(`M -10 ${-47 + b} Q 0 ${-41 + b} 10 ${-47 + b} L 8 ${-51 + b} L -8 ${-51 + b} Z M 5 ${-45 + b} L 9 ${-33 + b} L 4 ${-35 + b} Z`), 2);
+  // head: a black braid over the shoulder, a wide hat with a gull feather
+  const hy0 = -65 + b;
+  limb(g, -13, hy0 + 4, -15, hy0 + 26, 6, '#1f1a24');
+  for (let i = 0; i < 3; i++) { g.strokeStyle = '#3a3344'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(-17, hy0 + 9 + i * 6); g.lineTo(-13, hy0 + 11 + i * 6); g.stroke(); }
+  disc(g, 0, hy0, 17, skin);
+  fs(g, '#1f1a24', P2(`M -17 ${hy0 + 2} Q -16 ${hy0 - 15} 0 ${hy0 - 15} Q 16 ${hy0 - 15} 17 ${hy0 + 2} Q 9 ${hy0 - 8} -3 ${hy0 - 8} Q -12 ${hy0 - 7} -17 ${hy0 + 2} Z`));
+  fs(g, '#6b4528', P2(`M -30 ${hy0 - 9} Q 0 ${hy0 - 17} 30 ${hy0 - 9} Q 26 ${hy0 - 4} 0 ${hy0 - 8} Q -26 ${hy0 - 4} -30 ${hy0 - 9} Z`));
+  fs(g, '#6b4528', P2(`M -14 ${hy0 - 11} Q -13 ${hy0 - 29} 0 ${hy0 - 29} Q 13 ${hy0 - 29} 14 ${hy0 - 11} Z`));
+  fs(g, '#d8463a', P2(`M -14 ${hy0 - 15} L 14 ${hy0 - 15} L 14 ${hy0 - 11} L -14 ${hy0 - 11} Z`), 1.8);
+  g.save(); g.translate(11, hy0 - 16); g.rotate(-0.9 + Math.sin(t * 3) * 0.06);
+  fs(g, '#f4f9ff', P2('M 0 0 Q 6 -10 2 -24 Q -4 -12 0 0 Z'), 1.8);
+  g.strokeStyle = '#9aa8c4'; g.lineWidth = 1; g.beginPath(); g.moveTo(0.5, -2); g.lineTo(2, -22); g.stroke();
+  g.restore();
+  o.skin = skin; folkEyes(g, [-6, 6], hy0 + 1, o, 0.95);
+  if ((o.face || 'calm') === 'calm') { g.fillStyle = skin; g.fillRect(-11, hy0 - 4.5, 22, 3.5); g.strokeStyle = OUTLINE; g.lineWidth = 2; g.beginPath(); g.moveTo(-10, hy0 - 1); g.lineTo(-2, hy0 - 1); g.moveTo(2, hy0 - 1); g.lineTo(10, hy0 - 1); g.stroke(); }
+  blush(g, -10, hy0 + 7, 3); blush(g, 10, hy0 + 7, 3);
+  folkMouth(g, 1, hy0 + 9, o, 5.5);
+}
+const FOLK_DRAW = { marina: drawMarina, mara: drawMara, boro: drawBoro, salina: drawSalina };
+// one islander on any canvas: feet at (x, y), s = pixels per unit
+function drawFolkChar(g, who, x, y, s, o = {}) {
+  g.save(); g.translate(x, y); g.scale(o.flip ? -s : s, s);
+  FOLK_DRAW[who](g, o);
+  g.restore();
+}
+// a portrait: head and shoulders on a round backdrop in the islander's colour
+function folkPortrait(cv, who, o = {}) {
+  const g = cv.getContext('2d'), w = cv.width, h = cv.height;
+  g.clearRect(0, 0, w, h);
+  const F = FOLK[who];
+  if (o.ring !== false) {
+    g.save(); g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 2, 0, TAU); g.clip();
+    const gr = g.createRadialGradient(w / 2, h * 0.38, 0, w / 2, h / 2, w / 2);
+    gr.addColorStop(0, hexA(F.col, 0.55)); gr.addColorStop(1, hexA(F.col, 0.12));
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    drawFolkChar(g, who, w / 2, h * (who === 'boro' ? 1.2 : 1.5), w / 74, o);
+    g.restore();
+    g.strokeStyle = hexA(F.col, 0.9); g.lineWidth = Math.max(2, w / 40); g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 2, 0, TAU); g.stroke();
+  } else drawFolkChar(g, who, w / 2, h * 0.97, h / 112, o);
+  if (o.locked) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(16,22,44,0.92)'; g.fillRect(0, 0, w, h); g.globalCompositeOperation = 'source-over'; }
+}
+
+// ---- hosts: a portrait that talks next to a bubble, on the map, the workshop, the Archive and the lab
+const hostCvs = new Set();
+function folkCanvas(who, size, o = {}) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = size * 2; cv.className = 'folkc';
+  cv.style.width = cv.style.height = `${size}px`; cv.dataset.who = who; cv.dataset.seed = Math.random() * 3;
+  if (o.locked) cv.dataset.locked = 1; if (o.ring === false) cv.dataset.noring = 1;
+  hostCvs.add(cv); folkPortrait(cv, who, { t: 0, locked: o.locked, ring: o.ring });
+  return cv;
+}
+// fills a .host box: who talks and what they say; the face moves while the text is fresh
+function hostSay(box, who, text) {
+  if (!box) return;
+  let cv = box.querySelector('canvas.folkc');
+  if (!cv || cv.dataset.who !== who) { if (cv) { hostCvs.delete(cv); cv.remove(); } cv = folkCanvas(who, 64); box.prepend(cv); }
+  cv.dataset.talk = T + Math.min(2.6, 0.6 + text.length * 0.035);
+  const p = box.querySelector('.hsay'); p.innerHTML = `<b>${FOLK[who].name}</b>${text}`;
+  p.classList.remove('pop'); void p.offsetWidth; p.classList.add('pop');
+}
+const folkLine = (who, k) => FOLK[who].say[(k ?? Math.floor(Math.random() * 99)) % FOLK[who].say.length];
+let hostFrame = 0;
+function hostTick() {
+  if (++hostFrame % 2 || !hostCvs.size) return;
+  for (const cv of hostCvs) {
+    if (!cv.isConnected) { hostCvs.delete(cv); continue; }
+    if (cv.dataset.locked || cv.offsetParent === null) continue;
+    const talk = +cv.dataset.talk > T;
+    folkPortrait(cv, cv.dataset.who, { t: T, seed: +cv.dataset.seed, face: talk ? 'talk' : cv.dataset.face || 'calm', ring: !cv.dataset.noring, act: +cv.dataset.act || 0 });
+  }
+}
+// tapping a host makes them say something else
+document.addEventListener('pointerdown', e => {
+  const cv = e.target.closest && e.target.closest('.host canvas.folkc'); if (!cv) return;
+  hostSay(cv.parentElement, cv.dataset.who, folkLine(cv.dataset.who)); sfx('pop');
+});
+
+// ---- the guardian picker (prep screen and map)
+let guardBack = null;
+function openGuardSheet(back) {
+  guardBack = back;
+  const list = $('guardList'); list.innerHTML = '';
+  const row = (id, html, on, open) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'lc gopt' + (on ? ' sel' : '') + (open ? '' : ' locked');
+    b.innerHTML = html; b.disabled = !open;
+    b.onclick = () => { save.guard = id; persist(); sfx('card'); vib(12); closeGuardSheet(); };
+    list.appendChild(b); return b;
+  };
+  for (const id of FOLK_IDS) {
+    const F = FOLK[id], open = folkOpen(id);
+    const b = row(id, `<span class="ico gp"></span><span><b>${open ? F.name : '???'} <small>${open ? F.role : ''}</small></b><span class="d">${open ? F.guard : `Se une al superar «${CAMPAIGN[F.need].name}»`}</span></span>`, guardOf() === id, open);
+    b.querySelector('.gp').appendChild(folkCanvas(id, 52, { locked: !open }));
+  }
+  row(null, `<span class="ico">${ico('i_candado', 30)}</span><span><b>Sin guardián</b><span class="d">La luna defiende la isla sola.</span></span>`, !guardOf(), true).querySelector('.ico').innerHTML = '—';
+  $('guardSheet').hidden = false;
+}
+function closeGuardSheet() { $('guardSheet').hidden = true; const f = guardBack; guardBack = null; if (f) f(); }
+$('guardClose').onclick = closeGuardSheet;
+$('guardSheet').addEventListener('click', e => { if (e.target.id === 'guardSheet') closeGuardSheet(); });
+// the little "Guardián: X · Cambiar" row
+function guardRow(el, back) {
+  if (!el) return;
+  const any = FOLK_IDS.some(folkOpen); el.hidden = !any; if (!any) return;
+  const g = guardOf(), dot = el.querySelector('.gdot');
+  dot.innerHTML = ''; if (g) dot.appendChild(folkCanvas(g, 30)); else dot.textContent = '—';
+  el.querySelector('.gname').textContent = g ? `${FOLK[g].name} · ${FOLK[g].role}` : 'Sin guardián';
+  el.querySelector('button').onclick = () => openGuardSheet(back);
+}
+
+// ---- the guardian during a run: stands on the island next to the lighthouse and helps in their own way
+const GUARD_HI = { marina: '¡Yo vigilo desde el faro!', mara: 'Mis inventos están listos.', boro: 'Si algo se rompe, lo arreglo.', salina: 'Las perlas, para ti. Casi todas.' };
+function guardStart() {
+  const g = S.mis && S.mis.tut ? null : guardOf();
+  S.guard = g; S.gT = 10; S.gAct = 0; S.gSay = null;
+  if (!g) return;
+  if (g === 'mara') { S.chargeMul *= 1.2; S.tideMul = 1.2; }
+  if (g === 'salina') { S.magnetMul *= 1.6; S.coinMul *= 1.1; S.trK = 0.7; S.trT *= 0.7; recompute(); }
+  setTimeout(() => { if (S && S.guard === g && !S.ended) guardSay(GUARD_HI[g]); }, 2800);
+}
+function guardSay(t, dur = 2.4) { S.gSay = { t, T: dur, D: dur }; S.gAct = Math.max(S.gAct, 1.2); }
+// the lighthouse beam turns like on the title; ships caught in it slow down
+function marinaBeam() { const c = Math.cos(T * 0.85); return { c, sg: c < 0 ? -1 : 1, len: W * 0.62 * Math.abs(c) }; }
+function guardTick(dt) {
+  const g = S.guard; if (!g) return;
+  S.gAct = Math.max(0, S.gAct - dt);
+  if (S.gSay && (S.gSay.T -= dt) <= 0) S.gSay = null;
+  if (g === 'boro') {
+    if ((S.gT -= dt) <= 0) {
+      S.gT = 10;
+      const d = Math.min(S.maxHp * 0.02, S.maxHp - S.hp);
+      if (d >= 0.5) { S.hp += d; S.gAct = 1; S.nums.push({ x: W / 2 + 28 * u, y: ISL().top - 26 * u, v: `+${Math.round(d)}`, txt: true, col: '#9be15d', t: 0 }); sfx('crash'); sparks(W / 2 + 22 * u, ISL().top - 6 * u); }
+    }
+  } else if (g === 'marina') {
+    const I = ISL(), lx = I.r - 30 * u, B = marinaBeam();
+    for (const e of S.enemies) {
+      if (e.dead || e.def.kind !== 'ship' || e.isBoss) continue;
+      const dx = (e.x - lx) * B.sg;
+      if (dx > 0 && dx < B.len) slowE(e, 0.25, 0.3);
+      if (e.type === 'brulote' && !e.marWarn && e.x > -20 * u && e.x < W + 20 * u) { e.marWarn = true; guardSay(`¡Brulote por la ${e.x < W / 2 ? 'izquierda' : 'derecha'}!`, 1.8); }
+    }
+  }
+}
+function drawGuardian() {
+  const g = S.guard; if (!g) return;
+  const I = ISL(), x = W / 2 + 28 * u, y = I.top + 1.5 * u, panic = S.hurtT > 0;
+  const act = g === 'boro' ? Math.max(0, Math.sin(Math.min(1, S.gAct) * Math.PI)) : Math.min(1, S.gAct);
+  drawFolkChar(ctx, g, x, y, 0.19 * u, { t: T * (panic ? 1.8 : 1), face: S.gSay ? 'talk' : panic ? 'surprised' : 'calm', act, flip: g === 'boro', glow: false, look: -1 });
+}
+// what the guardian says, over the ships and the shots
+function drawGuardSay() {
+  const sy = S.guard && S.gSay; if (!sy) return;
+  const I = ISL(), x = W / 2 + 28 * u, y = I.top + 1.5 * u;
+  ctx.font = `${11 * u}px "Lilita One", sans-serif`;
+  const tw = ctx.measureText(sy.t).width, bw = tw + 14 * u, bh = 19 * u, bx = clamp(x - bw * 0.7, 6 * u, W - bw - 6 * u), by = y - 52 * u;
+  const a = Math.min(1, sy.T / 0.25, (sy.D - sy.T) / 0.2);
+  ctx.save(); ctx.globalAlpha = clamp(a, 0, 1);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 2 * u;
+  rr(bx, by, bw, bh, 9 * u); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x - 4 * u, by + bh - 1); ctx.lineTo(x, by + bh + 6 * u); ctx.lineTo(x + 3 * u, by + bh - 1); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#fff'; ctx.fillRect(x - 3 * u, by + bh - 2.5 * u, 5 * u, 3 * u);
+  ctx.fillStyle = OUTLINE; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sy.t, bx + bw / 2, by + bh / 2 + 0.5 * u);
+  ctx.restore();
+}
+
+// ---- the village on the title grows with the campaign: houses, a windmill, the forge, the dock, lanterns
+const villageP = () => CAMPAIGN.reduce((a, m) => a + (misDone(m.i) ? 1 : 0), 0);
+function house(x, y, w, h, roof, wall, k) {
+  ctx.lineJoin = 'round'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.6 * k;
+  ctx.fillStyle = wall; ctx.fillRect(x - w / 2, y - h, w, h); ctx.strokeRect(x - w / 2, y - h, w, h);
+  ctx.fillStyle = roof; ctx.beginPath(); ctx.moveTo(x - w / 2 - 3 * k, y - h + 1 * k); ctx.lineTo(x, y - h - w * 0.55); ctx.lineTo(x + w / 2 + 3 * k, y - h + 1 * k); ctx.closePath(); ctx.fill(); ctx.stroke();
+  const wy = y - h * 0.62;
+  softGlow(x, wy, 6 * k, '#ffb04a', 0.35 + 0.1 * Math.sin(T * 2.7 + x));
+  ctx.fillStyle = '#ffcf7a'; ctx.fillRect(x - 2.2 * k, wy - 2.2 * k, 4.4 * k, 4.4 * k); ctx.strokeRect(x - 2.2 * k, wy - 2.2 * k, 4.4 * k, 4.4 * k);
+}
+// beside the village sprite, between the lighthouse and the right edge and by the palm tree, the village grows
+function drawVillageBack(I, top) {
+  const p = villageP(), k = u;
+  // a tall house that peeks over the two little ones (the museum gets its dome on it)
+  if (p >= 16) house(W / 2 + 30 * u, top - 5 * u, 10 * u, 11 * u, '#4f9a6a', '#f3e3c3', k);
+  if (p >= 2) house(W / 2 + 25 * u, top, 11 * u, 9 * u, '#d8463a', '#f3e3c3', k);
+  if (p >= 6) house(W / 2 + 36 * u, top, 10 * u, 8 * u, '#2f8f9d', '#efe0c4', k);
+  // Mara's windmill by the palm tree
+  if (p >= 3) {
+    const bx = W / 2 - 37 * u, cy = top - 17 * u;
+    ctx.fillStyle = '#e9d9b8'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.5 * u; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(bx - 4.5 * u, top); ctx.lineTo(bx - 3 * u, cy); ctx.lineTo(bx + 3 * u, cy); ctx.lineTo(bx + 4.5 * u, top); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#7a5cc8'; ctx.beginPath(); ctx.moveTo(bx - 4.5 * u, cy + 0.5 * u); ctx.lineTo(bx, cy - 4.5 * u); ctx.lineTo(bx + 4.5 * u, cy + 0.5 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#6b4528'; ctx.fillRect(bx - 1.4 * u, top - 4 * u, 2.8 * u, 4 * u);
+    ctx.save(); ctx.translate(bx, cy - 1 * u); ctx.rotate(T * 1.2);
+    for (let i = 0; i < 4; i++) { ctx.rotate(TAU / 4); ctx.fillStyle = '#f4ecd0'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(2.2 * u, -2 * u); ctx.lineTo(2.2 * u, -10 * u); ctx.lineTo(-0.8 * u, -10 * u); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    ctx.restore();
+    ctx.fillStyle = OUTLINE; ctx.beginPath(); ctx.arc(bx, cy - 1 * u, 1.4 * u, 0, TAU); ctx.fill();
+  }
+  // Boro's forge: a chimney on the teal house that puffs smoke and sparks
+  if (p >= 6) {
+    const cx = W / 2 + 38 * u, cy = top - 13 * u;
+    ctx.fillStyle = '#8a6a5a'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.4 * u; ctx.fillRect(cx - 1.6 * u, cy - 5 * u, 3.2 * u, 7 * u); ctx.strokeRect(cx - 1.6 * u, cy - 5 * u, 3.2 * u, 7 * u);
+    for (let i = 0; i < 4; i++) { const f = (T * 0.35 + i / 4) % 1; ctx.fillStyle = `rgba(210,215,230,${0.4 * (1 - f)})`; ctx.beginPath(); ctx.arc(cx + Math.sin(f * 5 + i) * 3 * u + f * 5 * u, cy - 7 * u - f * 24 * u, (1.6 + f * 4.5) * u, 0, TAU); ctx.fill(); }
+    if (Math.sin(T * 3.1) > 0.97) S0parts.push({ x: cx, y: cy - 5 * u, vx: rand(-20, 20), vy: -rand(30, 60), t: 0 });
+  }
+  // Salina's lookout: a flag on the red house
+  if (p >= 10) {
+    const cx = W / 2 + 22 * u, cy = top - 14 * u;
+    ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.4 * u; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - 11 * u); ctx.stroke();
+    ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.moveTo(cx, cy - 11 * u); ctx.lineTo(cx + 7 * u, cy - 9 * u + Math.sin(T * 5) * u); ctx.lineTo(cx, cy - 6.5 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  // the museum for the Archive: a little dome on the tall house
+  if (p >= 18) {
+    const cx = W / 2 + 30 * u, cy = top - 22 * u;
+    ctx.fillStyle = '#c9d6e6'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.4 * u; ctx.beginPath(); ctx.arc(cx, cy, 4 * u, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.arc(cx, cy - 5 * u, 1.3 * u, 0, TAU); ctx.fill();
+  }
+}
+const S0parts = [];
+// in front of it: bunting, flower boxes, the dock with a boat, lanterns going up, fireworks after the ending
+function drawVillageFront(I, top) {
+  const p = villageP();
+  if (p >= 1) {
+    const x1 = I.l + 14 * u, y1 = top - 24 * u, x2 = I.r - 30 * u, y2 = top - 40 * u, n = 9, cols = ['#ff6f61', '#ffd36b', '#7fe0b5', '#9fe3ff', '#ff9ad5'];
+    ctx.strokeStyle = 'rgba(28,20,48,0.85)'; ctx.lineWidth = 1 * u; ctx.beginPath();
+    const pt = f => [x1 + (x2 - x1) * f, y1 + (y2 - y1) * f + Math.sin(f * Math.PI) * 9 * u];
+    for (let i = 0; i <= 20; i++) { const [x, y] = pt(i / 20); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke();
+    for (let i = 1; i < n; i++) { const [x, y] = pt(i / n), sw = Math.sin(T * 3 + i) * 0.15; ctx.save(); ctx.translate(x, y); ctx.rotate(sw); ctx.fillStyle = cols[i % cols.length]; ctx.beginPath(); ctx.moveTo(-2.4 * u, 0); ctx.lineTo(2.4 * u, 0); ctx.lineTo(0, 5 * u); ctx.closePath(); ctx.fill(); ctx.lineWidth = 0.8 * u; ctx.stroke(); ctx.restore(); }
+  }
+  if (p >= 8) for (let i = 0; i < 7; i++) { const x = W / 2 - 40 * u + i * 13 * u, c = ['#ff8fc8', '#ffd36b', '#ff6f61', '#b49cff'][i % 4]; if (Math.abs(x - (I.r - 30 * u)) < 6 * u) continue; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, top + 1 * u, 1.7 * u, 0, TAU); ctx.fill(); }
+  if (p >= 13) {
+    // the dock floats with the water on the left of the island
+    const x0 = I.l - 34 * u, wy = waveY(I.l - 20 * u);
+    ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.6 * u;
+    for (const px of [x0 + 4 * u, x0 + 18 * u, x0 + 32 * u]) { ctx.fillStyle = '#6b4528'; ctx.fillRect(px - 1.5 * u, wy - 6 * u, 3 * u, 14 * u); ctx.strokeRect(px - 1.5 * u, wy - 6 * u, 3 * u, 14 * u); }
+    ctx.fillStyle = '#a2683a'; ctx.fillRect(x0, wy - 7 * u, 36 * u, 3.5 * u); ctx.strokeRect(x0, wy - 7 * u, 36 * u, 3.5 * u);
+    const bx = x0 - 14 * u, by = waveY(bx) + Math.sin(T * 1.6) * 1 * u;
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(Math.sin(T * 1.3) * 0.05);
+    ctx.fillStyle = '#d8463a'; ctx.beginPath(); ctx.moveTo(-10 * u, -4 * u); ctx.lineTo(10 * u, -4 * u); ctx.lineTo(7 * u, 2 * u); ctx.lineTo(-7 * u, 2 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, -4 * u); ctx.lineTo(0, -18 * u); ctx.stroke();
+    ctx.fillStyle = '#f4ecd0'; ctx.beginPath(); ctx.moveTo(1 * u, -17 * u); ctx.lineTo(9 * u, -6 * u); ctx.lineTo(1 * u, -6 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+  if (p >= 15) for (let i = 0; i < 5; i++) {
+    const f = (T * 0.04 + i * 0.2) % 1, x = W / 2 + Math.sin(i * 2.3 + f * 4) * W * 0.32, y = top - 20 * u - f * H * 0.42;
+    softGlow(x, y, 10 * u, '#ffb04a', 0.35 * (1 - f));
+    ctx.fillStyle = `rgba(255,170,90,${0.9 * (1 - f)})`; rr(x - 2.6 * u, y - 3.2 * u, 5.2 * u, 6.4 * u, 2 * u); ctx.fill();
+  }
+  if (save.ending) {
+    const f = (T * 0.23) % 1, i = Math.floor(T * 0.23);
+    if (f < 0.45) {
+      const x = W * (0.2 + ((i * 0.37) % 0.6)), y = H * (0.12 + ((i * 0.53) % 0.16)), r = f / 0.45 * 34 * u, c = ['#ffd36b', '#ff8fc8', '#9fe3ff', '#7fe0b5'][i % 4];
+      ctx.globalAlpha = 1 - f / 0.45;
+      for (let k = 0; k < 12; k++) { const a = k / 12 * TAU; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x + Math.cos(a) * r, y + Math.sin(a) * r + f * 10 * u, 1.8 * u, 0, TAU); ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+  }
+  for (let i = S0parts.length - 1; i >= 0; i--) { const q = S0parts[i]; q.t += 1 / 60; q.x += q.vx / 60; q.y += q.vy / 60; q.vy += 80 / 60; if (q.t > 0.8) { S0parts.splice(i, 1); continue; } ctx.fillStyle = `rgba(255,190,90,${1 - q.t / 0.8})`; ctx.fillRect(q.x, q.y, 1.6 * u, 1.6 * u); }
+}
+
+// ---- decisions between missions: an islander asks, the answer changes the next mission
+const DECISIONS = [
+  { id: 'puerto', who: 'boro', q: '¿Arreglamos el puerto o reforzamos la muralla?', o: [
+    { name: 'El puerto', good: '+15% de monedas al terminar la próxima misión', ico: 'i_monedas', apply: () => { S.coinMul *= 1.15; } },
+    { name: 'La muralla', good: '+20% de vida de la isla en la próxima misión', ico: 'i_murallas', apply: () => { S.maxHp *= 1.2; S.hp = S.maxHp; } }] },
+  { id: 'faro', who: 'marina', q: '¿Dejamos el faro encendido toda la noche o guardamos el aceite?', o: [
+    { name: 'Encender el faro', good: 'Los barcos navegan un 10% más lentos', ico: 'i_faro', apply: () => { S.spdMul *= 0.9; } },
+    { name: 'Guardar el aceite', good: 'Empiezas con el botón de marea cargado', ico: 'i_marea', apply: () => { S.tideCh = 1; } }] },
+  { id: 'ruta', who: 'salina', q: '¿Vamos por la ruta segura o por el atajo entre los arrecifes?', o: [
+    { name: 'La ruta segura', good: 'Tus armas recargan un 15% más rápido', ico: 'i_lente', apply: () => { S.runCd *= 0.85; } },
+    { name: 'El atajo', good: 'Empiezas con 40 perlas para el mercader', ico: 'i_perla', apply: () => { S.pearls += 40; } }] },
+  { id: 'invento', who: 'mara', q: '¿Probamos mi último invento en la próxima misión?', o: [
+    { name: '¡Pruébalo!', good: 'Empiezas con un arma más, al azar', ico: 'i_arsenal', apply: () => { const pool = Object.keys(WEAPONS).filter(id => !hasW(id)); if (pool.length && S.weapons.length < S.slots) addWeapon(pick(pool)); } },
+    { name: 'Mejor no', good: 'La habilidad de la luna empieza cargada', ico: 'i_motor', apply: () => { S.charge = 1; } }] },
+  { id: 'coral', who: 'boro', q: '¿Afilo el coral del arrecife o tejemos redes nuevas?', o: [
+    { name: 'Afilar el coral', good: '+25% de daño del arrecife y de la marea', ico: 'i_arrecife', apply: () => { S.runReef *= 1.25; } },
+    { name: 'Redes nuevas', good: '+30% de experiencia en la próxima misión', ico: 'i_sabio', apply: () => { S.runXp *= 1.3; } }] },
+  { id: 'mapa', who: 'salina', q: 'He encontrado un mapa viejo. ¿Lo seguimos?', o: [
+    { name: 'Seguir el mapa', good: 'Un tesoro asoma pronto y salen más', ico: 'i_tesoro', apply: () => { S.trT = 8; S.trK = (S.trK || 1) * 0.6; } },
+    { name: 'Guardarlo', good: '+10% de probabilidad de crítico', ico: 'i_critico', apply: () => { S.runCrit += 0.1; } }] },
+  { id: 'fiesta', who: 'marina', q: 'Los pescadores quieren dar una fiesta. ¿La celebramos?', o: [
+    { name: '¡Fiesta!', good: 'La isla se repara sola más deprisa', ico: 'i_vida', apply: () => { S.regen += 0.6; } },
+    { name: 'Mejor vigilar', good: '+10% de daño en la próxima misión', ico: 'i_poder', apply: () => { S.runDmg *= 1.1; } }] },
+  { id: 'laton', who: 'mara', q: '¿Imán nuevo para la luna o coraza de latón para la isla?', o: [
+    { name: 'El imán', good: 'La luna atrae las perlas desde mucho más lejos', ico: 'i_iman', apply: () => { S.magnetMul *= 1.5; } },
+    { name: 'La coraza', good: '-10% de daño recibido', ico: 'i_coraza', apply: () => { S.runTaken *= 0.9; } }] },
+];
+const DEC = Object.fromEntries(DECISIONS.map(d => [d.id, d]));
+// after a mission is beaten for the first time, the next islander in line has a question (only those who have joined)
+function queueDecision() {
+  if (save.boon || save.decide) return;
+  const open = DECISIONS.filter(d => folkOpen(d.who)); if (!open.length) return;
+  save.decN = (save.decN || 0) + 1;
+  save.decide = open[save.decN % open.length].id;
+}
+// asked before the next briefing; the answer waits for the next mission
+// talkSkipTo: where "skip" leads when it is not a decision (the Archive sets it after opening an echo)
+let talkThen = null, talkSkipTo = null;
+function openTalk(who, eyebrow, text, opts, then, skipTxt) {
+  talkThen = then; talkSkipTo = null;
+  const box = $('talkHost'); box.innerHTML = '<p class="hsay"></p>';
+  const cv = folkCanvas(who, 120); box.prepend(cv);
+  $('talkEyebrow').textContent = eyebrow; $('talkName').textContent = `${FOLK[who].name}, ${FOLK[who].role.toLowerCase()}`;
+  hostSay(box, who, text);
+  $('talkOpts').innerHTML = opts.map((o, i) => `<button type="button" class="pact" data-i="${i}"><span class="ico" aria-hidden="true">${ico(o.ico, 44)}</span><span class="txt"><b>${o.name}</b>${o.good ? `<span class="g">${o.good}</span>` : ''}</span></button>`).join('');
+  $('talkOpts').querySelectorAll('.pact').forEach(b => b.onclick = () => { const o = opts[+b.dataset.i]; sfx('evo'); vib(20); talkSkipTo = null; if (o.pick) o.pick(); const f = talkThen; talkThen = null; if (f) f(); });
+  $('talkSkip').hidden = !skipTxt; $('talkSkip').textContent = skipTxt || '';
+  show('scrTalk'); sfx('card');
+}
+$('talkSkip').onclick = () => { const to = talkSkipTo; talkSkipTo = null; if (to) { talkThen = null; to(); return; } save.decide = null; persist(); const f = talkThen; talkThen = null; if (f) f(); };
+function askDecision(then) {
+  const d = DEC[save.decide]; if (!d) { save.decide = null; then(); return; }
+  openTalk(d.who, 'Antes de zarpar', d.q, d.o.map((o, k) => ({ ...o, pick: () => { save.boon = { id: d.id, o: k }; save.decide = null; persist(); } })), then, 'Decidir otro día');
+}
+const boonOf = () => save.boon && DEC[save.boon.id] ? DEC[save.boon.id].o[save.boon.o] : null;
+// the next campaign mission takes the answer and spends it
+function applyBoon() {
+  const b = boonOf(); if (!b || !S.mis || S.mis.echo || S.mis.tut) return;
+  const d = DEC[save.boon.id];
+  b.apply(); recompute(); save.boon = null; persist();
+  setTimeout(() => { if (S && !S.ended) banner(`${FOLK[d.who].name}: ${b.name.replace(/^¡|!$/g, '')}`, b.good, 2); }, 2700);
+}
+// what joins after a first win: an islander, the lab
+function folkUnlocks(M, first, unlocks) {
+  if (!first) return;
+  for (const id of FOLK_IDS) if (FOLK[id].need === M.i) { unlocks.push(`Nuevo guardián: ${FOLK[id].name}, ${FOLK[id].role.toLowerCase()}`); if (!guardOf()) save.guard = id; }
+  if (M.i === LAB_NEED) unlocks.push('Nuevo: el laboratorio de Mara, en el Taller');
+  if (M.i < CAMPAIGN.length - 1) queueDecision();
+}
+// =====================================================================
+// SECRETS AND THE ARCHIVE: four echoes of old tides hidden in the campaign (each one a short battle
+// from the past and a relic), the bestiary, the stories already seen, the achievements, the epilogue,
+// and Mara's lab for free practice.
+// =====================================================================
+// ---- relics: a strategic twist on one weapon, never a plain damage boost
+const RELICS = {
+  caracola: { name: 'Caracola del eco', w: 'rayo', ico: 'i_caracola', d: 'Rayo lunar: cada rayo rebota en otro enemigo con la mitad de daño, pero el primero pega un 15% menos.' },
+  gemelo: { name: 'Remolino gemelo', w: 'remolino', ico: 'i_remolino', d: 'Remolino: nacen dos a la vez, uno en cada arrecife, más pequeños y un 40% más flojos.' },
+  lente: { name: 'Lente partida', w: 'faro', ico: 'i_lente', d: 'Faro: el haz se parte en dos que barren lados opuestos, cada uno con el 60% del daño.' },
+  ancla: { name: 'Ancla del guardián', w: 'ancla', ico: 'i_ancla', d: 'Ancla: empuja a los barcos el doble de lejos, pero golpea un 25% más flojo.' },
+};
+const relicOwned = id => (save.relics || []).includes(id);
+// the Moon's ray jumps on from the ship it hit to the closest other one
+function relicBounce(e, dmg) {
+  let best = null, bd = 110 * u;
+  for (const o of S.threat) { if (o === e || o.dead) continue; const d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
+  if (!best) return;
+  hit(best, dmg); S.fx.push({ type: 'beam', x1: e.x, y1: e.y, x2: best.x, y2: best.y, t: 0, life: 0.14, c: '#bfe8ff' });
+}
+
+// ---- the echoes: found as a singing conch at very low tide in one mission of each chapter
+const ROMAN = ['I', 'II', 'III', 'IV'];
+const ECHOES = [
+  { name: 'La noche del primer farol', ch: 0, at: 2, relic: 'caracola', kind: 'survive', waves: 6, gico: 'i_faro', goal: 'Sobrevive 6 oleadas a oscuras', cond: 'Noche cerrada: solo alumbran la luna y el faro', x3: 'Hunde 80 enemigos',
+    dark: 0.9, noHorde: true, hint: 'En «El barco del tesoro», cuando la marea baja del todo, algo canta en la arena.',
+    intro: 'Hace cien años, la abuela de Marina encendió el primer farol de la isla en la noche más negra. Así la defendió.',
+    start() { if (!hasW('faro') && S.weapons.length < S.slots) addWeapon('faro'); },
+    x3ok: () => S.kills >= 80, hud: () => [survRow(), ['i_estrella', `${Math.min(S.kills, 80)}/80 hundidos`, S.kills >= 80]] },
+  { name: 'El invierno sin luna', ch: 1, at: 6, relic: 'gemelo', kind: 'survive', waves: 7, gico: 'i_hielo', goal: 'Sobrevive 7 oleadas', cond: 'La luna está débil; el arrecife, más afilado que nunca', x3: 'Congela a 30 enemigos',
+    mods: { dmg: 0.65 }, hint: 'En «El faro del norte» dicen que el hielo guarda una caracola. Solo asoma con la marea muy baja.',
+    intro: 'Hubo un invierno en que la Luna apenas brillaba. Los pescadores defendieron el Mar de Escarcha con el hielo y el arrecife.',
+    start() { S.runReef *= 2; S.hazardT = 8; recompute(); },
+    x3ok: () => (S.frozenN || 0) >= 30, hud: () => [survRow(), ['i_escarcha', `${Math.min(S.frozenN || 0, 30)}/30 congelados`, (S.frozenN || 0) >= 30]] },
+  { name: 'La flota de fuego', ch: 2, at: 10, relic: 'lente', kind: 'sink', waves: 7, need: 25, gico: 'i_polvora', goal: 'Hunde 25 brulotes', cond: 'Una flota entera de brulotes', x3: 'Ningún brulote toca la isla',
+    noHorde: true, hint: 'En «Lluvia de ceniza», entre la lava, una caracola espera la bajamar más baja.',
+    intro: 'Una noche, cien brulotes ardieron rumbo al Puerto de Ceniza. El puerto sigue en pie gracias a quien los hundió.',
+    fleet: w => ({ brulote: 2.2 + 0.3 * w, sloop: 2, pirate: w >= 3 ? 2 : 0, gull: w >= 4 ? 1 : 0 }),
+    kill: e => { if (e.type === 'brulote') misGoal(e); }, x3ok: () => !S.dmgBy.brulote,
+    hud: () => [['i_polvora', `${S.mg}/25 brulotes`, S.mg >= 25], ['i_estrella', S.dmgBy.brulote ? 'Un brulote tocó la isla' : 'Ningún brulote en la isla', false, !!S.dmgBy.brulote]] },
+  { name: 'El primer eclipse', ch: 3, at: 15, relic: 'ancla', kind: 'boss', waves: 5, bossType: 'eclipse', gico: 'i_eclipse', goal: 'Derrota al primer eclipse', cond: 'El Demonio aún es joven: llega en la oleada 5', x3: 'Vida por encima del 75%',
+    hint: 'En «Noche sin estrellas», bajo la oscuridad, la última caracola espera la marea más baja.',
+    intro: 'Mil años atrás, la Luna y el viejo guardián de las islas se enfrentaron al primer eclipse. Nadie recuerda cómo acabó. Hasta hoy.' },
+];
+ECHOES.forEach((m, k) => { m.k = k; m.i = -1 - k; m.n = `Eco ${ROMAN[k]}`; m.echo = true; m.boss = m.kind === 'boss'; m.ready = true; if (m.boss) m.x3ok = () => S.hp / S.maxHp > 0.75; });
+const echoRec = k => (save.echo || {})[k] || { found: 0, s: [0, 0, 0] };
+const echoesFound = () => ECHOES.filter(m => echoRec(m.k).found).length;
+// in the mission that hides it, the conch takes the treasure's place once the tide drops far enough
+function echoTick() {
+  if (!S.mis || S.mis.echo || S.treasure || S.wave < 2) return;
+  const m = ECHOES.find(x => x.at === S.mis.i); if (!m || echoRec(m.k).found || S.echoGone) return;
+  let x, n = 0;
+  do { x = rand(0.1, 0.9) * W; n++; } while (n < 30 && (Math.abs(x - W / 2) < 72 * u || inReef(x, 10 * u) || wreckAt(x, 12 * u)));
+  S.treasure = { x, kind: 'conch', echo: m.k, t: 0, life: 1e9, hold: 0, show: 0, got: 0, ph: rand(0, TAU) };
+}
+function echoFound(k) {
+  const rec = (save.echo = save.echo || {})[k] || (save.echo[k] = { found: 0, s: [0, 0, 0] });
+  rec.found = 1; S.echoGone = true; persist();
+  const m = ECHOES[k];
+  banner('¡Un eco de antiguas mareas!', `«${m.name}» ya está en el Archivo`, 2.6);
+  sfx('evo'); vib([30, 40, 30, 40, 90]); S.flash = Math.max(S.flash, 0.15);
+  for (let i = 0; i < 24; i++) S.parts.push({ x: S.treasure.x, y: floorY() - 14 * u, vx: rand(-90, 90), vy: -rand(80, 240), t: 0, life: rand(0.8, 1.4), c: i % 2 ? '#bfe8ff' : '#ffd36b', s: rand(1.6, 3), g: 120 });
+}
+// a spiral shell that glows blue: drawn by the treasure code when kind is 'conch'
+function drawConch(x, y, s, rot) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+  softGlowAt(0, -8, 30, '#9fe3ff', 0.35 + 0.15 * Math.sin(T * 3));
+  ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = OUTLINE;
+  ctx.fillStyle = '#f6d7c3'; ctx.beginPath(); ctx.moveTo(-22, 2); ctx.quadraticCurveTo(-20, -22, 4, -24); ctx.quadraticCurveTo(26, -22, 24, -4); ctx.quadraticCurveTo(10, 8, -22, 2); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#ff9ec0'; ctx.beginPath(); ctx.moveTo(24, -4); ctx.quadraticCurveTo(34, 2, 30, 10); ctx.quadraticCurveTo(18, 8, 10, 2); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = '#c98a72'; ctx.lineWidth = 2;
+  ctx.beginPath(); for (let i = 0; i <= 30; i++) { const a = i / 30 * TAU * 1.6, r = 3 + i * 0.5; const px = -2 + Math.cos(a) * r, py = -10 + Math.sin(a) * r * 0.8; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke();
+  ctx.restore();
+}
+function softGlowAt(x, y, r, col, a) { const n = parseInt(col.slice(1), 16), g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`); g.addColorStop(1, `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},0)`); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); }
+// the end of an echo: stars like a mission, its relic the first time it is beaten
+function echoEnd(won) {
+  const M = S.mis, rec = (save.echo = save.echo || {})[M.k] || (save.echo[M.k] = { found: 1, s: [0, 0, 0] });
+  const st = [won, won && S.hp / S.maxHp > 0.5, won && !!(M.x3ok && M.x3ok())], first = won && !rec.s[0], base = 250 + 100 * M.k;
+  S.stars = st; S.newStars = st.map((v, k) => v && !rec.s[k]);
+  const rows = [], unlocks = [];
+  if (won) rows.push([first ? 'Eco superado' : 'Eco repetido', first ? base : Math.round(base * 0.3)]);
+  const ns = S.newStars.slice(1).filter(Boolean).length;
+  if (ns) rows.push([ns > 1 ? 'Estrellas nuevas' : 'Estrella nueva', ns * Math.round(base * 0.25)]);
+  rec.s = rec.s.map((v, k) => (v || st[k]) ? 1 : 0);
+  if (first) { const R = RELICS[M.relic]; save.relics = save.relics || []; if (!save.relics.includes(M.relic)) save.relics.push(M.relic); if (!save.relic) save.relic = M.relic; unlocks.push(`Reliquia nueva: ${R.name}`); }
+  return { rows, unlocks, coins: rows.reduce((a, r) => a + r[1], 0) };
+}
+
+// ---- the bestiary: whatever has been seen, with how many were sunk
+const BEAST = [
+  { id: 'sloop', spr: 'sloop0', d: 'Rápidas y frágiles. Con marea baja se estrellan contra el arrecife.' },
+  { id: 'galleon', spr: 'galleon0', d: 'Lentos y duros. Encallan incluso con la marea a media altura.' },
+  { id: 'mortar', spr: 'mortar0', d: 'Disparan desde lejos. Pon la luna en el camino de sus balas.' },
+  { id: 'pirate', spr: 'pirate0', d: 'Caminan por el fondo del mar: la pleamar o la luna los ahogan.' },
+  { id: 'crab', spr: 'crab0', d: 'Solo se ahogan con la pleamar y la luna justo encima.' },
+  { id: 'gull', spr: 'gull0', d: 'Vuelan: tócalas con la luna o usa tus armas.' },
+  { id: 'serpent', spr: 'serpHead', d: 'Nadan bajo las olas. En bajamar se quedan varadas sin agua.' },
+  { id: 'gold', spr: 'goldship0', d: 'Cruza el mar sin parar. Húndelo antes de que escape con el botín.' },
+  { id: 'brulote', spr: 'brulote0', d: 'Cargado de pólvora: si llega a la isla, estalla.' },
+  { id: 'nautilo', d: 'Solo asoma con la marea baja; sumergido, nada le hace daño.' },
+  { id: 'chaman', spr: 'sloop0', tint: 'chaman', d: 'Ancla lejos, protege a los barcos de su lado y prepara un ritual contra la isla.' },
+  { id: 'ghost', spr: 'ghost0', d: 'No se puede hundir, solo hacerlo retroceder. Dicen que una vez fue el guardián de las islas.' },
+  { id: 'b_kraken', boss: 'kraken', spr: 'krakenA', d: 'Golpea con los tentáculos y arrastra barcos hacia la isla.' },
+  { id: 'b_armada', boss: 'armada', spr: 'flag0', d: 'El buque insignia pirata, con su escolta y sus andanadas.' },
+  { id: 'b_leviatan', boss: 'leviatan', spr: 'levHead', d: 'Una serpiente colosal que se sumerge y embiste desde el fondo.' },
+  { id: 'b_eclipse', boss: 'eclipse', spr: 'eclipse0', d: 'Quiere apagar la Luna. Su sol negro oscurece todo el mar.' },
+  ...CAP_IDS.map(id => ({ id: `c_${id}`, cap: id, spr: 'galleon0', d: CAPTAINS[id].tip + '.' })),
+];
+const beastName = b => b.boss ? BOSS[b.boss].name : b.cap ? CAPTAINS[b.cap].name : EN[b.id].name;
+const beastSeen = b => !!((save.seenEn || {})[b.id] || (save.beast || {})[b.id] || save.tips['en_' + b.id] || (b.cap && (save.stats.capsSunk || []).includes(b.cap)));
+const beastN = b => b.cap ? ((save.stats.capsSunk || []).includes(b.cap) ? 1 : 0) : (save.beast || {})[b.id] || 0;
+function markSeen(id) { if (!S || S.lab) return; const s = save.seenEn = save.seenEn || {}; if (!s[id]) s[id] = 1; }
+function countSink(id) { if (!S || S.lab) return; const b = save.beast = save.beast || {}; b[id] = (b[id] || 0) + 1; }
+// the nautilus has no sprite: a little spiral shell with an eye
+function nautilusThumb(size) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = size * 2; cv.style.width = cv.style.height = `${size}px`;
+  const g = cv.getContext('2d'); g.scale(size / 32, size / 32);
+  g.lineJoin = 'round'; g.strokeStyle = OUTLINE; g.lineWidth = 1.8;
+  g.fillStyle = '#b36b4a'; g.beginPath(); g.arc(30, 30, 18, 0, TAU); g.fill(); g.stroke();
+  g.strokeStyle = '#f2c79a'; g.lineWidth = 2.4; g.beginPath(); for (let i = 0; i <= 30; i++) { const a = i / 30 * TAU * 1.5, r = 15 - i * 0.42; const x = 30 + Math.cos(a) * r, y = 30 + Math.sin(a) * r; i ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+  g.fillStyle = '#7fd3ff'; g.strokeStyle = OUTLINE; g.lineWidth = 1.6; g.beginPath(); g.arc(46, 36, 5, 0, TAU); g.fill(); g.stroke();
+  g.fillStyle = OUTLINE; g.beginPath(); g.arc(47, 36, 2, 0, TAU); g.fill();
+  return cv;
+}
+
+// ---- the Archive: the story, the bestiary, the secrets and the achievements
+let arcTab = 'hist';
+const ARC_STORY = [['intro', 'La leyenda de la Luna', 'El cómic del principio'], ['o0'], ['c0'], ['o1'], ['c1'], ['o2'], ['c2'], ['o3'], ['end'], ['true'], ['epi']];
+function openArchive(tab) {
+  if (tab) arcTab = tab;
+  refreshCoins();
+  ['hist', 'beast', 'sec', 'ach'].forEach(t => $(`arcT_${t}`).setAttribute('aria-selected', t === arcTab));
+  $('arcAchBadge').hidden = achClaimable() === 0;
+  const body = $('arcBody'); body.innerHTML = '';
+  const host = $('arcHost');
+  if (arcTab === 'hist') hostSay(host, 'marina', 'Aquí guardamos todo lo que ha pasado en las islas.');
+  else if (arcTab === 'beast') hostSay(host, 'boro', 'Conoce a tu enemigo. Yo los conozco a todos… de lejos.');
+  else if (arcTab === 'sec') hostSay(host, 'salina', echoesFound() < 4 ? 'Hay ecos de antiguas mareas escondidos en la campaña. Te dejo mis pistas.' : 'Los cuatro ecos han vuelto a sonar. Mira la última página.');
+  else hostSay(host, 'mara', 'Cada logro tiene premio. ¡Cóbralos!');
+  if (arcTab === 'hist') {
+    for (const [k, t0, d0] of ARC_STORY) {
+      const st = STORY[k], seen = k === 'intro' || (save.story || {})[k], epi = k === 'epi';
+      const open = epi ? echoesFound() >= 4 : seen;
+      const el = document.createElement('div'); el.className = 'lc' + (open ? '' : ' locked');
+      const title = t0 || st.title + (k[0] === 'o' ? ' · Apertura' : k[0] === 'c' ? ' · Cierre' : '');
+      const sub = d0 || (epi ? (open ? 'La última viñeta' : `Encuentra los 4 ecos de antiguas mareas (${echoesFound()}/4)`) : open ? `${st.panels.filter(p => !p.credits).length} viñetas` : 'Aún no la has visto');
+      el.innerHTML = `<span class="ico" aria-hidden="true">${ico(epi ? 'i_estrella' : 'i_libro', 34)}</span><span><b>${title}</b><span class="d">${sub}</span></span>`;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !open;
+      b.innerHTML = open ? 'Ver' : ico('i_candado', 22);
+      b.onclick = () => { sfx('card'); if (k === 'intro') openIntro(() => openArchive('hist')); else openStory(k, () => openArchive('hist')); };
+      el.appendChild(b); body.appendChild(el);
+    }
+  } else if (arcTab === 'beast') {
+    const seenN = BEAST.filter(beastSeen).length;
+    body.insertAdjacentHTML('beforeend', `<p class="lede small">${seenN} de ${BEAST.length} criaturas vistas. Los jefes y los capitanes, abajo.</p>`);
+    const grid = document.createElement('div'); grid.className = 'beasts';
+    for (const b of BEAST) {
+      const seen = beastSeen(b), el = document.createElement('div');
+      el.className = 'beast' + (seen ? '' : ' locked') + (b.boss ? ' boss' : b.cap ? ' cap' : '');
+      if (b.cap) el.style.setProperty('--cc', CAPTAINS[b.cap].col);
+      const art = document.createElement('span'); art.className = 'bart' + (b.tint ? ` t-${b.tint}` : '');
+      if (b.id === 'nautilo') art.appendChild(nautilusThumb(56)); else art.innerHTML = pic(b.spr, 64);
+      el.appendChild(art);
+      const n = beastN(b);
+      el.insertAdjacentHTML('beforeend', `<b>${seen ? beastName(b) : '???'}</b><span class="d">${seen ? b.d : 'Todavía no lo has visto.'}</span>${seen ? `<span class="meta">${b.id === 'ghost' ? 'No se puede hundir' : b.cap ? (n ? 'Hundido' : 'Aún sin hundir') : `${n.toLocaleString('es')} hundido${n === 1 ? '' : 's'}`}</span>` : ''}`);
+      grid.appendChild(el);
+    }
+    body.appendChild(grid);
+  } else if (arcTab === 'sec') {
+    for (const m of ECHOES) {
+      const rec = echoRec(m.k), R = RELICS[m.relic], won = !!rec.s[0], el = document.createElement('div');
+      el.className = 'lc echo' + (rec.found ? '' : ' locked');
+      el.innerHTML = `<span class="ico" aria-hidden="true">${ico(rec.found ? m.gico : 'i_candado', 34)}</span><span><span class="eyebrow">Eco ${ROMAN[m.k]} · ${ISLANDS[m.ch].name}</span><b>${rec.found ? m.name : 'Eco perdido'}</b><span class="d">${rec.found ? m.intro : `Pista de Salina: ${m.hint}`}</span>${rec.found ? `<span class="nst">${starsHtml(rec.s, 15)}</span>` : ''}</span>`;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !rec.found;
+      b.innerHTML = rec.found ? 'Jugar' : ico('i_candado', 22);
+      b.onclick = () => { sfx('card'); openTalk('salina', `Eco ${ROMAN[m.k]} · ${m.name}`, m.intro, [{ name: 'Escuchar el eco', good: `${m.goal}. ${m.cond}.`, ico: m.gico, pick: () => startRun('echo', m.k) }], () => {}, 'Ahora no'); talkSkipTo = () => openArchive('sec'); };
+      el.appendChild(b); body.appendChild(el);
+      // its relic
+      const r = document.createElement('div'); r.className = 'lc relic' + (won ? '' : ' locked') + (save.relic === m.relic && won ? ' sel' : '');
+      r.innerHTML = `<span class="ico" aria-hidden="true">${ico(won ? R.ico : 'i_candado', 30)}</span><span><span class="eyebrow">Reliquia</span><b>${won ? R.name : '???'}</b><span class="d">${won ? R.d : 'Supera este eco para conseguirla.'}</span></span>`;
+      const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'buy'; rb.disabled = !won;
+      rb.textContent = !won ? '—' : save.relic === m.relic ? 'Quitar' : 'Llevar';
+      rb.onclick = () => { save.relic = save.relic === m.relic ? null : m.relic; persist(); sfx('card'); openArchive('sec'); };
+      r.appendChild(rb); body.appendChild(r);
+    }
+  } else achInto(body, () => openArchive('ach'));
+  show('scrArchive');
+}
+['hist', 'beast', 'sec', 'ach'].forEach(t => { $(`arcT_${t}`).onclick = () => { sfx('card'); openArchive(t); $('scrArchive').scrollTop = 0; }; });
+$('arcBack').onclick = () => openTitle();
+
+// ---- the epilogue: the last page of the Archive, once the four echoes sing again
+STORY.epi = { title: 'Epílogo', go: 'Volver al Archivo', panels: [
+  { cap: 'Cuando los cuatro ecos volvieron a sonar, la isla entera salió al muelle. La Luna nunca había estado sola: cada generación tuvo a alguien que alzó un farol.', snd: 'evo',
+    bub: [{ t: '¡Gracias, Luna!', x: 4, y: 6, tail: 'b', at: 70 }],
+    paint: g => {
+      cSky(g, 0, ['#1b2a66', '#7a5ca8', '#ffb98a']); cMoon(g, 292, 52, 30, 'cheer');
+      for (let i = 0; i < 7; i++) { const x = 30 + i * 47, y = 30 + (i % 3) * 22; cGlow(g, x, y, 12, '#ffb04a', 0.5); g.fillStyle = '#ffb36b'; g.strokeStyle = '#1c1430'; g.lineWidth = 1.4; g.beginPath(); g.roundRect(x - 4, y - 5, 8, 10, 3); g.fill(); g.stroke(); }
+      cSea(g, 0, 176);
+      cIsland(g, 0, 300, 150, 0.55);
+      g.fillStyle = '#a2683a'; g.strokeStyle = '#1c1430'; g.lineWidth = 2; g.fillRect(10, 168, 250, 8); g.strokeRect(10, 168, 250, 8);
+      for (const x of [24, 90, 156, 222]) { g.fillStyle = '#6b4528'; g.fillRect(x, 176, 6, 30); g.strokeRect(x, 176, 6, 30); }
+      const who = [['salina', 54], ['boro', 108], ['marina', 162], ['mara', 214]];
+      for (const [w, x] of who) drawFolkChar(g, w, x, 168, w === 'boro' ? 0.5 : 0.56, { t: 1.2, face: w === 'marina' ? 'happy' : 'calm', act: w === 'marina' ? 1 : 0, look: 1 });
+    } },
+] };
+
+// ---- Mara's lab: any weapon, any boss, an island that can't fall and nothing is saved
+const LAB_NEED = 2;
+const labOpen = () => misDone(LAB_NEED);
+// the save as it was on entering: restarting from the pause menu keeps it, leaving puts it back
+let labBossI = 0, labSnap = null;
+function labStart() { audioInit(); labSnap = JSON.stringify(save); curtain(() => { beginRun('lab', 0); }); }
+function labBegin() {
+  if (!labSnap) labSnap = JSON.stringify(save);
+  S.lab = true; S.revives = 0;
+  $('labBar').hidden = false; $('hud').classList.add('lab');
+  setTimeout(() => { if (S && S.lab) banner('Laboratorio de Mara', 'Prueba lo que quieras: la isla no cae y no se guarda nada', 2.4); }, 600);
+}
+// everything done in the lab is forgotten when you leave
+function labEnd() {
+  const snap = labSnap; labSnap = null; S.ended = true;
+  $('labBar').hidden = true; $('hud').classList.remove('lab'); $('labSheet').hidden = true;
+  if (snap) { save = JSON.parse(snap); persist(); }
+  toMenu(); openShop('title');
+}
+function labSheet() {
+  if (mode !== 'play') return;
+  mode = 'lab'; dragId = null; setAudioGains();
+  renderLabSheet(); $('labSheet').hidden = false;
+}
+function renderLabSheet() {
+  const box = $('labWeap'); box.innerHTML = '';
+  const row = (icon, name, lv, max, add, sub, note) => {
+    const el = document.createElement('div'); el.className = 'lrow';
+    el.innerHTML = `${ico(icon, 30)}<span><b>${name}</b><small>${note || (lv ? `Nivel ${lv} de ${max}` : 'No la llevas')}</small></span>`;
+    const m = document.createElement('button'); m.type = 'button'; m.textContent = '−'; m.disabled = !lv; m.onclick = () => { sub(); afterLab(); };
+    const p = document.createElement('button'); p.type = 'button'; p.textContent = '+'; p.disabled = lv >= max; p.onclick = () => { add(); afterLab(); };
+    el.append(m, p); box.appendChild(el);
+  };
+  const full = () => S.weapons.length >= S.slots;
+  for (const id in WEAPONS) {
+    const w = hasW(id), W0 = WEAPONS[id];
+    if (w && (w.evo)) { row(EVOS[W0.evo].ico, EVOS[W0.evo].name, 3, 3, () => {}, () => { w.evo = false; syncEnts(); }, 'Fusión'); continue; }
+    row(W0.ico, W0.name, w ? w.lv : 0, full() && !w ? 0 : 3, () => { const x = hasW(id); if (!x) { if (S.weapons.length < S.slots) addWeapon(id); } else if (x.lv < 3) x.lv++; syncEnts(); }, () => { const x = hasW(id); if (!x) return; if (x.lv > 1) x.lv--; else S.weapons = S.weapons.filter(y => y !== x); syncEnts(); }, !w && full() ? 'No quedan huecos' : null);
+  }
+  for (const w of S.weapons.filter(x => x.union)) { const U = UNIONS[w.id]; row(U.ico, U.name, 3, 3, () => {}, () => { S.weapons = S.weapons.filter(x => x !== w); syncEnts(); }, 'Unión'); }
+  const pb = $('labPass'); pb.innerHTML = '';
+  for (const id in PASSIVES) {
+    const P0 = PASSIVES[id], lv = S.passives[id] || 0, el = document.createElement('div'); el.className = 'lrow';
+    el.innerHTML = `${ico(P0.ico, 30)}<span><b>${P0.name}</b><small>${lv ? `Nivel ${lv} de 3` : capFirst(P0.desc)}</small></span>`;
+    const m = document.createElement('button'); m.type = 'button'; m.textContent = '−'; m.disabled = !lv; m.onclick = () => { if (lv > 1) S.passives[id]--; else delete S.passives[id]; recompute(); syncEnts(); afterLab(); };
+    const p = document.createElement('button'); p.type = 'button'; p.textContent = '+'; p.disabled = lv >= 3 || (!lv && Object.keys(S.passives).length >= 5); p.onclick = () => { S.passives[id] = lv + 1; recompute(); syncEnts(); afterLab(); };
+    el.append(m, p); pb.appendChild(el);
+  }
+  // fusions and unions ready to make right now
+  const ready = comboRows().filter(r => r.state === 'ready');
+  $('labCombo').innerHTML = ready.length ? '' : '<p class="lede small">Sube un arma a nivel 3 y consigue su pasiva (o dos armas que se unen) para probar una fusión.</p>';
+  for (const r of ready) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'lc';
+    b.innerHTML = `<span class="ico">${ico(r.r, 34)}</span><span><b>${r.kind}: ${r.name}</b><span class="d">Tócala para probarla ya</span></span>`;
+    b.onclick = () => { const id = r.kind === 'Fusión' ? Object.keys(WEAPONS).find(k => EVOS[WEAPONS[k].evo].name === r.name) : Object.keys(UNIONS).find(k => UNIONS[k].name === r.name); applyLab(r.kind === 'Fusión' ? { k: 'evo', id } : { k: 'union', id }); };
+    $('labCombo').appendChild(b);
+  }
+  $('labRelic').innerHTML = '';
+  for (const id in RELICS) {
+    if (!relicOwned(id)) continue;
+    const R = RELICS[id], b = document.createElement('button'); b.type = 'button'; b.className = 'lc' + (S.relic === id ? ' sel' : '');
+    b.innerHTML = `<span class="ico">${ico(R.ico, 30)}</span><span><b>${R.name}</b><span class="d">${R.d}</span></span>`;
+    b.onclick = () => { S.relic = S.relic === id ? null : id; renderLabSheet(); sfx('card'); };
+    $('labRelic').appendChild(b);
+  }
+  $('labRelicH').hidden = !$('labRelic').children.length;
+}
+function applyLab(c) { mode = 'play'; $('labSheet').hidden = true; applyCard(c); }
+function afterLab() { recompute(); renderLabSheet(); sfx('card'); }
+function labClose() { $('labSheet').hidden = true; if (mode === 'lab') { mode = 'play'; setAudioGains(); } }
+$('labDone').onclick = labClose;
+$('labGear').onclick = labSheet;
+$('labWave').onclick = () => { if (mode === 'play' && S && S.lab) { for (const e of S.enemies) e.dead = true; S.enemies = []; nextWave(); sfx('card'); } };
+$('labBoss').onclick = () => { if (mode !== 'play' || !S || !S.lab) return; for (const e of S.enemies) e.dead = true; S.enemies = []; S.boss = null; S.eclipse = 0; S.night = 0; S.labBoss = ['kraken', 'armada', 'leviatan', 'eclipse'][labBossI++ % 4]; S.wave = 9; nextWave(); sfx('roar'); };
+$('labClear').onclick = () => { if (mode === 'play' && S && S.lab) { for (const e of S.enemies) if (!e.isBoss) e.dead = true; S.enemies = S.enemies.filter(e => !e.dead); S.boss = null; sfx('splash'); } };
+$('labExit').onclick = () => { if (S && S.lab) labEnd(); };
+// =====================================================================
 // LOOP
 // =====================================================================
 openTitle();
@@ -6274,6 +7226,7 @@ function loop(now) {
     else moonPortrait(c, id, f, 1, Math.sin(T * 2.2) * 4);
   }
   if (S && S.intro > 0) S.intro = Math.max(0, S.intro - dt / 0.9);
+  hostTick();
   draw();
   requestAnimationFrame(loop);
 }
