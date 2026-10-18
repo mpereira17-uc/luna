@@ -60,12 +60,12 @@ const PRESETS = {
       const M = S.mis, gi = M && M.gico;
       const hot = S.enemies.filter(e => !e.dead && !e.decoy && (e.cap || e.def.shaman || e.def.ghost || (gi === 'i_tesoro' && e.type === 'gold') || (e.type === 'nautilo' && (gi === 'i_marea' || !M))));
       hot.sort((a, b) => (b.def.shaman ? 2 : b.def.ghost && b.atIsland ? 3 : 0) - (a.def.shaman ? 2 : a.def.ghost && a.atIsland ? 3 : 0) || Math.abs(a.x - W / 2) - Math.abs(b.x - W / 2));
-      const bombs = gi === 'i_bombarda' ? S.proj.filter(q => q.type === 'bomb' && q.hostile && !q.done && q.t < q.T * 0.8) : [];
+      // shells (the bombardment mission, and any boss fight): stand where the soonest one comes down, they all fall on the island
+      const bombs = gi === 'i_bombarda' || (S.boss && !S.boss.dead) ? S.proj.filter(q => q.type === 'bomb' && q.hostile && !q.done && q.t < q.T - 0.05) : [];
       const boats = S.convoy ? S.convoy.boats.filter(q => !q.done) : [];
       if (bombs.length) {
-        // get in the way of the shell: aim where it will be a moment from now
-        bombs.sort((a, b) => Math.hypot(a.x - mx, a.y - my) - Math.hypot(b.x - mx, b.y - my));
-        const q = bombs[0], k = 0.18; tx = q.x + q.vx * k; ty = q.y + (q.vy + q.g * k / 2) * k;
+        bombs.sort((a, b) => (a.T - a.t) - (b.T - b.t));
+        const q = bombs[0], tt = Math.max(q.t + 0.15, q.T - 0.15); tx = q.x0 + q.vx * tt; ty = Math.min(B.y1, Math.max(B.y0, q.y0 + q.vy * tt + 0.5 * q.g * tt * tt));
       } else if (S.treasure && !S.treasure.got && S.treasure.show > 0.5 && S.enemies.filter(e => !e.dead && Math.abs(e.x - W / 2) < W * 0.18).length < 3) {
         // phase 4: a treasure showing in the sand at low tide: hold the moon over it
         tx = S.treasure.x; ty = B.y1;
@@ -101,6 +101,7 @@ const PRESETS = {
       if (S.wrecks) window.__wmax = Math.max(window.__wmax || 0, S.wrecks.length);
       if (S.mig && S.mig !== window.__lm) (window.__migs = window.__migs || []).push(S.mig.type + '@' + S.wave); window.__lm = S.mig;
       if (S.surge && !window.__ls) window.__tides = (window.__tides || 0) + 1; window.__ls = !!S.surge;
+      for (const q of S.proj) if (q.type === 'bomb' && q.hostile && !q.__seen) { q.__seen = 1; window.__bombs = (window.__bombs || 0) + 1; const Bm = L.bounds(); let reach = false; for (let k = 0; k <= 20; k++) { const tt = q.T * k / 20, x = q.x0 + q.vx * tt, y = q.y0 + q.vy * tt + 0.5 * q.g * tt * tt; if (x >= Bm.x0 && x <= Bm.x1 && y >= Bm.y0 - 30 && y <= Bm.y1 + 30) reach = true; } if (reach) window.__reach = (window.__reach || 0) + 1; }
     }, 100);
     setInterval(() => { const S = L.S; if (S) window.__log.push({ t: Math.round(S.t), w: S.wave, hp: Math.round(S.hp), mhp: Math.round(S.maxHp), lv: S.lv, en: S.enemies.length, k: S.kills, c: Math.round(S.pearls), boss: S.boss ? Math.round(S.boss.hp) : null, mode: L.mode }); }, 10000);
   }, [runMode, isl, bot, danger, PRESETS[preset], reef]);
@@ -121,6 +122,7 @@ const PRESETS = {
   console.log('PICKS', picks.join(', '));
   console.log('SHOP', JSON.stringify(await p.evaluate(() => window.__shop || [])));
   console.log('OCEAN', JSON.stringify(await p.evaluate(() => ({ pacts: window.__pacts || [], anoms: window.__anoms || [], wx: window.__wx || [], tides: window.__tides || 0 }))));
+  console.log('SHELLS', JSON.stringify(await p.evaluate(() => ({ fired: window.__bombs || 0, reachable: window.__reach || 0, stopped: window.__luna.S ? window.__luna.S.intercepts : 0 }))));
   console.log('SEA', JSON.stringify(await p.evaluate(() => ({ wrecksMax: window.__wmax || 0, treasures: window.__luna.S ? window.__luna.S.treasures || 0 : 0, migs: window.__migs || [] }))));
   console.log('ERRORS', errs.slice(0, 10));
   await b.close();
