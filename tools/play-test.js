@@ -35,12 +35,13 @@ const PRESETS = {
     sv.tips = { move: 1, tide: 1, crash: 1, swat: 1, pull: 1, strand: 1, elite: 1, active: 1, ecl: 1, en_sloop: 1, en_pirate: 1, en_gull: 1, en_galleon: 1, en_crab: 1, en_mortar: 1, en_serpent: 1, en_gold: 1 };
     L.start(m, +i);
     window.__log = []; window.__picks = [];
-    const rank = c => /union/.test(c.className) ? 0 : /evo/.test(c.className) ? 1 : /NIVEL/.test(c.innerText) && !/Espejo|Marea doble|Arrecife|Sangre|Luna de hielo|Lente|Pólvora|Caracola/.test(c.innerText) ? 2 : /NUEVA/.test(c.innerText) ? 3 : 4;
+    const rank = c => /union/.test(c.className) ? 0 : /evo/.test(c.className) ? 1 : /k-wup/.test(c.className) ? 2 : /k-wnew|k-pnew/.test(c.className) ? 3 : 4;
     setInterval(() => {
       const md = L.mode, S = L.S;
       if (md === 'levelup') { const cs = [...document.querySelectorAll('#cards .up')]; let best = 0; cs.forEach((c, k) => { if (rank(c) < rank(cs[best])) best = k; }); window.__picks.push((cs[best]?.querySelector('b')?.textContent || '?') + '@' + S.lv); L.pick(best); return; }
       if (md === 'merchant') { const before = Math.floor(L.S.pearls); for (let k = 0; k < 3; k++) L.buyMerchant(k); if (L.rerollMerchant) { L.rerollMerchant(); for (let k = 0; k < 3; k++) L.buyMerchant(k); } (window.__shop = window.__shop || []).push(`w${L.S.wave}: ${before} perlas, gastó ${before - Math.floor(L.S.pearls)}`); L.leaveMerchant(); return; }
       if (md === 'revive') { document.getElementById('reviveBtn').click(); return; }
+      if (md === 'fuse') { L.skipFuse(); return; }
       if (md !== 'play' || !S || bot === 'idle') return;
       const B = L.bounds(), W = L.W, mx = S.mx, my = S.my;
       let tx = mx, ty = B.y1;

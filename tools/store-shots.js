@@ -45,7 +45,7 @@ const OUT = path.join(__dirname, '..', 'google-play', 'capturas');
   for (let i = 0; i < 2; i++) await p.clock.runFor(1000);
   await shot('4-jefe');
   // workshop with the reef designs
-  await p.evaluate(() => { clearInterval(window.__bot); document.getElementById('quitBtn').click(); });
+  await p.evaluate(() => { clearInterval(window.__bot); document.getElementById('quitBtn').click(); document.getElementById('pYes').click(); });
   await p.clock.runFor(1500);
   await p.evaluate(() => { window.lunaBack && window.lunaBack(); window.lunaBack && window.lunaBack(); });
   await p.clock.runFor(300);

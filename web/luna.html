@@ -81,7 +81,26 @@ h2.st { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 
 .inl { display: inline !important; }
 .badge { font-size: 11px; font-weight: 900; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 999px; background: var(--danger); color: #fff; }
 
-.title-wrap { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 5vh; }
+.title-wrap { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 3vh; pointer-events: none; }
+#scrTitle .inner { margin-block: 0; flex: 1; justify-content: space-between; }
+.btn.big { padding: 18px 20px; font-size: 20px; }
+.btn.sea { background: linear-gradient(135deg, #3fb8c9, #2a6fb0); color: #04121f; box-shadow: 0 0 26px color-mix(in srgb, #3fb8c9 35%, transparent); }
+.btn.sea:disabled { background: color-mix(in srgb, var(--panel) 88%, transparent); color: var(--ink-dim); box-shadow: 0 0 0 1px var(--line) inset; opacity: 1; }
+.title-btns .row .btn { padding: 13px 14px; font-size: 16px; min-height: 64px; }
+.title-btns .row .btn { position: relative; }
+.title-btns .row .btn > span:first-child { min-width: 0; }
+.title-btns .row .btn small { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.title-btns .row .badge { position: absolute; top: -8px; right: -4px; }
+/* what the moon says when you tap it on the title */
+.say { position: fixed; z-index: 21; left: 0; top: 0; max-width: min(64vw, 260px); padding: 8px 13px 9px; background: #fff; color: #1c1430; border: 2.5px solid #1c1430; border-radius: 16px; font: 15px/1.2 var(--comic); letter-spacing: 0.02em; text-align: center; text-wrap: balance; pointer-events: none; transform: translate(-50%, -100%); animation: sayIn 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+.say::after { content: ""; position: absolute; left: var(--tx, 50%); bottom: -9px; width: 14px; height: 14px; background: #fff; border-right: 2.5px solid #1c1430; border-bottom: 2.5px solid #1c1430; transform: translateX(-50%) rotate(45deg); }
+/* beside the moon: the bubble sits to its right (r) or left (l) with the tail pointing back at it */
+.say.r { transform: translate(0, -50%); transform-origin: left center; }
+.say.l { transform: translate(-100%, -50%); transform-origin: right center; }
+.say.r::after, .say.l::after { top: 50%; bottom: auto; }
+.say.r::after { left: -8px; transform: translateY(-50%) rotate(135deg); }
+.say.l::after { left: auto; right: -8px; transform: translateY(-50%) rotate(-45deg); }
+@keyframes sayIn { from { opacity: 0; scale: 0.6; } to { opacity: 1; scale: 1; } }
 .title-wrap h1 {
   font-family: var(--display); font-weight: 400; margin: 0;
   font-size: clamp(76px, 25vw, 124px); line-height: 0.92; color: var(--moon);
@@ -97,7 +116,9 @@ h2.st { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 
 .lc .ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 26px; background: color-mix(in srgb, var(--moon) 9%, transparent); }
 .lc .ico.moonico { background: none; }
 .danger { display: flex; gap: 3px; margin-top: 7px; flex-wrap: wrap; }
-.danger button { width: 23px; height: 24px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel-2); font-size: 11px; font-weight: 900; padding: 0; color: var(--ink-dim); }
+.danger button { position: relative; width: 26px; height: 28px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12px; font-weight: 900; padding: 0; color: var(--ink-dim); }
+/* small buttons keep their look but get a 44 px touch area */
+.danger button::after, .moon-pick button::after { content: ""; position: absolute; inset: -9px -4px; }
 .danger button.on { background: var(--danger); border-color: var(--danger); color: #fff; }
 .mship { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 98px; }
 .danger button:disabled { opacity: 0.3; cursor: default; }
@@ -136,7 +157,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .pips { display: flex; gap: 4px; margin-top: 6px; }
 .pips i { width: 16px; height: 5px; border-radius: 3px; background: var(--line); }
 .pips i.on { background: var(--gold); }
-.buy { border: 0; border-radius: 12px; padding: 10px 12px; font-weight: 900; font-size: 14px; background: var(--moon); color: var(--night); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.buy { min-height: 44px; border: 0; border-radius: 12px; padding: 10px 12px; font-weight: 900; font-size: 14px; background: var(--moon); color: var(--night); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .buy:disabled { background: var(--line); color: var(--ink-dim); cursor: default; }
 .buy.claim { background: var(--ok); }
 .buy.sw { background: var(--panel-2); color: var(--ink-dim); box-shadow: 0 0 0 1px var(--line) inset; }
@@ -149,7 +170,38 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .mod b { color: var(--lantern); }
 .moon-pick { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 85%, transparent); font-size: 14px; }
 .moon-pick .moon-dot { width: 22px; height: 22px; }
-.moon-pick button { margin-left: auto; border: 0; background: none; color: var(--gold); font-weight: 800; font-size: 14px; }
+.moon-pick button { position: relative; margin-left: auto; border: 0; background: none; color: var(--gold); font-weight: 800; font-size: 14px; padding: 8px 4px; }
+
+/* moons: a carousel of cards, swipe or use the arrows */
+.moons-in { margin-block: 0 auto; gap: 12px; }
+.mcar { position: relative; }
+.mtrack { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x pan-y; overscroll-behavior-x: contain; border-radius: 22px; }
+.mtrack::-webkit-scrollbar { display: none; }
+.mcard { flex: 0 0 100%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 18px 16px; border-radius: 22px; text-align: center;
+  background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--mc) 22%, var(--panel)), var(--panel) 62%); border: 1px solid color-mix(in srgb, var(--mc) 40%, var(--line)); }
+.mcard.sel { box-shadow: 0 0 0 2px var(--gold) inset; }
+.mcv { width: clamp(104px, 30vw, 136px); height: clamp(104px, 30vw, 136px); cursor: pointer; }
+.mcard h3 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; color: var(--moon); }
+.mcard .eyebrow { color: var(--mc); }
+.mcard .quote { margin: 0; font: 16px/1.25 var(--comic); letter-spacing: 0.02em; color: #fff3d1; min-height: 40px; text-wrap: balance; }
+.mbars { display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; width: 100%; max-width: 300px; align-items: center; margin: 2px 0; }
+.mbars > span { font-size: 12px; font-weight: 800; color: var(--ink-dim); text-align: left; }
+.mbars .pp { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+.mbars .pp i { height: 8px; border-radius: 3px; background: var(--line); }
+.mbars .pp i.on { background: var(--mc); box-shadow: 0 0 6px color-mix(in srgb, var(--mc) 50%, transparent); }
+.mabil { display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; width: 100%; text-align: left; padding: 9px 11px; border-radius: 14px; background: color-mix(in srgb, var(--night) 45%, transparent); font-size: 13px; line-height: 1.35; color: var(--ink-dim); }
+.mabil b { color: var(--ink); font-size: 15px; display: block; }
+.mfacts { display: flex; flex-direction: column; gap: 4px; width: 100%; font-size: 13px; text-align: left; }
+.mfacts span { display: flex; align-items: center; gap: 6px; line-height: 1.3; }
+.mfacts .plus { color: var(--ok); font-weight: 700; }
+.mfacts .weak { color: #ff9a9a; font-weight: 700; }
+.mnav { position: absolute; top: 54px; z-index: 2; width: 44px; height: 44px; font-size: 26px; line-height: 1; }
+.mnav.prev { left: 6px; } .mnav.next { right: 6px; }
+.mnav:disabled { opacity: 0.25; }
+.mdots { display: flex; justify-content: center; gap: 7px; }
+.mdots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: transform 0.2s, background 0.2s; }
+.mdots i.on { background: var(--gold); transform: scale(1.3); }
+.mdots i.own { box-shadow: 0 0 0 1.5px var(--ink-dim) inset; }
 
 /* results */
 .card { background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--line); border-radius: 22px; padding: 22px 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -158,14 +210,38 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .tally { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; width: 100%; font-size: 15px; text-align: left; font-variant-numeric: tabular-nums; margin: 0; }
 .tally dt { color: var(--ink-dim); }
 .tally dd { margin: 0; font-weight: 800; text-align: right; }
+.rmoon { width: 120px; height: 120px; margin: -6px 0 -4px; }
+.rsum { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rcause { margin: 0; padding: 9px 12px; border-radius: 12px; width: 100%; font-size: 14px; line-height: 1.35; background: color-mix(in srgb, var(--danger) 12%, transparent); border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent); color: #ffc0c6; display: flex; align-items: center; gap: 8px; text-align: left; }
+.rstar { width: 100%; display: flex; flex-direction: column; gap: 8px; text-align: left; padding: 12px; border-radius: 14px; background: color-mix(in srgb, var(--gold) 8%, transparent); border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent); }
+.rstar .hd { display: flex; align-items: center; gap: 10px; }
+.rstar .hd small { display: block; font-size: 11px; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+.rstar .hd b { font-size: 17px; }
+.rcoins dd { color: var(--gold); }
+.rcoins dt.tot, .rcoins dd.tot { font-size: 18px; }
 .unlock { padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--ok) 12%, transparent); border: 1px solid color-mix(in srgb, var(--ok) 40%, transparent); color: var(--ok); font-weight: 700; font-size: 14px; width: 100%; }
 .build { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .build > span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 6px 9px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); font-weight: 700; }
 .build span.evo { border-color: var(--gold); color: var(--gold); }
 /* pause: gear (weapons and passives, like Vampire Survivors) and the combination book */
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); }
-.seg button { display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; padding: 10px 6px; font-size: 15px; font-weight: 800; background: none; color: var(--ink-dim); }
+.seg { display: grid; grid-template-columns: repeat(var(--tabs, 2), minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); }
+.seg button { min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; padding: 8px 4px; font-size: 14px; font-weight: 800; background: none; color: var(--ink-dim); }
 .seg button[aria-selected="true"] { background: var(--panel-2); color: var(--ink); box-shadow: 0 0 0 1px var(--line) inset; }
+.seg3 { --tabs: 3; }
+.sgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 4px; }
+.sgrid > span { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 2px; border-radius: 12px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); font-size: 11px; font-weight: 700; color: var(--ink-dim); text-align: center; }
+.sgrid b { font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.dbars { display: flex; flex-direction: column; gap: 7px; }
+.dbar { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; font-size: 13px; font-weight: 700; }
+.dbar .nm { display: block; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dbar .tr { display: block; height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.dbar .tr i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--lantern), var(--gold)); transform-origin: left; animation: grow 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.dbar.top .tr i { background: linear-gradient(90deg, var(--gold), #fff3b0); }
+.dbar .v { font-variant-numeric: tabular-nums; color: var(--ink-dim); min-width: 44px; text-align: right; }
+@keyframes grow { from { transform: scaleX(0); } }
+.confirm { display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; background: color-mix(in srgb, var(--danger) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); text-align: center; animation: slide 0.25s both; }
+.confirm b { font-family: var(--display); font-weight: 400; font-size: 21px; color: var(--moon); }
+.confirm p { margin: 0; font-size: 14px; color: var(--ink-dim); line-height: 1.4; }
 .sec2 { display: flex; align-items: baseline; justify-content: space-between; margin: 4px 0 8px; font-family: var(--display); font-weight: 400; font-size: 19px; color: var(--gold); }
 .sec2 small { font-family: var(--body); font-size: 13px; font-weight: 700; color: var(--ink-dim); }
 .gslots { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 6px; }
@@ -198,22 +274,31 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 #levelUp h2 { font-family: var(--display); font-weight: 400; font-size: 40px; margin: 0; color: var(--gold); text-align: center; text-shadow: 0 0 30px color-mix(in srgb, var(--gold) 50%, transparent); animation: pop 0.35s both; }
 .cards { display: grid; gap: 10px; }
 .up {
-  display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; text-align: left;
-  padding: 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; text-align: left;
+  padding: 16px 14px; min-height: 96px; border-radius: 20px; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
   animation: slide 0.3s both; position: relative;
 }
 .up:nth-child(2) { animation-delay: 0.06s; }
 .up:nth-child(3) { animation-delay: 0.12s; }
 .up:active { transform: scale(0.98); }
-.up .ico { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 30px; background: var(--panel-2); }
+.up .ico { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; font-size: 30px; background: var(--panel-2); }
 .lvs { font-style: normal; color: var(--gold); letter-spacing: 0.05em; }
 .lvs .off { opacity: 0.28; font-style: normal; }
 .up .tag .stars { display: block; font-style: normal; color: var(--gold); letter-spacing: 0.05em; font-size: 12px; text-align: right; margin-top: 2px; }
 .up.union { border-color: #c58bff; background: linear-gradient(135deg, color-mix(in srgb, #c58bff 22%, var(--panel)), color-mix(in srgb, var(--gold) 10%, var(--panel))); box-shadow: 0 0 30px color-mix(in srgb, #c58bff 35%, transparent); }
 .up.union .tag { color: #d9b8ff; }
-.up b { font-size: 17px; display: block; }
+.up b { font-size: 18px; display: block; margin-top: 3px; }
+.up .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tagl { font-size: 10.5px; font-weight: 900; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 999px; background: var(--line); color: var(--ink); }
+.tagl.t-new { background: color-mix(in srgb, var(--ok) 22%, transparent); color: var(--ok); }
+.tagl.t-up { background: color-mix(in srgb, #7fd3ff 22%, transparent); color: #9fdcff; }
+.tagl.t-evo { background: color-mix(in srgb, var(--gold) 26%, transparent); color: var(--gold); }
+.tagl.t-union { background: color-mix(in srgb, #c58bff 28%, transparent); color: #e0c4ff; }
+.lvchg { font-size: 13px; color: var(--gold); letter-spacing: 0.04em; white-space: nowrap; }
+.lvchg .off { opacity: 0.28; }
+.lvchg .ar { color: var(--ink-dim); margin: 0 3px; letter-spacing: 0; }
 .up .d { font-size: 13px; color: var(--ink-dim); line-height: 1.35; display: block; margin-top: 3px; }
-.up .tag { position: absolute; top: 10px; right: 12px; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; color: var(--ink-dim); }
+
 .up.new .tag { color: var(--ok); }
 .up.evo { border-color: var(--gold); background: linear-gradient(135deg, color-mix(in srgb, var(--gold) 18%, var(--panel)), var(--panel)); box-shadow: 0 0 30px color-mix(in srgb, var(--gold) 30%, transparent); }
 .up.evo .tag { color: var(--gold); }
@@ -223,6 +308,25 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .slots span.gap { opacity: 0; width: 8px; border: 0; background: none; }
 @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes slide { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- fusion / union moment ---------- */
+#fuseFx { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; text-align: center; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--fz, var(--gold)) 30%, #0b0820), #0b0820 70%); animation: scrFade 0.2s both; cursor: pointer; }
+#fuseFx.union { --fz: #c58bff; }
+.fz-stage { position: relative; width: 200px; height: 150px; }
+.fz-stage > span { position: absolute; left: 50%; top: 50%; line-height: 0; }
+.fz-a { animation: fzA 0.8s cubic-bezier(0.5, 0, 0.8, 0.6) both; }
+.fz-b { animation: fzB 0.8s cubic-bezier(0.5, 0, 0.8, 0.6) both; }
+.fz-r { opacity: 0; animation: fzR 0.6s 0.8s cubic-bezier(0.2, 1.7, 0.4, 1) both; filter: drop-shadow(0 0 22px var(--fz, var(--gold))); }
+@keyframes fzA { 0% { transform: translate(-190%, -50%) rotate(-30deg); } 75% { transform: translate(-75%, -50%) rotate(8deg) scale(1.05); } 100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; } }
+@keyframes fzB { 0% { transform: translate(90%, -50%) rotate(30deg); } 75% { transform: translate(-25%, -50%) rotate(-8deg) scale(1.05); } 100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; } }
+@keyframes fzR { from { opacity: 0; transform: translate(-50%, -50%) scale(0.2) rotate(-40deg); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.fz-flash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, #fff, transparent 55%); opacity: 0; animation: fzFlash 0.7s 0.72s ease-out both; pointer-events: none; }
+@keyframes fzFlash { 0% { opacity: 0; } 15% { opacity: 0.95; } 100% { opacity: 0; } }
+.fz-kind { animation: slide 0.35s 0.95s both; color: var(--fz, var(--gold)); }
+.fz-name { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(30px, 10vw, 42px); color: var(--moon); text-shadow: 0 0 30px color-mix(in srgb, var(--fz, var(--gold)) 60%, transparent); animation: pop 0.4s 1.0s both; }
+.fz-desc { margin: 0; max-width: 320px; color: var(--ink); font-size: 15px; line-height: 1.4; animation: slide 0.35s 1.15s both; }
+.fz-skip { margin-top: 18px; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-dim); animation: blink 1.2s 1.4s ease-in-out infinite alternate; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { #fuseFx *, #fuseFx { animation-duration: 0.01s !important; animation-delay: 0s !important; } .fz-a, .fz-b { display: none; } }
 
 /* ---------- studio splash (IA Games) over the title on launch ---------- */
 #splash { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: radial-gradient(circle at 50% 42%, #6a4ff0, #2a1d8a 60%, #140e45); transition: opacity 0.5s; }
@@ -264,15 +368,25 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
   padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
   padding-top: calc(env(safe-area-inset-top, 0px) + 10px); display: flex; flex-direction: column; gap: 7px; }
 .hud-row { display: flex; align-items: center; gap: 10px; }
-#hud .icon-btn { pointer-events: auto; width: 40px; height: 40px; font-size: 13px; }
+#hud .icon-btn { pointer-events: auto; width: 44px; height: 44px; font-size: 13px; }
+.hpbox { position: relative; flex: 1; max-width: 230px; display: flex; align-items: center; gap: 5px; }
+.hpbox .castle { flex: none; line-height: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.7)); }
+#hpHurt { position: absolute; left: 34px; top: 22px; font-weight: 900; font-size: 14px; color: var(--danger); text-shadow: 0 1px 3px #000, 0 0 8px rgba(255,95,109,0.6); opacity: 0; pointer-events: none; font-variant-numeric: tabular-nums; }
+#hpHurt.go { animation: hurtUp 0.9s ease-out both; }
+@keyframes hurtUp { 0% { opacity: 0; transform: translateY(-4px) scale(1.4); } 15% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(10px); } }
+.hpbox.hit .bar { animation: hpShake 0.3s; }
+@keyframes hpShake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+.hud-r { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.xpline { display: flex; align-items: center; gap: 8px; padding-left: 2px; }
 .bar { position: relative; height: 16px; border-radius: 8px; background: rgba(5,10,24,0.7); border: 1px solid rgba(255,255,255,0.12); overflow: hidden; flex: 1; }
 .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 8px; transition: width 0.15s linear; }
 .bar span { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 900; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 #hpFill { background: linear-gradient(90deg, #ff5f6d, #ff9d6c); }
-.xp { height: 8px; }
+.bar.hp { height: 14px; }
+.xp { height: 6px; border-radius: 3px; }
 #xpFill { background: linear-gradient(90deg, #7fd3ff, #b49cff); }
-.wave { font-family: var(--display); font-size: 17px; color: var(--moon); white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 70px; text-align: right; }
-.lv { font-size: 12px; font-weight: 900; color: #b9a8ff; min-width: 40px; }
+.wave { font-family: var(--display); font-size: 16px; line-height: 1.1; color: var(--moon); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; text-shadow: 0 1px 3px #000; }
+.lv { font-size: 11px; font-weight: 900; color: #b9a8ff; min-width: 34px; text-shadow: 0 1px 2px #000; }
 #bossBar { display: flex; flex-direction: column; gap: 3px; }
 #bossName { font-family: var(--display); font-size: 15px; color: var(--danger); text-align: center; text-shadow: 0 0 12px rgba(255,95,109,0.6); }
 #bossBar .bar { flex: none; height: 10px; }
@@ -280,9 +394,16 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 #bossCast.ok { color: #8ff0a4; }
 @keyframes castPulse { from { opacity: .65; transform: scale(.97); } to { opacity: 1; transform: scale(1.03); } }
 #bossFill { background: linear-gradient(90deg, #8d1e3a, #ff5f6d); }
-#combo { position: absolute; left: 14px; top: calc(env(safe-area-inset-top, 0px) + 136px); text-align: left; pointer-events: none; transform-origin: left center; }
-#comboNum { font-family: var(--display); font-size: 34px; line-height: 1; color: var(--gold); text-shadow: 0 0 20px rgba(255,211,138,0.6), 0 2px 0 #000; font-variant-numeric: tabular-nums; }
-#comboTxt { font-weight: 900; font-size: 18px; letter-spacing: 0.08em; color: #fff; text-shadow: 0 0 14px var(--lantern), 0 2px 0 #000; text-transform: uppercase; min-height: 22px; }
+#combo { display: flex; align-items: baseline; gap: 6px; padding-left: 52px; min-height: 22px; pointer-events: none; }
+#comboNum { font-family: var(--display); font-size: 21px; line-height: 1; color: var(--gold); text-shadow: 0 0 14px rgba(255,211,138,0.55), 0 2px 0 #000; font-variant-numeric: tabular-nums; }
+#comboTxt { font-weight: 900; font-size: 12px; letter-spacing: 0.08em; color: #fff; text-shadow: 0 0 10px var(--lantern), 0 1px 0 #000; text-transform: uppercase; }
+/* a chest opens under the HUD: the chest shakes, then shows what it gave */
+#chestPop { position: absolute; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 112px); transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 8px; border-radius: 16px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--gold); box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 30%, transparent); pointer-events: none; animation: pop 0.3s both; max-width: 88vw; }
+#chestPop b { display: block; font-size: 14px; color: var(--gold); }
+#chestPop small { display: block; font-size: 12px; font-weight: 700; color: var(--ink); }
+#chestPop .cpi { line-height: 0; }
+#chestPop.shake .cpi { animation: chestShake 0.45s; }
+@keyframes chestShake { 20% { transform: rotate(-12deg); } 40% { transform: rotate(10deg); } 60% { transform: rotate(-8deg); } 80% { transform: rotate(5deg) scale(1.1); } }
 #comboNum.bump, #comboTxt.bump { animation: pop 0.25s both; }
 .hud-bottom { position: absolute; left: 0; right: 0; bottom: 0;
   padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px));
@@ -307,10 +428,21 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 #activeBtn.ready #activeIco { filter: none; }
 #activeBtn.ready #activeLbl { color: var(--gold); }
 @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(244,236,208,0.6); } to { box-shadow: 0 0 0 12px rgba(244,236,208,0); } }
-#banner { position: fixed; left: 50%; top: 33%; transform: translate(-50%, -50%); pointer-events: none; text-align: center; font-family: var(--display); color: var(--moon); font-size: 30px; line-height: 1.1; text-shadow: 0 2px 20px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; width: 92%; z-index: 15; }
-#banner small { display: block; font-family: var(--body); font-size: 15px; font-weight: 700; color: var(--ink); margin-top: 6px; text-shadow: 0 1px 6px #000; }
+#banner { position: fixed; left: 50%; top: 24%; transform: translate(-50%, -50%); pointer-events: none; text-align: center; font-family: var(--display); color: var(--moon); font-size: 25px; line-height: 1.1; text-shadow: 0 2px 20px rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s; width: 92%; z-index: 15; }
+#banner small { display: block; font-family: var(--body); font-size: 14px; font-weight: 700; color: var(--ink); margin-top: 6px; text-shadow: 0 1px 6px #000; }
 #banner.show { opacity: 1; }
-#banner.boss { color: var(--danger); font-size: 36px; }
+#banner.boss { color: var(--danger); font-size: 30px; }
+@media (max-height: 700px) {
+  .title-wrap h1 { font-size: clamp(64px, 20vw, 96px); }
+  .title-wrap .lede { font-size: 14px; }
+  .btn.big { padding: 14px 18px; }
+  .title-btns .row .btn { min-height: 56px; padding: 10px 12px; }
+  .tile { padding: 7px 2px 6px; }
+  .up { min-height: 84px; padding: 12px; }
+  .mcard { gap: 4px; padding: 10px 14px 12px; }
+  .mcard .quote { min-height: 0; font-size: 15px; }
+  .rmoon { width: 92px; height: 92px; }
+}
 @media (prefers-reduced-motion: reduce) { .up, #levelUp h2, #comboNum.bump, #comboTxt.bump { animation: none; } #activeBtn.ready { animation: none; } }
 </style>
 
@@ -322,21 +454,18 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
   <div class="hud-top">
     <div class="hud-row">
       <button class="icon-btn" id="pauseBtn" type="button" aria-label="Pausa">❚❚</button>
-      <div class="bar"><i id="hpFill"></i><span id="hpText"></span></div>
-      <div class="wave" id="waveText"></div>
+      <div class="hpbox"><span class="castle" id="hpIco" aria-hidden="true"></span><div class="bar hp"><i id="hpFill"></i><span id="hpText"></span></div><span id="hpHurt" aria-hidden="true"></span></div>
+      <div class="hud-r"><div class="wave" id="waveText"></div><span class="coins-hud"><i class="pearl"></i><span id="coinText">0</span></span></div>
     </div>
-    <div class="hud-row">
-      <span class="lv" id="lvText">Nv 1</span>
-      <div class="bar xp"><i id="xpFill"></i></div>
-      <span class="coins-hud"><i class="pearl"></i><span id="coinText">0</span></span>
-    </div>
+    <div class="xpline"><span class="lv" id="lvText">Nv 1</span><div class="bar xp"><i id="xpFill"></i></div></div>
     <div id="bossBar" hidden>
       <span id="bossName"></span>
       <span id="bossCast" hidden></span>
       <div class="bar"><i id="bossFill"></i></div>
     </div>
+    <div id="combo"><span id="comboNum"></span><span id="comboTxt"></span></div>
   </div>
-  <div id="combo"><div id="comboNum"></div><div id="comboTxt"></div></div>
+  <div id="chestPop" hidden><span class="cpi" id="chestIco"></span><span><b id="chestTitle"></b><small id="chestSub"></small></span></div>
   <div class="hud-bottom">
     <div class="kit" id="kitW"></div>
     <button id="activeBtn" type="button" aria-label="Habilidad de la luna"><span id="activeIco"></span><span id="activeLbl">Tsunami</span></button>
@@ -344,6 +473,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
   </div>
 </div>
 <div id="banner"></div>
+<div id="moonSay" class="say" hidden></div>
 
 <!-- Title -->
 <div class="screen clear" id="scrTitle">
@@ -357,12 +487,15 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
       <h1>Luna</h1>
       <p class="lede">Vuela la luna, levanta el mar, estrella flotas contra el arrecife y saquea su tesoro.</p>
     </div>
-    <div class="stack" style="margin-top: 20vh">
-      <button class="btn primary" id="goPlay" type="button"><span>Jugar<small id="playSub">Isla Coral</small></span><span aria-hidden="true">→</span></button>
-      <button class="btn hot" id="goDaily" type="button"><span>Reto diario<small id="dailySub"></small></span><span class="badge" id="dailyBadge">NUEVO</span></button>
+    <div class="stack title-btns" id="titleBtns">
+      <button class="btn primary big" id="goPlay" type="button"><span>Jugar<small id="playSub">Isla Coral</small></span><span aria-hidden="true">→</span></button>
+      <div class="row">
+        <button class="btn sea" id="goEndless" type="button"><span>Marea sin fin<small id="endlessSub"></small></span></button>
+        <button class="btn hot" id="goDaily" type="button"><span>Reto diario<small id="dailySub"></small></span><span class="badge" id="dailyBadge">NUEVO</span></button>
+      </div>
       <div class="tiles">
-        <button class="tile" id="goShop" type="button"><span data-ico="i_arsenal"></span>Taller<span class="badge" id="shopBadge" hidden>!</span></button>
         <button class="tile" id="goMoons" type="button"><span data-ico="i_dorada"></span>Lunas</button>
+        <button class="tile" id="goShop" type="button"><span data-ico="i_arsenal"></span>Taller<span class="badge" id="shopBadge" hidden>!</span></button>
         <button class="tile" id="goMis" type="button"><span data-ico="i_mision"></span>Misiones<span class="badge" id="misBadge" hidden>!</span></button>
         <button class="tile" id="goAch" type="button"><span data-ico="i_trofeo"></span>Logros<span class="badge" id="achBadge" hidden>!</span></button>
       </div>
@@ -379,6 +512,10 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
       <button class="set-row" id="setMusic" type="button" role="switch" aria-checked="true"><span data-ico="i_musica"></span><span class="lbl">Música</span><span class="switch"></span></button>
       <button class="set-row" id="setSfx" type="button" role="switch" aria-checked="true"><span data-ico="i_sonido"></span><span class="lbl">Efectos de sonido</span><span class="switch"></span></button>
       <button class="set-row" id="setVib" type="button" role="switch" aria-checked="true"><span data-ico="i_vibra"></span><span class="lbl">Vibración</span><span class="switch"></span></button>
+    </div>
+    <h3 class="sec">Pantalla</h3>
+    <div class="set-list">
+      <button class="set-row" id="setFx" type="button" role="switch" aria-checked="false"><span data-ico="i_estrella"></span><span class="lbl">Efectos reducidos<small>Menos partículas y números en pantalla, para móviles modestos</small></span><span class="switch"></span></button>
     </div>
     <h3 class="sec">Historia</h3>
     <div class="set-list">
@@ -408,9 +545,14 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <!-- Moons -->
 <div class="screen" id="scrMoons" hidden>
   <div class="topbar"><button class="icon-btn" id="moonsBack" type="button" aria-label="Volver">←</button><h2 class="st">Lunas</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
-  <div class="inner" style="margin-block: 0 auto">
-    <p class="lede">Cada luna empieza con un arma distinta y tiene su propia habilidad especial.</p>
-    <div class="stack" id="moonList"></div>
+  <div class="inner moons-in">
+    <div class="mcar">
+      <div class="mtrack" id="moonTrack" aria-roledescription="carrusel"></div>
+      <button class="icon-btn mnav prev" id="moonPrev" type="button" aria-label="Luna anterior">‹</button>
+      <button class="icon-btn mnav next" id="moonNext" type="button" aria-label="Luna siguiente">›</button>
+    </div>
+    <div class="mdots" id="moonDots" aria-hidden="true"></div>
+    <button class="btn primary center" id="moonPick" type="button">Elegir</button>
   </div>
 </div>
 
@@ -487,9 +629,10 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div class="screen" id="scrPause" hidden>
   <div class="inner">
     <h2 class="st">Pausa</h2>
-    <div class="seg" role="tablist">
+    <div class="seg seg3" role="tablist">
       <button type="button" role="tab" id="pTabGear" aria-selected="true">Mejoras</button>
       <button type="button" role="tab" id="pTabCombo" aria-selected="false">Combinaciones<span class="badge" id="pComboBadge" hidden>!</span></button>
+      <button type="button" role="tab" id="pTabStats" aria-selected="false">Estadísticas</button>
     </div>
     <div id="pGear">
       <h3 class="sec2">Armas <small id="pWCount"></small></h3>
@@ -502,11 +645,24 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
       <p class="lede small">Fusión: un arma a nivel 3 más su pasiva. Unión: dos armas a nivel 3 que se juntan en una.</p>
       <div class="combos" id="pCombos"></div>
     </div>
-    <div class="stack">
+    <div id="pStats" hidden>
+      <div class="sgrid" id="pSGrid"></div>
+      <h3 class="sec2">Daño por arma <small id="pDmgTot"></small></h3>
+      <div class="dbars" id="pDmg"></div>
+    </div>
+    <div class="stack" id="pBtns">
       <button class="btn primary center" id="resumeBtn" type="button">Continuar</button>
       <div class="row">
         <button class="btn ghost center" id="restartBtn" type="button">Reiniciar</button>
         <button class="btn ghost center" id="quitBtn" type="button">Terminar y cobrar</button>
+      </div>
+    </div>
+    <div class="confirm" id="pConfirm" hidden>
+      <b id="pConfirmTitle"></b>
+      <p id="pConfirmTxt"></p>
+      <div class="row">
+        <button class="btn ghost center" id="pNo" type="button">Seguir jugando</button>
+        <button class="btn hot center" id="pYes" type="button">Terminar</button>
       </div>
     </div>
   </div>
@@ -531,9 +687,14 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div class="screen" id="scrResult" hidden>
   <div class="inner">
     <div class="card result">
+      <canvas class="rmoon" id="rMoon" width="200" height="200" aria-hidden="true"></canvas>
       <span class="eyebrow" id="rEyebrow"></span>
       <h3 id="rTitle"></h3>
+      <p class="rsum" id="rSum"></p>
+      <p class="rcause" id="rCause" hidden></p>
+      <div class="rstar" id="rStar" hidden></div>
       <dl class="tally" id="rTally"></dl>
+      <dl class="tally rcoins" id="rCoins"></dl>
       <div class="build" id="rBuild"></div>
       <div class="stack" id="rUnlocks"></div>
     </div>
@@ -545,6 +706,16 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
       </div>
     </div>
   </div>
+</div>
+
+<!-- Fusion / union moment -->
+<div id="fuseFx" hidden role="dialog" aria-live="polite">
+  <div class="fz-flash"></div>
+  <div class="fz-stage"><span class="fz-a" id="fzA"></span><span class="fz-b" id="fzB"></span><span class="fz-r" id="fzR"></span></div>
+  <span class="eyebrow fz-kind" id="fzKind"></span>
+  <h2 class="fz-name" id="fzName"></h2>
+  <p class="fz-desc" id="fzDesc"></p>
+  <span class="fz-skip">Toca para seguir</span>
 </div>
 
 <script src="atlas.js"></script>
@@ -671,13 +842,27 @@ const UNIONS = {
   torbellino: { a: 'remolino', b: 'escarcha', name: 'Torbellino helado', ico: 'i_torbellino', desc: 'Remolinos de hielo en los dos arrecifes que frenan y congelan.' },
 };
 const MOONS = [
-  { id: 'llena', name: 'Luna llena', color: '#f4ecd0', cost: 0, weapon: 'rayo', active: 'Tsunami', ico: 'i_tsunami', activeDesc: 'Una ola gigante barre los dos lados y empuja a todos lejos.', perk: 'Equilibrada.' },
-  { id: 'roja', name: 'Luna roja', color: '#ff6b5a', cost: 350, weapon: 'canon', active: 'Furia', ico: 'i_furia', activeDesc: '8 s de doble daño y disparos mucho más rápidos.', perk: '+20% de daño, pero -20% de vida de la isla.' },
-  { id: 'hielo', name: 'Luna de hielo', color: '#9fe3ff', cost: 800, weapon: 'escarcha', active: 'Ventisca', ico: 'i_ventisca', activeDesc: 'Congela a todos los enemigos durante 4 s.', perk: '+30% de duración de frenado, pero -10% de daño.' },
-  { id: 'nueva', name: 'Luna nueva', color: '#b49cff', cost: 1400, weapon: 'tiburon', active: 'Eclipse', ico: 'i_eclipse', activeDesc: '6 s en los que la isla es invulnerable y los enemigos reciben +60% de daño.', perk: '+20% de experiencia, pero la habilidad carga un 15% más lento.' },
-  { id: 'tormenta', name: 'Luna de tormenta', color: '#8fa8d8', cost: 2200, weapon: 'tormenta', active: 'Diluvio', ico: 'i_diluvio', activeDesc: '6 s de rayos cayendo por todo el mar.', perk: 'Lleva 6 armas en vez de 5, pero -20% de experiencia.' },
-  { id: 'dorada', name: 'Luna dorada', color: '#ffd36b', cost: 3000, weapon: 'faro', active: 'Fiebre del oro', ico: 'i_tesoro', activeDesc: '7 s en los que cada enemigo hundido suelta una perla y el imán cubre todo el mar.', perk: '+50% de perlas y de monedas, pero -30% de vida de la isla.' },
+  { id: 'llena', name: 'Luna llena', color: '#f4ecd0', cost: 0, weapon: 'rayo', active: 'Tsunami', ico: 'i_tsunami', activeDesc: 'Una ola gigante barre los dos lados y empuja a todos lejos.', perk: 'Equilibrada.',
+    role: 'La protectora', plus: 'Equilibrada: buena para aprender', weak: 'No destaca en nada', bars: [3, 3, 3, 2],
+    say: ['Yo cuido de la isla, tú mueve la marea.', '¡Hola! ¿Salimos a defender el faro?', 'Respira hondo y sigue a las olas.'] },
+  { id: 'roja', name: 'Luna roja', color: '#ff6b5a', cost: 350, weapon: 'canon', active: 'Furia', ico: 'i_furia', activeDesc: '8 s de doble daño y disparos mucho más rápidos.', perk: '+20% de daño, pero -20% de vida de la isla.',
+    role: 'La furiosa', plus: '+20% de daño', weak: '-20% de vida de la isla', bars: [5, 2, 1, 2],
+    say: ['Si se acercan, que se quemen.', '¿Eso es una flota? Qué risa.', '¡Más cañones! ¡Más fuego!'] },
+  { id: 'hielo', name: 'Luna de hielo', color: '#9fe3ff', cost: 800, weapon: 'escarcha', active: 'Ventisca', ico: 'i_ventisca', activeDesc: 'Congela a todos los enemigos durante 4 s.', perk: '+30% de duración de frenado, pero -10% de daño.',
+    role: 'La serena', plus: '+30% de frenado y congelación', weak: '-10% de daño', bars: [2, 3, 5, 2],
+    say: ['Calma. El mar también se congela.', 'Las prisas son para los piratas.', 'Un poco de frío nunca hizo daño… a mí.'] },
+  { id: 'nueva', name: 'Luna nueva', color: '#b49cff', cost: 1400, weapon: 'tiburon', active: 'Eclipse', ico: 'i_eclipse', activeDesc: '6 s en los que la isla es invulnerable y los enemigos reciben +60% de daño.', perk: '+20% de experiencia, pero la habilidad carga un 15% más lento.',
+    role: 'La misteriosa', plus: '+20% de experiencia', weak: 'Habilidad un 15% más lenta', bars: [4, 4, 2, 2],
+    say: ['Nadie me ve venir…', 'Shhh. Los tiburones están cerca.', 'La oscuridad también protege.'] },
+  { id: 'tormenta', name: 'Luna de tormenta', color: '#8fa8d8', cost: 2200, weapon: 'tormenta', active: 'Diluvio', ico: 'i_diluvio', activeDesc: '6 s de rayos cayendo por todo el mar.', perk: 'Lleva 6 armas en vez de 5, pero -20% de experiencia.',
+    role: 'La gruñona', plus: '6 armas en vez de 5', weak: '-20% de experiencia', bars: [4, 3, 3, 2],
+    say: ['¡Grrr! ¿Quién me ha despertado?', 'Rayos y truenos, ¡a por ellos!', 'No me hagas enfadar… más.'] },
+  { id: 'dorada', name: 'Luna dorada', color: '#ffd36b', cost: 3000, weapon: 'faro', active: 'Fiebre del oro', ico: 'i_tesoro', activeDesc: '7 s en los que cada enemigo hundido suelta una perla y el imán cubre todo el mar.', perk: '+50% de perlas y de monedas, pero -30% de vida de la isla.',
+    role: 'La codiciosa', plus: '+50% de perlas y monedas', weak: '-30% de vida de la isla', bars: [3, 1, 2, 5],
+    say: ['¿Eso que brilla es un tesoro?', '¡Cada barco hundido, una perla!', 'Lo bueno se guarda. Lo mejor, también.'] },
 ];
+// the four bars on each moon card
+const MOON_BARS = ['Daño', 'Vida', 'Control', 'Botín'];
 // permanent workshop upgrades bought with coins (earned at the end of each run)
 const META = [
   { id: 'muralla', name: 'Murallas', ico: 'i_murallas', desc: '+12 de vida máxima de la isla', base: 30, max: 10 },
@@ -712,9 +897,9 @@ const ACH = [
   { id: 'isl3', name: 'Corazón de lava', desc: 'Supera Isla Brasa.', goal: 1, stat: 'isl_brasa', reward: 250 },
   { id: 'isl4', name: 'Más allá del abismo', desc: 'Supera Isla Abisal.', goal: 1, stat: 'isl_abismo', reward: 500 },
   { id: 'evo1', name: 'Fusión', desc: 'Consigue tu primera fusión de armas.', goal: 1, stat: 'evos', reward: 80 },
-  { id: 'evo8', name: 'Coleccionista', desc: 'Consigue las 8 fusiones.', goal: 8, stat: 'evos', reward: 400 },
+  { id: 'evo8', name: 'Coleccionista', desc: 'Consigue las 10 fusiones.', goal: 10, stat: 'evos', reward: 400 },
   { id: 'uni1', name: 'Unión', desc: 'Une dos armas por primera vez.', goal: 1, stat: 'unions', reward: 100 },
-  { id: 'uni4', name: 'Maestro de las mareas', desc: 'Consigue las 4 uniones.', goal: 4, stat: 'unions', reward: 400 },
+  { id: 'uni4', name: 'Maestro de las mareas', desc: 'Consigue las 8 uniones.', goal: 8, stat: 'unions', reward: 400 },
   { id: 'gold5', name: 'Cazatesoros', desc: 'Hunde 5 barcos del tesoro.', goal: 5, stat: 'golds', reward: 150 },
   { id: 'danger3', name: 'Sin miedo', desc: 'Supera una isla en Peligro 3.', goal: 3, stat: 'dangerBest', reward: 300 },
   { id: 'combo100', name: 'Imparable', desc: 'Encadena una racha de 100.', goal: 100, stat: 'maxCombo', reward: 120 },
@@ -911,6 +1096,25 @@ function spr(n, x, y, s, flip, rot, sy) {
   ctx.save(); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.scale(flip ? -s : s, syy);
   ctx.drawImage(f.img, f.x, f.y, f.w, f.h, -f.ax, -f.ay, f.pw, f.ph); ctx.restore(); return true;
 }
+// the same, onto another canvas (the small moon portraits of the DOM screens)
+function sprOn(g, n, x, y, s, sy) {
+  const f = FR[n]; if (!f || !f.img.complete) return false;
+  const syy = sy || s; g.drawImage(f.img, f.x, f.y, f.w, f.h, x - f.ax * s, y - f.ay * syy, f.pw * s, f.ph * syy); return true;
+}
+// a moon with a face on a small canvas: k = size pulse, dy = hop, rot = tilt
+function moonPortrait(cv, id, face, k = 1, dy = 0, rot = 0) {
+  const g = cv.getContext('2d'), w = cv.width, h = cv.height, M = MOONS.find(m => m.id === id) || MOONS[0];
+  g.clearRect(0, 0, w, h);
+  const n = parseInt(M.color.slice(1), 16), rgb = `${n >> 16 & 255},${n >> 8 & 255},${n & 255}`;
+  const halo = g.createRadialGradient(w / 2, h / 2, w * 0.2, w / 2, h / 2, w * 0.5);
+  halo.addColorStop(0, `rgba(${rgb},0.35)`); halo.addColorStop(1, `rgba(${rgb},0)`);
+  g.fillStyle = halo; g.fillRect(0, 0, w, h);
+  const s = w * 0.34 / 31 * k;
+  g.save(); g.translate(w / 2, h / 2 + dy); g.rotate(rot);
+  if (!sprOn(g, `moon_${id}`, 0, 0, s)) { g.fillStyle = M.color; g.beginPath(); g.arc(0, 0, w * 0.34, 0, TAU); g.fill(); }
+  sprOn(g, `face_${face}`, 0, 0, s);
+  g.restore();
+}
 // an icon from the icons atlas as an inline element for the DOM screens
 function ico(n, size = 28) {
   const f = FR[n], A = window.LUNA_ATLAS?.icons;
@@ -1038,7 +1242,7 @@ function newRun(runMode, islIdx) {
   const B = moonBounds();
   S = {
     mode: runMode, islIdx: runMode === 'island' ? islIdx : 0, isl, palIdx: runMode === 'island' ? islIdx : 0, moon, mods, dailyList: dm, danger,
-    t: 0, dmgBy: {}, wave: 1, waveT: 0, bossSpawned: false, bossClearT: 0, spawnAcc: 0,
+    t: 0, dmgBy: {}, dmgDone: {}, wave: 1, waveT: 0, bossSpawned: false, bossClearT: 0, spawnAcc: 0,
     enemies: [], dying: [], proj: [], fx: [], parts: [], nums: [], ents: [], threat: [], seaT: [], coins: [], chests: [],
     mx: W * 0.3, my: (B.y0 + B.y1) / 2, pull: 0.2, tideP: -Math.PI / 2, level: TIDE_LO, tideDir: 1, moonLock: 0, moonSlow: 0, moonSlowK: 'ink', night: 0, face: 'calm', faceT: 0,
     hp: maxHp, maxHp, regen: 0.25 * metaLv('vigor'), hurtAcc: 0, hurtT: 0, hurtFace: 0,
@@ -1307,7 +1511,8 @@ function spawnBoss() {
   if (type === 'armada') { b.invuln = false; b.x = side < 0 ? -80 * u : W + 80 * u; }
   if (type === 'leviatan') { b.tx = bossPost(b, 0.2); b.y = levelY(0.3); }
   if (type === 'eclipse') { b.x = side < 0 ? -90 * u : W + 90 * u; b.y = levelY(2.1); }
-  S.boss = b;
+  S.boss = b; S.lastBoss = name;
+  S.face = 'surprised'; S.faceT = 1.3;   // then angry for the whole fight (see moonFace)
   banner(name, BOSS_INTRO[type], 2.6, true);
   MUS.boss = true; MUS.intensity = 3;
   sfx('roar'); vib([80, 60, 160]);
@@ -1527,6 +1732,8 @@ function killBoss(b) {
 // =====================================================================
 // COMBAT CORE
 // =====================================================================
+// who is dealing damage right now (a weapon id, 'luna', 'mar'): the update loop sets it, hit() books it for the stats
+let SRC = null;
 function hit(e, base, o) {
   if (e.dead || e.invuln || e.shield || e.phased) return 0;
   let d = base * S.st.dmg * (S.furia > 0 ? 2 : 1) * (S.eclipse > 0 ? 1.6 : 1);
@@ -1536,14 +1743,15 @@ function hit(e, base, o) {
   // armoured enemies take half of every hit until the armour breaks
   const armored = e.armor > 0;
   if (armored) { d *= 0.5; e.armor -= d; if (e.armor <= 0) armorBreak(e); }
+  const k = SRC || 'otros'; S.dmgDone[k] = (S.dmgDone[k] || 0) + Math.min(d, Math.max(0, e.hp));
   e.hp -= d; e.flash = 0.07;
   if (!dot && S.st.poison && !e.def?.ghost) { e.psn = 3; e.psnD = Math.max(e.psnD || 0, base * S.st.poison); }
   // the iron chain makes every blow push the enemy back a little
   if (!dot && S.st.kb > 1 && !e.isBoss) shove(e, Math.min(16, 3 + base * 0.12) * u * (S.st.kb - 1));
   if (dot) {
     e.dotAcc += d;
-    if (e.dotT <= 0) { if (e.dotAcc >= 1) num(e.x, e.y - e.r * u, e.dotAcc, false, armored ? '#c3d2e6' : o.col); e.dotAcc = 0; e.dotT = 0.4; }
-  } else num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit, armored ? '#c3d2e6' : undefined);
+    if (e.dotT <= 0) { if (e.dotAcc >= 1) num(e.x, e.y - e.r * u, e.dotAcc, false, armored ? '#c3d2e6' : o.col, e); e.dotAcc = 0; e.dotT = 0.4; }
+  } else num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit, armored ? '#c3d2e6' : undefined, e);
   if (e.hp <= 0) { if (e.isBoss) killBoss(e); else if (e.def.ghost) repel(e); else kill(e); }
   return d;
 }
@@ -1662,12 +1870,13 @@ function openChest() {
   const evo = S.weapons.find(evoReady);
   if (evo) { applyCard({ k: 'evo', id: evo.id }); return; }
   const wl = S.weapons.filter(w => !w.evo && !w.union && w.lv < 3), pl = Object.keys(S.passives).filter(p => S.passives[p] < 3);
-  if (wl.length && (Math.random() < 0.7 || !pl.length)) { const w = pick(wl); w.lv++; syncEnts(); banner('¡Cofre!', `${WEAPONS[w.id].name} sube a nivel ${w.lv}`, 1.6); }
-  else if (pl.length) { const p = pick(pl); S.passives[p]++; recompute(); banner('¡Cofre!', `${PASSIVES[p].name} sube a nivel ${S.passives[p]}`, 1.6); }
-  else { const n = Math.round(15 * S.isl.coin); S.pearls += n; S.pearlsGot += n; banner('¡Cofre!', `+${n} perlas`, 1.4); }
+  if (wl.length && (Math.random() < 0.7 || !pl.length)) { const w = pick(wl); w.lv++; syncEnts(); chestPop(WEAPONS[w.id].name, `Sube a nivel ${w.lv}`, WEAPONS[w.id].ico); }
+  else if (pl.length) { const p = pick(pl); S.passives[p]++; recompute(); chestPop(PASSIVES[p].name, `Sube a nivel ${S.passives[p]}`, PASSIVES[p].ico); }
+  else { const n = Math.round(15 * S.isl.coin); S.pearls += n; S.pearlsGot += n; chestPop('Perlas', `+${n} perlas`, 'i_perla'); }
 }
 
 function moonSwat(dt) {
+  SRC = 'luna';
   const m = moonPos(), mr = MOON_R();
   for (const e of S.enemies) {
     if (e.dead || e.def.kind !== 'fly' || Math.hypot(e.x - m.x, e.y - m.y) > mr + e.r * u) continue;
@@ -1688,7 +1897,7 @@ function islandDamage(d, ignoreEclipse, src = 'boss') {
   S.hp -= d; S.hurtAcc += d; S.dmgBy[src] = (S.dmgBy[src] || 0) + d; S.waveHurt += d;
   if (S.hurtT <= 0) {
     S.hurtT = 0.35;
-    if (S.hurtAcc >= 1) { num(W / 2 + rand(-20, 20) * u, ISL().top - 40 * u, S.hurtAcc, false, '#ff5f6d'); sfx('hurt'); vib(30); S.flash = Math.min(0.45, S.flash + 0.12); if (S.hurtAcc >= 4) { S.face = 'hurt'; S.faceT = 0.8; } }
+    if (S.hurtAcc >= 1) { hudHurt(S.hurtAcc); sfx('hurt'); vib(30); S.flash = Math.min(0.45, S.flash + 0.12); if (S.hurtAcc >= 4) { S.face = 'hurt'; S.faceT = 0.8; } }
     S.hurtAcc = 0;
   }
 }
@@ -1704,10 +1913,14 @@ function comboAnnounce(txt) {
   clearTimeout(comboTxtTimer); comboTxtTimer = setTimeout(() => { el.textContent = ''; }, 1400);
   sfx('combo'); vib(20);
 }
-function num(x, y, v, crit, col) {
-  if (S.nums.length > 55) S.nums.shift();
+// damage numbers: quick hits on the same enemy add up into one number, and there are never more than 14
+// on screen (8 with reduced effects); crits always show, the oldest plain number makes room
+const numCap = () => save.fxLow ? 8 : 14;
+function num(x, y, v, crit, col, e) {
   if (v < 0.5) return;
-  S.nums.push({ x, y, v: Math.round(v), crit, col, t: 0 });
+  if (e && !crit) { const n = S.nums.find(n => n.e === e && !n.crit && !n.txt && n.t < 0.35); if (n) { n.v += Math.round(v); n.x = x; n.y = y; n.t = Math.min(n.t, 0.12); n.pop = 0.1; return; } }
+  if (S.nums.filter(n => !n.txt).length >= numCap()) { const i = S.nums.findIndex(n => !n.txt && !n.crit); if (i < 0 && !crit) return; S.nums.splice(i < 0 ? 0 : i, 1); }
+  S.nums.push({ x, y, v: Math.round(v), crit, col, t: 0, e });
 }
 function explode(x, y, r, dmg, col) {
   for (const e of S.threat) { if (Math.hypot(e.x - x, e.y - y) < r + e.r * u) hit(e, dmg); }
@@ -1749,11 +1962,11 @@ function syncEnts() {
   S.ents = S.ents.filter(e => (e.type === 'whirl' && !e.perm) || e.type === 'tsunami' || e.type === 'jelly');
   for (const w of S.weapons) {
     if (w.id === 'tiburon') {
-      if (w.evo) S.ents.push({ type: 'mega', x: W * 0.2, y: levelY(0.3), t: 0, cd: 1, leap: null });
-      else { const n = w.lv; for (let i = 0; i < n; i++) S.ents.push({ type: 'shark', side: i % 2 ? 1 : -1, x: i % 2 ? W * 0.8 : W * 0.2, y: levelY(0.3), t: rand(0, 6), cd: 0, tgt: null }); }
+      if (w.evo) S.ents.push({ type: 'mega', src: 'tiburon', x: W * 0.2, y: levelY(0.3), t: 0, cd: 1, leap: null });
+      else { const n = w.lv; for (let i = 0; i < n; i++) S.ents.push({ type: 'shark', src: 'tiburon', side: i % 2 ? 1 : -1, x: i % 2 ? W * 0.8 : W * 0.2, y: levelY(0.3), t: rand(0, 6), cd: 0, tgt: null }); }
     }
     if (w.id === 'remolino' && w.evo) {
-      for (const R of REEFS()) S.ents.push({ type: 'whirl', perm: true, x: R.c, r: 95 * u * S.st.area, life: 1e9, t: 0, dps: 85 });
+      for (const R of REEFS()) S.ents.push({ type: 'whirl', src: 'remolino', perm: true, x: R.c, r: 95 * u * S.st.area, life: 1e9, t: 0, dps: 85 });
     }
   }
 }
@@ -2093,7 +2306,7 @@ function reefPowers(dt) {
 
 function updEnts(dt) {
   for (const n of S.ents) {
-    n.t += dt;
+    n.t += dt; SRC = n.src || (n.type === 'tsunami' ? 'luna' : null);
     if (n.type === 'whirl') {
       for (const e of S.seaT) {
         if (Math.abs(e.x - n.x) < n.r + e.r * u * 0.5) {
@@ -2319,6 +2532,7 @@ function moonSplat(k) {
 }
 function updProj(dt) {
   for (const p of S.proj) {
+    SRC = p.src || (p.type === 'lava' ? 'mar' : null);
     if (p.type === 'chainshot') {   // two balls on a chain skim the sea (or fly at bird height) and plough through everything
       p.t += dt; p.x += p.vx * dt;
       const ty = p.high ? levelY(1.15) : waveY(p.x) - 12 * u;
@@ -2401,7 +2615,7 @@ function hazards(dt) {
 // =====================================================================
 function useActive() {
   if (mode !== 'play' || S.charge < 1 || S.mods.noActive) return;
-  S.charge = 0; missionProgress('active', 1);
+  S.charge = 0; missionProgress('active', 1); SRC = 'luna';
   const id = S.moon.id;
   if (id === 'llena') tsunami(1);
   else if (id === 'roja') { S.furia = 8; banner('¡Furia!', 'Doble daño durante 8 s', 1.4); }
@@ -2413,7 +2627,8 @@ function useActive() {
   } else if (id === 'nueva') { S.eclipse = 6; banner('¡Eclipse!', 'La isla es invulnerable', 1.4); }
   else if (id === 'tormenta') { S.diluvio = 6; S.diluvioT = 0; banner('¡Diluvio!', 'Rayos por todo el mar', 1.4); }
   else if (id === 'dorada') { S.fiebre = 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
-  S.face = 'angry'; S.faceT = 1.6;
+  S.face = id === 'roja' ? 'angry' : 'effort'; S.faceT = 1.6;
+  S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.5, r1: MOON_R() * 3, c: S.moon.color });
   sfx('tsunami'); vib([60, 40, 140]);
   S.shake = Math.max(S.shake, 0.6);
 }
@@ -2444,34 +2659,37 @@ function rollCards() {
   return out;
 }
 const lvStars = n => `<i class="lvs" aria-label="nivel ${n} de 3">${'★'.repeat(n)}<em class="off">${'★'.repeat(3 - n)}</em></i>`;
+// the level change on a card: stars before → stars after
+const lvChange = (a, b) => `<span class="lvchg" aria-label="de nivel ${a} a ${b}">${'★'.repeat(a)}<span class="off">${'★'.repeat(3 - a)}</span><span class="ar">→</span>${'★'.repeat(b)}<span class="off">${'★'.repeat(3 - b)}</span></span>`;
+// tag: the coloured label (Nueva, Mejora, Fusión, Unión); cls also names the kind of card (k-wup, k-wnew…)
 function cardInfo(c) {
-  if (c.k === 'evo') { const E = EVOS[WEAPONS[c.id].evo]; return { ico: E.ico, name: E.name, d: E.desc, tag: 'FUSIÓN', cls: 'evo' }; }
-  if (c.k === 'union') { const U = UNIONS[c.id]; return { ico: U.ico, name: U.name, d: `${U.desc} Une ${WEAPONS[U.a].name} y ${WEAPONS[U.b].name}.`, tag: 'UNIÓN', cls: 'union' }; }
-  if (c.k === 'wup') { const w = hasW(c.id), D = WEAPONS[c.id]; return { ico: D.ico, name: D.name, d: D.lv[w.lv], tag: `NIVEL ${w.lv + 1}`, cls: '', lv: w.lv + 1 }; }
+  if (c.k === 'evo') { const E = EVOS[WEAPONS[c.id].evo]; return { ico: E.ico, name: E.name, d: `${E.desc} Fusiona ${WEAPONS[c.id].name} con ${PASSIVES[WEAPONS[c.id].pair].name}.`, tag: 'FUSIÓN', tc: 'evo', cls: 'evo' }; }
+  if (c.k === 'union') { const U = UNIONS[c.id]; return { ico: U.ico, name: U.name, d: `${U.desc} Une ${WEAPONS[U.a].name} y ${WEAPONS[U.b].name}.`, tag: 'UNIÓN', tc: 'union', cls: 'union' }; }
+  if (c.k === 'wup') { const w = hasW(c.id), D = WEAPONS[c.id]; return { ico: D.ico, name: D.name, d: D.lv[w.lv], tag: 'MEJORA', tc: 'up', cls: '', from: w.lv, lv: w.lv + 1 }; }
   if (c.k === 'wnew') {
     const D = WEAPONS[c.id], mates = unionMates(c.id).filter(m => hasW(m)).map(m => WEAPONS[m].name);
-    return { ico: D.ico, name: D.name, d: `${D.desc}${mates.length ? ` A nivel 3 se une con ${mates.join(' o ')}.` : ''}`, tag: 'NUEVA', cls: 'new', lv: 1 };
+    return { ico: D.ico, name: D.name, d: `${D.desc}${mates.length ? ` A nivel 3 se une con ${mates.join(' o ')}.` : ''}`, tag: 'NUEVA', tc: 'new', cls: 'new', from: 0, lv: 1 };
   }
-  if (c.k === 'pup') { const D = PASSIVES[c.id]; return { ico: D.ico, name: D.name, d: `${D.desc}.`, tag: `NIVEL ${S.passives[c.id] + 1}`, cls: '', lv: S.passives[c.id] + 1 }; }
-  if (c.k === 'pnew') { const D = PASSIVES[c.id], pair = Object.keys(WEAPONS).find(k => WEAPONS[k].pair === c.id); return { ico: D.ico, name: D.name, d: `${D.desc}.${pair ? ` Fusiona con ${WEAPONS[pair].name} a nivel 3.` : ''}`, tag: 'NUEVA', cls: 'new', lv: 1 }; }
-  if (c.k === 'heal') return { ico: 'i_vida', name: 'Reparar la isla', d: 'Recupera el 35% de la vida.', tag: '', cls: '' };
-  return { ico: 'i_perla', name: 'Bolsa de perlas', d: `+${Math.round(15 * S.isl.coin * S.coinMul)} perlas para el mercader.`, tag: '', cls: '' };
+  if (c.k === 'pup') { const D = PASSIVES[c.id]; return { ico: D.ico, name: D.name, d: `${capFirst(D.desc)}.`, tag: 'MEJORA', tc: 'up', cls: '', from: S.passives[c.id], lv: S.passives[c.id] + 1 }; }
+  if (c.k === 'pnew') { const D = PASSIVES[c.id], pair = Object.keys(WEAPONS).find(k => WEAPONS[k].pair === c.id); return { ico: D.ico, name: D.name, d: `${capFirst(D.desc)}.${pair ? ` Fusiona con ${WEAPONS[pair].name} a nivel 3.` : ''}`, tag: 'NUEVA', tc: 'new', cls: 'new', from: 0, lv: 1 }; }
+  if (c.k === 'heal') return { ico: 'i_vida', name: 'Reparar la isla', d: 'Recupera el 35% de la vida.', tag: 'EXTRA', tc: '', cls: '' };
+  return { ico: 'i_perla', name: 'Bolsa de perlas', d: `+${Math.round(15 * S.isl.coin * S.coinMul)} perlas para el mercader.`, tag: 'EXTRA', tc: '', cls: '' };
 }
 function applyCard(c) {
   if (c.k === 'evo') {
-    const w = hasW(c.id); w.evo = true; w.t = 0;
+    const w = hasW(c.id), W0 = WEAPONS[c.id], E = EVOS[W0.evo]; w.evo = true; w.t = 0;
     if (!save.stats.evos.includes(c.id)) save.stats.evos.push(c.id);
     if (c.id === 'coral') S.coralWall = true;
     syncEnts();
-    banner(EVOS[WEAPONS[c.id].evo].name, '¡Fusión completada!', 1.6);
-    sfx('evo'); vib([40, 30, 40, 30, 120]); S.flash = 0.3; S.face = 'happy'; S.faceT = 1.6;
+    vib([40, 30, 40, 30, 120]); S.flash = 0.3; S.face = 'cheer'; S.faceT = 2;
+    fuseMoment('evo', W0.ico, PASSIVES[W0.pair].ico, E.ico, E.name, E.desc);
   } else if (c.k === 'union') {
     const U = UNIONS[c.id];
     S.weapons = S.weapons.filter(w => w.id !== U.a && w.id !== U.b);
     addWeapon(c.id, true);
     if (!save.stats.unions.includes(c.id)) save.stats.unions.push(c.id);
-    banner(U.name, '¡Unión de armas!', 1.8);
-    sfx('evo'); vib([40, 30, 40, 30, 160]); S.flash = 0.35; S.face = 'happy'; S.faceT = 1.6;
+    vib([40, 30, 40, 30, 160]); S.flash = 0.35; S.face = 'cheer'; S.faceT = 2;
+    fuseMoment('union', WEAPONS[U.a].ico, WEAPONS[U.b].ico, U.ico, U.name, U.desc);
   } else if (c.k === 'wup') { hasW(c.id).lv++; syncEnts(); }
   else if (c.k === 'wnew') addWeapon(c.id);
   else if (c.k === 'pup') { S.passives[c.id]++; passiveGained(c.id); }
@@ -2498,8 +2716,8 @@ function renderCards() {
   const box = $('cards'); box.innerHTML = '';
   currentCards.forEach((c, i) => {
     const info = cardInfo(c);
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'up ' + info.cls;
-    b.innerHTML = `<span class="ico" aria-hidden="true">${ico(info.ico, 44)}</span><span><b>${info.name}</b><span class="d">${info.d}</span></span><span class="tag">${info.tag}${info.lv ? `<span class="stars">${lvStars(info.lv)}</span>` : ''}</span>`;
+    const b = document.createElement('button'); b.type = 'button'; b.className = `up ${info.cls} k-${c.k}`;
+    b.innerHTML = `<span class="ico" aria-hidden="true">${ico(info.ico, 50)}</span><span class="txt"><span class="top"><span class="tagl t-${info.tc}">${info.tag}</span>${info.lv ? lvChange(info.from, info.lv) : ''}</span><b>${info.name}</b><span class="d">${info.d}</span></span>`;
     b.addEventListener('click', () => chooseCard(i));
     box.appendChild(b);
   });
@@ -2511,9 +2729,33 @@ function chooseCard(i) {
   if (mode !== 'levelup') return;
   applyCard(currentCards[i]);
   sfx('card');
+  if (mode === 'fuse') { show(null); return; }
+  afterCard();
+}
+function afterCard() {
   if (S.xp >= S.need) { openLevelUp(); return; }
   mode = 'play'; show(null); setAudioGains();
 }
+// ---- a fusion or union gets its own moment: the two pieces fly together, a flash, the new weapon's name
+let fuseBack = 'play', fuseTimer = 0;
+function fuseMoment(kind, aIco, bIco, rIco, name, desc) {
+  const el = $('fuseFx');
+  $('fzA').innerHTML = ico(aIco, 84); $('fzB').innerHTML = ico(bIco, 84); $('fzR').innerHTML = ico(rIco, 132);
+  $('fzKind').textContent = kind === 'union' ? '¡Unión de armas!' : '¡Fusión!'; $('fzName').textContent = name; $('fzDesc').textContent = desc;
+  el.className = kind; el.hidden = false;
+  // restart the animations
+  el.querySelectorAll('*').forEach(n => { n.style.animation = 'none'; void n.offsetWidth; n.style.animation = ''; });
+  fuseBack = mode === 'fuse' ? fuseBack : mode; mode = 'fuse'; dragId = null; setAudioGains();
+  sfx('evo'); setTimeout(() => { if (mode === 'fuse') sfx('tsunami'); }, 760);
+  clearTimeout(fuseTimer); fuseTimer = setTimeout(fuseEnd, 2600);
+}
+function fuseEnd() {
+  if (mode !== 'fuse') return;
+  clearTimeout(fuseTimer); $('fuseFx').hidden = true;
+  if (fuseBack === 'merchant') { mode = 'merchant'; renderMerchant(); setAudioGains(); return; }
+  afterCard();
+}
+$('fuseFx').addEventListener('pointerdown', e => { e.preventDefault(); fuseEnd(); });
 $('rerollBtn').addEventListener('click', () => { if (S.rerolls > 0) { S.rerolls--; currentCards = rollCards(); renderCards(); sfx('card'); } });
 
 // =====================================================================
@@ -2612,23 +2854,32 @@ function update(dt) {
   if (S.fiebre > 0) S.fiebre -= dt;
   if (S.diluvio > 0) {
     S.diluvio -= dt; S.diluvioT -= dt;
-    if (S.diluvioT <= 0) { S.diluvioT = 0.12; const e = randomTarget(false); if (e) { chain(e, 70, 1); sfx('thunder'); } }
+    if (S.diluvioT <= 0) { S.diluvioT = 0.12; const e = randomTarget(false); if (e) { SRC = 'luna'; chain(e, 70, 1); sfx('thunder'); } }
   }
   if (S.faceT > 0) S.faceT -= dt;
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
+  SRC = 'mar';
   waves(dt);
   hazards(dt);
   buildThreats();
   S.faroBeams = [];
-  for (const w of S.weapons) WUP[w.id](w, dt);
-  reefPowers(dt);
+  // whatever a weapon leaves behind (projectiles, whirlpools, jellyfish) keeps counting as that weapon's damage
+  for (const w of S.weapons) {
+    const ne = S.ents.length, np = S.proj.length;
+    SRC = w.id; WUP[w.id](w, dt);
+    for (let i = ne; i < S.ents.length; i++) S.ents[i].src = S.ents[i].src || w.id;
+    for (let i = np; i < S.proj.length; i++) S.proj[i].src = S.proj[i].src || w.id;
+  }
+  SRC = 'mar'; reefPowers(dt);
   updEnts(dt);
+  SRC = 'mar';
   for (const e of S.enemies) if (!e.dead) updEnemy(e, dt);
   if (S.boss && !S.boss.dead) updBoss(S.boss, dt);
   moonSwat(dt);
   updProj(dt);
+  SRC = null;
   updPickups(dt);
   S.enemies = S.enemies.filter(e => !e.dead);
   for (const e of S.dying) e.dyT += dt;
@@ -2638,8 +2889,9 @@ function update(dt) {
   if (S.clamSnap) S.clamSnap = S.clamSnap.map(v => Math.max(0, v - dt));
   for (const p of S.parts) { p.t += dt; p.vy += (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
   S.parts = S.parts.filter(p => p.t < p.life);
-  if (S.parts.length > 700) S.parts.splice(0, S.parts.length - 700);
-  for (const n of S.nums) n.t += dt;
+  const pcap = save.fxLow ? 260 : 700;
+  if (S.parts.length > pcap) S.parts.splice(0, S.parts.length - pcap);
+  for (const n of S.nums) { n.t += dt; if (n.pop > 0) n.pop -= dt; }
   S.nums = S.nums.filter(n => n.t < (n.txt ? 1.2 : 0.8));
   if (S.moonKick > 0) S.moonKick -= dt;
   if (S.cannonKick > 0) S.cannonKick -= dt;
@@ -2653,7 +2905,7 @@ function update(dt) {
 // =====================================================================
 // FX helpers
 // =====================================================================
-function burst(x, y, n, c, sp = 160) { if (reduceMotion) n = Math.ceil(n / 3); for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: rand(-sp, sp), vy: rand(-sp * 1.2, -sp * 0.2), t: 0, life: rand(0.4, 0.9), c, s: rand(1.5, 3.2), g: 420 }); }
+function burst(x, y, n, c, sp = 160) { if (reduceMotion) n = Math.ceil(n / 3); else if (save.fxLow) n = Math.ceil(n / 2); for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: rand(-sp, sp), vy: rand(-sp * 1.2, -sp * 0.2), t: 0, life: rand(0.4, 0.9), c, s: rand(1.5, 3.2), g: 420 }); }
 function splash(x, y, n) { burst(x, y, n, '#cfe6ff', 120); sfx('splash'); }
 function bubbles(x, y, n) { for (let i = 0; i < n; i++) S.parts.push({ x: x + rand(-8, 8), y, vx: rand(-10, 10), vy: rand(-70, -30), t: 0, life: rand(0.5, 1), c: 'rgba(220,240,255,0.8)', s: rand(1.5, 3), g: -20, ring: true }); }
 function sparks(x, y) { for (let i = 0; i < 6; i++) S.parts.push({ x, y, vx: rand(-140, 140), vy: rand(-160, -40), t: 0, life: rand(0.2, 0.45), c: '#ffd38a', s: 2, g: 500 }); }
@@ -2684,7 +2936,13 @@ function drawSky() {
   const g = ctx.createLinearGradient(0, 0, 0, levelY(0.6));
   g.addColorStop(0, P.sky[0]); g.addColorStop(0.6, P.sky[1]); g.addColorStop(1, P.sky[2]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  for (const s of stars) { ctx.fillStyle = `rgba(${P.star},${0.45 + 0.4 * Math.sin(T * 1.3 + s.p)})`; ctx.fillRect(s.x, s.y, s.r * 1.4, s.r * 1.4); }
+  // background in layers: stars, far islands and clouds drift a little against the moon, each at its own depth
+  const px = (W / 2 - moonPos().x) / W;
+  for (const s of stars) { const x = (s.x + px * 6 * u + T * 0.6 * s.r + W) % W; ctx.fillStyle = `rgba(${P.star},${0.45 + 0.4 * Math.sin(T * 1.3 + s.p)})`; ctx.fillRect(x, s.y, s.r * 1.4, s.r * 1.4); }
+  ctx.globalAlpha = 0.5;
+  spr('farA', W * 0.3 + px * 14 * u + Math.sin(T * 0.03) * 8 * u, levelY(0.66), 0.5 * u);
+  spr('farB', W * 0.76 + px * 10 * u - Math.sin(T * 0.025) * 6 * u, levelY(0.7), 0.42 * u);
+  ctx.globalAlpha = 1;
   // distant sea stacks rise from the sea floor, so the tide always laps at them; their tops sit just above high water
   const fy = floorY(), sy = (fy - levelY(0.98)) / 192;
   ctx.globalAlpha = 0.65;
@@ -2693,15 +2951,16 @@ function drawSky() {
     ctx.fillStyle = P.far; ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(0, hz); ctx.quadraticCurveTo(W * 0.1, hz - 22, W * 0.2, fy); ctx.moveTo(W * 0.8, fy); ctx.quadraticCurveTo(W * 0.9, hz - 28, W, hz); ctx.lineTo(W, fy); ctx.fill();
   }
   ctx.globalAlpha = 0.42;
-  for (const c of clouds) { c.x += c.v / 60; if (c.x > W + 90 * u) c.x = -90 * u; spr(`cloud${c.k}`, c.x, c.y, c.s * u); }
+  for (const c of clouds) { c.x += c.v / 60; if (c.x > W + 90 * u) c.x = -90 * u; spr(`cloud${c.k}`, c.x + px * 22 * u * c.s, c.y, c.s * u); }
   ctx.globalAlpha = 1;
+  if (!S) drawFarShips();
   // the moon's halo and the column of light pulling the sea up
-  const m = moonPos(), col = moonColor();
-  softGlow(m.x, m.y, MOON_R() * 4.2, col, 0.28);
+  const m = moonPos(), col = moonColor(), mr = MOON_R() * titleMoonK();
+  softGlow(m.x, m.y, mr * 4.2, col, 0.28);
   const wy = waveY(m.x);
   const lg = ctx.createLinearGradient(0, m.y, 0, wy);
   lg.addColorStop(0, hexA(col, 0.16)); lg.addColorStop(1, hexA(col, 0.02));
-  ctx.fillStyle = lg; ctx.beginPath(); ctx.moveTo(m.x - MOON_R() * 0.7, m.y); ctx.lineTo(m.x + MOON_R() * 0.7, m.y); ctx.lineTo(m.x + PULL_W() * 0.9, wy); ctx.lineTo(m.x - PULL_W() * 0.9, wy); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = lg; ctx.beginPath(); ctx.moveTo(m.x - mr * 0.7, m.y); ctx.lineTo(m.x + mr * 0.7, m.y); ctx.lineTo(m.x + PULL_W() * 0.9, wy); ctx.lineTo(m.x - PULL_W() * 0.9, wy); ctx.closePath(); ctx.fill();
 }
 const moonColor = () => S && S.moonLock > 0 ? '#7a2030' : (S ? S.moon.color : MOONS.find(x => x.id === save.moon)?.color || '#f4ecd0');
 
@@ -2744,6 +3003,78 @@ function drawReefs() {
   if (reefHas(3) && S) reefPts('clam').forEach((p, i) => spr((S.clamSnap?.[i % 2] || 0) > 0 ? 'clam1' : 'clam0', p.x, p.y, cs, p.x > W / 2));
   if (reefHas(4) && S) for (const p of reefPts('vent')) softGlow(p.x, p.y, (8 + 3 * Math.sin(T * 4 + p.x)) * u, '#ff8a3d', 0.6);
 }
+// ---- life on the island: waving flags, windows that light up at night, villagers and the lighthouse beam
+// design points of each village sprite: flag pole (x, top, bottom, length, colour) and windows [x, y, w, h]
+const VIL = {
+  coral:    { flag: [100, 7, 62, 19, '#2fb7c9'], win: [[13, 46, 6, 5], [45, 40, 6, 6], [59, 40, 6, 6], [82, 48, 7, 5]] },
+  escarcha: { flag: [55, 0, 14, 15, '#5aa8e0'], win: [[12, 48, 6, 6], [44, 41, 7, 7], [59, 41, 7, 7], [84, 50, 7, 6]] },
+  brasa:    { flag: [58, 0, 15, 15, '#ff7a3d'], win: [[12, 48, 6, 6], [42, 39, 5, 6], [90, 50, 7, 6]] },
+  abismo:   { flag: [89, 2, 16, 14, '#b48cff'], win: [[16, 38, 6, 7], [49, 32, 5, 7], [57, 32, 5, 7], [86, 42, 6, 7], [16.5, 50, 5, 5]] },
+};
+function villageLife(b, vx, top, k) {
+  const f = FR[`vil_${b}`], V = VIL[b]; if (!f || !V) return;
+  const X = x => vx + (x - f.ax) * k, Y = y => top + (y - f.ay) * k;
+  // windows: a warm glow that breathes; now and then one goes dark and lights up again
+  V.win.forEach(([x, y, w, h], i) => {
+    const cx = X(x + w / 2), cy = Y(y + h / 2);
+    if (Math.sin(T * 0.21 + i * 2.3) > 0.94) { ctx.fillStyle = 'rgba(16,10,34,0.82)'; ctx.fillRect(X(x), Y(y), w * k, h * k); return; }
+    softGlow(cx, cy, 9 * k, b === 'abismo' ? '#d58cff' : '#ffb04a', 0.3 + 0.12 * Math.sin(T * 3.1 + i * 1.7));
+  });
+  // the flag: a pole (coral's is part of the sprite) and a pennant that ripples in the wind
+  const [fx, fy, fb, len, col] = V.flag, x0 = X(fx), y0 = Y(fy), n = 9, hh = (b === 'coral' ? 10 : 8) * k;
+  if (b !== 'coral') {
+    ctx.lineCap = 'round'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 2.6 * k; ctx.beginPath(); ctx.moveTo(x0, Y(fb)); ctx.lineTo(x0, y0 - 1 * k); ctx.stroke();
+    ctx.strokeStyle = '#a2683a'; ctx.lineWidth = 1.2 * k; ctx.stroke(); ctx.lineCap = 'butt';
+  }
+  const pt = (i, dy) => { const t = i / n; return [x0 - len * k * t, y0 + dy + Math.sin(T * 5.5 - i * 0.85) * 1.7 * k * t]; };
+  ctx.beginPath(); ctx.moveTo(x0, y0);
+  for (let i = 1; i <= n; i++) ctx.lineTo(...pt(i, 0));
+  for (let i = n; i >= 0; i--) { const [x, y] = pt(i, hh * (1 - 0.25 * i / n)); ctx.lineTo(x, y); }
+  ctx.closePath(); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.3 * k; ctx.lineJoin = 'round'; ctx.stroke();
+  const [ex, ey] = pt(n * 0.45, hh * 0.45);
+  ctx.fillStyle = '#fff6d8'; ctx.beginPath(); ctx.arc(ex, ey, 2.1 * k, 0, TAU); ctx.fill();
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(ex + 0.9 * k, ey - 0.5 * k, 1.7 * k, 0, TAU); ctx.fill();
+}
+// two or three islanders stroll on the plateau; when the island is under attack they run
+const FOLK_C = { coral: ['#ff9d6c', '#7fd3ff', '#ffd36b'], escarcha: ['#d8463a', '#4a7ec8', '#f4f9ff'], brasa: ['#5a4a6a', '#ffb04a', '#a2683a'], abismo: ['#b48cff', '#6e55a0', '#e6b8ff'] };
+const folk = [{ x: -0.6, d: 1, v: 1, p: 0 }, { x: 0.35, d: -1, v: 0.8, p: 2 }, { x: 0.8, d: -1, v: 1.2, p: 4 }];
+function drawFolk(b, I, top) {
+  const panic = S && (S.hurtT > 0 || (S.boss && !S.boss.dead)), half = (I.r - I.l) / 2 - 16 * u, dt = 1 / 60;
+  folk.forEach((f, i) => {
+    if (i === 2 && !S) return;
+    f.x += f.d * f.v * (panic ? 3.2 : 0.35) * dt * 18 * u / half;
+    if (Math.abs(f.x) > 1) { f.x = Math.sign(f.x); f.d = -f.d; }
+    if (!panic && Math.random() < 0.002) f.d = -f.d;
+    const x = W / 2 + f.x * half, step = Math.sin(T * (panic ? 18 : 7) + f.p), y = top - Math.abs(step) * (panic ? 1.6 : 0.7) * u;
+    const c = (FOLK_C[b] || FOLK_C.coral)[i];
+    ctx.lineWidth = 0.9 * u; ctx.strokeStyle = OUTLINE;
+    ctx.beginPath(); ctx.moveTo(x - 1 * u, y - 1.6 * u); ctx.lineTo(x - 1 * u - step * 0.8 * u, y + 0.6 * u); ctx.moveTo(x + 1 * u, y - 1.6 * u); ctx.lineTo(x + 1 * u + step * 0.8 * u, y + 0.6 * u); ctx.stroke();
+    ctx.fillStyle = c; rr(x - 1.9 * u, y - 6.4 * u, 3.8 * u, 5 * u, 1.6 * u); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#f2c79a'; ctx.beginPath(); ctx.arc(x, y - 8.2 * u, 1.9 * u, 0, TAU); ctx.fill(); ctx.stroke();
+    if (panic) { ctx.beginPath(); ctx.moveTo(x - 1.6 * u, y - 5.5 * u); ctx.lineTo(x - 3.4 * u, y - 9 * u); ctx.moveTo(x + 1.6 * u, y - 5.5 * u); ctx.lineTo(x + 3.4 * u, y - 9 * u); ctx.stroke(); }
+  });
+}
+// the lighthouse beam turns: it sweeps out to one side, faces the viewer (a flare) and sweeps out to the other
+function lighthouseBeam(lx, ly) {
+  const c = Math.cos(T * 0.85), sg = c < 0 ? -1 : 1, len = W * 0.62 * Math.abs(c), wd = (5 + 26 * (1 - Math.abs(c))) * u;
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  const g = ctx.createLinearGradient(lx, ly, lx + sg * len, ly);
+  g.addColorStop(0, 'rgba(255,224,150,0.34)'); g.addColorStop(1, 'rgba(255,224,150,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(lx, ly - 2.5 * u); ctx.lineTo(lx + sg * len, ly - wd); ctx.lineTo(lx + sg * len, ly + wd * 0.7); ctx.lineTo(lx, ly + 2.5 * u); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  softGlow(lx, ly, (14 + 22 * (1 - Math.abs(c))) * u, '#ffe39a', 0.35 + 0.4 * (1 - Math.abs(c)));
+}
+// far off on the title, ships sail along the horizon in both directions
+const farShips = [{ x: 0.1, v: 0.012, k: 'sloop', s: 0.3 }, { x: 0.75, v: -0.008, k: 'galleon', s: 0.26 }];
+function drawFarShips() {
+  ctx.globalAlpha = 0.42;
+  for (const f of farShips) {
+    f.x += f.v / 60; if (f.x > 1.15) f.x = -0.15; if (f.x < -0.15) f.x = 1.15;
+    const x = f.x * W, y = levelY(0.62) + Math.sin(T * 1.2 + f.x * 9) * 1.2 * u;
+    spr(`${f.k}${Math.floor(T * 2 + f.x * 10) % 2}`, x, y, f.s * u, f.v < 0);
+  }
+  ctx.globalAlpha = 1;
+}
 function drawLand() {
   const P = pal(), I = ISL(), fy = floorY(), b = biome();
   drawReefs();
@@ -2767,12 +3098,14 @@ function drawLand() {
     else spr(d.k, d.x, fy + 3 * u, 0.75 * u * d.s);
   }
   const top = I.top + 1.5 * u;
-  if (S && (hasW('faro') || S.weapons.find(w => w.id === 'prisma'))) {
-    spr('lighthouse', I.r - 30 * u, top, 0.64 * u);
-    softGlow(I.r - 30 * u, I.top - 58 * u, 22 * u, '#ffd38a', 0.5 + 0.2 * Math.sin(T * 6));
-  }
+  const faro = S && (hasW('faro') || S.weapons.find(w => w.id === 'prisma'));
+  if (faro || !S) spr('lighthouse', I.r - 30 * u, top, 0.64 * u);
+  if (faro) softGlow(I.r - 30 * u, I.top - 58 * u, 22 * u, '#ffd38a', 0.5 + 0.2 * Math.sin(T * 6));
   ctx.save(); ctx.translate(I.l + 12 * u, top); ctx.rotate(Math.sin(T * 1.1) * 0.03); spr(`tree_${b}`, 0, 0, 0.62 * u); ctx.restore();
   spr(`vil_${b}`, W / 2 - 6 * u, top, 0.64 * u);
+  villageLife(b, W / 2 - 6 * u, top, 0.64 * u);
+  drawFolk(b, I, top);
+  if (!S) lighthouseBeam(I.r - 30 * u, I.top - 58 * u);
   const walls = metaLv('muralla');
   if (walls) { spr('wall', I.l + 4 * u, top + 2 * u, (0.55 + walls * 0.03) * u); spr('wall', I.r - 4 * u, top + 2 * u, (0.55 + walls * 0.03) * u, true); }
   if (S && (hasW('canon') || S.weapons.find(w => w.id === 'truenos'))) {
@@ -3310,13 +3643,46 @@ function drawParts() {
   }
   ctx.globalAlpha = 1;
 }
+// ---- the moon's character: a resting face of its own, blinks, looks around and reacts
+const IDLE_FACE = { llena: 'calm', roja: 'fierce', hielo: 'serene', nueva: 'sly', tormenta: 'grumpy', dorada: 'greedy' };
+const blinker = () => ({ at: rand(1, 3), shut: 0 });
+// a blink lasts 0.14 s and comes every 2–5 s; each face that blinks keeps its own clock
+function blinkFace(b, idle) {
+  if (T > b.at) { if (T > b.at + 0.14) b.at = T + rand(2.2, 5); else return idle + '_blink'; }
+  return idle;
+}
+const moonBlink = blinker();
+let titleFace = null, titleFaceT = 0, titleKick = 0, gazeX = 0, gazeY = 0, gazeT = -9, lookX = 0, lookY = 0;
+function moonFace(id) {
+  if (S && S.faceT > 0) return S.face;
+  if (!S && titleFaceT > T) return titleFace;
+  if (S) {
+    if (S.furia > 0 || (S.boss && !S.boss.dead)) return 'angry';
+    if (S.hp < S.maxHp * 0.3) return 'worried';
+    if (S.combo >= 25 && S.comboT > 0.4) return 'happy';
+  }
+  return blinkFace(moonBlink, IDLE_FACE[id] || 'calm');
+}
+// where the eyes go: the finger on the title, the nearest threat in a run (eased, a few design units at most)
+function moonLook(m, s) {
+  let tx = 0, ty = 0;
+  if (!S && T - gazeT < 2.5) { tx = gazeX - m.x; ty = gazeY - m.y; }
+  else if (S && S.threat && S.threat[0]) { const e = S.threat[0]; tx = e.x - m.x; ty = e.y - m.y; }
+  else if (!S) { tx = Math.sin(T * 0.5) * 40; ty = Math.cos(T * 0.37) * 20; }
+  const d = Math.hypot(tx, ty) || 1, k = Math.min(1, d / (60 * u));
+  const ease = Math.min(1, 0.12 * 60 / 60);
+  lookX += (tx / d * k * 2.6 - lookX) * ease; lookY += (ty / d * k * 1.8 - lookY) * ease;
+  return [lookX * s, lookY * s];
+}
+// the title moon is bigger, as big as the phone's height allows
+const titleMoonK = () => S ? 1 : clamp(1.15 + (H - 640) / 600, 1.15, 1.5);
 function drawMoon() {
-  const m = moonPos(), r = MOON_R(), id = S ? S.moon.id : save.moon;
-  const kick = S && S.moonKick > 0 ? 1 + S.moonKick * 0.5 : 1, bob = Math.sin(T * 2.2) * 2 * u;
-  const s = r / 31 * kick;
-  if (!spr(`moon_${id}`, m.x, m.y + bob, s)) { ctx.fillStyle = moonColor(); ctx.beginPath(); ctx.arc(m.x, m.y + bob, r, 0, TAU); ctx.fill(); }
-  const face = !S ? 'calm' : S.faceT > 0 ? S.face : (S.furia > 0 || (S.boss && !S.boss.dead)) ? 'angry' : 'calm';
-  spr(`face_${face}`, m.x, m.y + bob, s);
+  const m = moonPos(), id = S ? S.moon.id : save.moon, big = titleMoonK(), r = MOON_R() * big;
+  const kick = S && S.moonKick > 0 ? 1 + S.moonKick * 0.5 : !S && titleKick > T ? 1 + Math.sin((titleKick - T) / 0.35 * Math.PI) * 0.12 : 1, bob = Math.sin(T * 2.2) * 2 * u * big;
+  const s = r / 31 * kick, sq = !S && titleKick > T ? 1 - Math.sin((titleKick - T) / 0.35 * Math.PI) * 0.08 : 1;
+  if (!spr(`moon_${id}`, m.x, m.y + bob, s, false, 0, s * sq)) { ctx.fillStyle = moonColor(); ctx.beginPath(); ctx.arc(m.x, m.y + bob, r, 0, TAU); ctx.fill(); }
+  const [lx, ly] = moonLook(m, s);
+  spr(`face_${moonFace(id)}`, m.x + lx, m.y + bob + ly, s, false, 0, s * sq);
   if (S && S.moonSlow > 0) {
     const a = Math.min(1, S.moonSlow * 2), k = S.moonSlowK, cy = m.y + bob;
     if (k === 'ice') {
@@ -3338,7 +3704,7 @@ function drawMoon() {
 function drawNums() {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const n of S.nums) {
-    const k = n.t / (n.txt ? 1.2 : 0.8), sz = (n.crit ? 19 : n.coin ? 12 : 13) * Math.max(0.9, u) * (n.t < 0.08 ? 1.3 : 1);
+    const k = n.t / (n.txt ? 1.2 : 0.8), sz = (n.crit ? 21 : n.coin ? 12 : 13) * Math.max(0.9, u) * (n.t < 0.08 || n.pop > 0 ? 1.3 : 1);
     ctx.globalAlpha = 1 - k * k;
     ctx.font = `900 ${sz}px Figtree, system-ui, sans-serif`;
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.7)';
@@ -3371,7 +3737,7 @@ function drawDark() {
 }
 function draw() {
   ctx.save();
-  if (S && S.shake > 0 && !reduceMotion) ctx.translate((Math.random() - 0.5) * 16 * S.shake * u, (Math.random() - 0.5) * 16 * S.shake * u);
+  if (S && S.shake > 0 && !reduceMotion) { const k = 16 * S.shake * u * (save.fxLow ? 0.5 : 1); ctx.translate((Math.random() - 0.5) * k, (Math.random() - 0.5) * k); }
   drawSky();
   drawLand();
   drawWater(true);
@@ -3446,6 +3812,24 @@ function updateHUD() {
   const kp = Object.keys(S.passives).map(id => `<span>${ico(PASSIVES[id].ico, 24)}<i>${S.passives[id]}</i></span>`).join('');
   if (kp !== hudCache.kp) { hudCache.kp = kp; $('kitP').innerHTML = kp; }
 }
+// damage to the island shows in red right under the health bar, and the bar jolts
+function hudHurt(v) {
+  const el = $('hpHurt'), box = el.parentNode;
+  el.textContent = `-${Math.round(v)}`; el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
+  box.classList.remove('hit'); void box.offsetWidth; box.classList.add('hit');
+}
+// a chest opens under the HUD without stopping the game: it shakes, then shows what came out
+let chestTimer = 0;
+function chestPop(title, sub, icon) {
+  const el = $('chestPop');
+  $('chestIco').innerHTML = ico('i_cofre', 40); $('chestTitle').textContent = '¡Cofre!'; $('chestSub').textContent = 'Abriendo…';
+  el.hidden = false; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+  clearTimeout(chestTimer);
+  chestTimer = setTimeout(() => {
+    $('chestIco').innerHTML = ico(icon, 40); $('chestTitle').textContent = title; $('chestSub').textContent = sub; sfx('coin');
+    chestTimer = setTimeout(() => { el.hidden = true; }, 1700);
+  }, 450);
+}
 let bannerTimer = 0;
 function banner(title, sub = '', secs = 1.8, boss = false) {
   const b = $('banner'); b.innerHTML = `${title}${sub ? `<small>${sub}</small>` : ''}`; b.classList.toggle('boss', boss); b.classList.add('show');
@@ -3507,8 +3891,19 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.concat
 const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) {
   SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
-  $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant'); }
-function refreshCoins() { document.querySelectorAll('.coinCount').forEach(el => el.textContent = Math.floor(save.coins).toLocaleString('es')); }
+  $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant');
+  if (id !== 'scrTitle') $('moonSay').hidden = true; }
+// the coin counters roll up to a new total (after a run) and drop straight down when you spend
+let coinsShown = null, coinsAnim = 0;
+function refreshCoins() {
+  const to = Math.floor(save.coins), from = coinsShown === null ? to : coinsShown, id = ++coinsAnim;
+  const put = v => document.querySelectorAll('.coinCount').forEach(el => el.textContent = v.toLocaleString('es'));
+  coinsShown = to;
+  if (from >= to || reduceMotion) { put(to); return; }
+  const t0 = performance.now();
+  const f = now => { if (id !== coinsAnim) return; const k = Math.min(1, (now - t0) / 900); put(Math.round(from + (to - from) * (1 - (1 - k) ** 3))); if (k < 1) requestAnimationFrame(f); };
+  put(from); requestAnimationFrame(f);
+}
 function statVal(s) {
   if (s === 'evos') return save.stats.evos.length;
   if (s === 'unions') return save.stats.unions.length;
@@ -3525,6 +3920,7 @@ const coinBtn = n => `<i class="coin"></i>${n.toLocaleString('es')}`;
 function paintIcons(root, size) { root.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico, size); }); }
 function openSettings() {
   paintIcons($('scrSettings'), 32);
+  $('setFx').setAttribute('aria-checked', !!save.fxLow);
   $('setMusic').setAttribute('aria-checked', save.music);
   $('setSfx').setAttribute('aria-checked', save.sfx);
   $('setVib').setAttribute('aria-checked', save.vib !== false);
@@ -3538,12 +3934,60 @@ function openTitle() {
   const dm = dailyMods();
   $('dailySub').textContent = dm.map(m => m.name).join(' + ');
   $('dailyBadge').hidden = save.daily.date === today() && save.daily.played;
+  const endlessOpen = !!save.isl.coral?.cleared;
+  $('goEndless').disabled = !endlessOpen;
+  $('endlessSub').textContent = !endlessOpen ? 'Supera Isla Coral' : save.endlessBest ? `Récord: oleada ${save.endlessBest}` : 'Sin final';
   $('achBadge').hidden = achClaimable() === 0;
   $('misBadge').hidden = missionsReady() === 0;
   $('shopBadge').hidden = !canBuySomething();
   paintIcons($('scrTitle'), 34); $('gearIco').innerHTML = ico('i_ajustes', 32);
   show('scrTitle');
+  requestAnimationFrame(measureTitle);
+  // the moon says hello the first time the title comes up in a session
+  if (!greeted) { greeted = true; setTimeout(() => { if (!S && !$('scrTitle').hidden) talkMoon(); }, 2300); }
 }
+// ---- the title moon: it floats between the title and the buttons, follows your finger and talks when tapped
+let titleGap = null, greeted = false, sayTimer = 0, sayIdx = 0;
+function measureTitle() {
+  if ($('scrTitle').hidden) return;
+  const a = document.querySelector('#scrTitle .title-wrap').getBoundingClientRect(), b = $('titleBtns').getBoundingClientRect();
+  titleGap = [a.bottom, b.top];
+}
+window.addEventListener('resize', () => requestAnimationFrame(measureTitle));
+function talkMoon() {
+  const M = MOONS.find(x => x.id === save.moon) || MOONS[0], el = $('moonSay');
+  el.textContent = M.say[sayIdx++ % M.say.length]; el.hidden = false;
+  el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+  clearTimeout(sayTimer); sayTimer = setTimeout(() => { el.hidden = true; }, 2800);
+  placeSay();
+}
+// keep the bubble next to the moon (beside it when there is room, above it otherwise) and on screen
+function placeSay() {
+  const el = $('moonSay'); if (el.hidden) return;
+  const m = moonPos(), r = MOON_R() * titleMoonK(), right = W - (m.x + r + 14) - 10, left = m.x - r - 24;
+  const side = Math.max(right, left) >= 150 ? (right >= left ? 'r' : 'l') : '';
+  if (el.dataset.side !== side) { el.dataset.side = side; el.className = `say ${side}`; }
+  if (side) {
+    el.style.maxWidth = `${Math.min(240, side === 'r' ? right : left)}px`;
+    el.style.left = `${side === 'r' ? m.x + r + 14 : m.x - r - 14}px`; el.style.top = `${m.y - r * 0.2}px`;
+  } else {
+    el.style.maxWidth = '';
+    const hw = el.offsetWidth / 2, x = clamp(m.x, hw + 10, W - hw - 10);
+    el.style.left = `${x}px`; el.style.top = `${m.y - r - 14}px`;
+    el.style.setProperty('--tx', `${clamp(50 + (m.x - x) / (hw * 2) * 100, 12, 88)}%`);
+  }
+}
+document.addEventListener('pointermove', e => { if (!S) { gazeX = e.clientX; gazeY = e.clientY; gazeT = T; } }, { passive: true });
+document.addEventListener('pointerdown', e => {
+  if (S || $('scrTitle').hidden) return;
+  gazeX = e.clientX; gazeY = e.clientY; gazeT = T;
+  if (e.target.closest('button')) return;
+  const m = moonPos(), r = MOON_R() * titleMoonK();
+  if (Math.hypot(e.clientX - m.x, e.clientY - m.y) > r * 1.4) return;
+  audioInit();
+  titleFace = pick(['happy', 'cheer', 'surprised', 'cool']); titleFaceT = T + 1.4; titleKick = T + 0.35;
+  talkMoon(); sfx('pop'); vib(15);
+});
 // =====================================================================
 // INTRO COMIC (before the first run, and again from "Ver la historia")
 // =====================================================================
@@ -3621,22 +4065,63 @@ function openIslands() {
   e.appendChild(go); list.appendChild(e);
   show('scrIslands');
 }
-let moonsReturn = 'title';
+let moonsReturn = 'title', moonIdx = 0, moonCvs = [], moonReact = { t: 0, face: null, i: -1 }, moonQ = {};
+const moonBlinks = MOONS.map(blinker);
+const moonStep = () => $('moonTrack').clientWidth + 14;
 function openMoons(from) {
   if (from) moonsReturn = from;
   refreshCoins();
-  const list = $('moonList'); list.innerHTML = '';
-  MOONS.forEach(m => {
-    const owned = save.moons.includes(m.id), sel = save.moon === m.id;
-    const el = document.createElement('div'); el.className = 'lc' + (sel ? ' sel' : '');
-    el.innerHTML = `<span class="ico moonico" aria-hidden="true">${pic(`moon_${m.id}`, 48)}</span><span><b>${m.name}</b><span class="d"><b class="inl" style="color:${m.color}">${ico(m.ico, 18)} ${m.active}:</b> ${m.activeDesc}</span><span class="d">Empieza con ${ico(WEAPONS[m.weapon].ico, 18)} ${WEAPONS[m.weapon].name}. ${m.perk}</span></span>`;
-    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy';
-    if (sel) { btn.textContent = 'Elegida'; btn.disabled = true; }
-    else if (owned) { btn.textContent = 'Elegir'; btn.onclick = () => { save.moon = m.id; persist(); sfx('card'); openMoons(); }; }
-    else { btn.innerHTML = coinBtn(m.cost); btn.disabled = save.coins < m.cost; btn.onclick = () => { save.coins -= m.cost; save.moons.push(m.id); save.moon = m.id; persist(); sfx('evo'); openMoons(); }; }
-    el.appendChild(btn); list.appendChild(el);
+  const track = $('moonTrack');
+  track.innerHTML = MOONS.map((m, i) => `<article class="mcard" style="--mc:${m.color}" aria-label="${m.name}">
+    <canvas class="mcv" width="272" height="272" aria-hidden="true"></canvas>
+    <span class="eyebrow">${m.role}</span><h3>${m.name}</h3>
+    <p class="quote">“${m.say[0]}”</p>
+    <div class="mbars">${MOON_BARS.map((b, k) => `<span>${b}</span><span class="pp" aria-label="${b}: ${m.bars[k]} de 5">${[0, 1, 2, 3, 4].map(j => `<i class="${j < m.bars[k] ? 'on' : ''}"></i>`).join('')}</span>`).join('')}</div>
+    <div class="mabil">${ico(m.ico, 40)}<span><b>${m.active}</b>${m.activeDesc}</span></div>
+    <div class="mfacts"><span>${ico(WEAPONS[m.weapon].ico, 20)} Empieza con ${WEAPONS[m.weapon].name}</span><span class="plus">✓ ${m.plus}</span><span class="weak">✗ Punto débil: ${m.weak}</span></div>
+  </article>`).join('');
+  moonCvs = [...track.querySelectorAll('.mcv')];
+  // tap a moon: it reacts and says another line
+  moonCvs.forEach((c, i) => c.onclick = () => {
+    const M = MOONS[i]; moonQ[M.id] = ((moonQ[M.id] || 0) + 1) % M.say.length;
+    c.parentNode.querySelector('.quote').textContent = `“${M.say[moonQ[M.id]]}”`;
+    moonReact = { t: T + 1.3, face: pick(['happy', 'cool', 'surprised', 'cheer']), i }; sfx('pop'); vib(12);
   });
+  $('moonDots').innerHTML = MOONS.map(m => `<i class="${save.moons.includes(m.id) ? 'own' : ''}"></i>`).join('');
   show('scrMoons');
+  moonIdx = Math.max(0, MOONS.findIndex(m => m.id === save.moon));
+  requestAnimationFrame(() => { track.scrollLeft = moonIdx * moonStep(); moonUpdate(); });
+}
+function moonUpdate() {
+  const M = MOONS[moonIdx], owned = save.moons.includes(M.id), sel = save.moon === M.id, btn = $('moonPick');
+  [...$('moonDots').children].forEach((d, i) => d.classList.toggle('on', i === moonIdx));
+  [...$('moonTrack').children].forEach((c, i) => c.classList.toggle('sel', MOONS[i].id === save.moon));
+  $('moonPrev').disabled = moonIdx === 0; $('moonNext').disabled = moonIdx === MOONS.length - 1;
+  if (sel) { btn.textContent = 'Elegida'; btn.disabled = true; }
+  else if (owned) { btn.textContent = `Elegir ${M.name}`; btn.disabled = false; }
+  else { btn.innerHTML = `Comprar · ${coinBtn(M.cost)}`; btn.disabled = save.coins < M.cost; }
+}
+$('moonTrack').addEventListener('scroll', () => { const i = clamp(Math.round($('moonTrack').scrollLeft / moonStep()), 0, MOONS.length - 1); if (i !== moonIdx) { moonIdx = i; moonUpdate(); sfx('card'); } }, { passive: true });
+const moonGo = d => $('moonTrack').scrollTo({ left: clamp(moonIdx + d, 0, MOONS.length - 1) * moonStep(), behavior: reduceMotion ? 'auto' : 'smooth' });
+$('moonPrev').onclick = () => moonGo(-1);
+$('moonNext').onclick = () => moonGo(1);
+$('moonPick').onclick = () => {
+  const M = MOONS[moonIdx];
+  if (!save.moons.includes(M.id)) { if (save.coins < M.cost) return; save.coins -= M.cost; save.moons.push(M.id); sfx('evo'); vib([30, 30, 80]); $('moonDots').children[moonIdx].classList.add('own'); }
+  else { sfx('card'); vib(12); }
+  save.moon = M.id; persist(); refreshCoins();
+  moonReact = { t: T + 1.6, face: 'cheer', i: moonIdx };
+  moonUpdate();
+};
+// called every frame while the moons screen is open: the card in view blinks, bobs and pulls faces now and then
+function drawMoonCards() {
+  for (let i = Math.max(0, moonIdx - 1); i <= Math.min(MOONS.length - 1, moonIdx + 1); i++) {
+    const c = moonCvs[i]; if (!c) continue;
+    const M = MOONS[i], ph = T % 3.4, cyc = ['happy', 'cool', 'surprised', 'effort', 'cheer'][Math.floor(T / 3.4) % 5];
+    const face = moonReact.i === i && moonReact.t > T ? moonReact.face : i === moonIdx && ph > 2.5 ? cyc : blinkFace(moonBlinks[i], IDLE_FACE[M.id]);
+    const hop = moonReact.i === i && moonReact.t > T ? -Math.abs(Math.sin((moonReact.t - T) * 7)) * 14 : 0;
+    moonPortrait(c, M.id, face, 1, Math.sin(T * 2.2 + i) * 5 + hop);
+  }
 }
 let shopReturn = 'title';
 function openShop(from) {
@@ -3730,6 +4215,7 @@ function beginRun(runMode, islIdx) {
   hudCache = {};
   mode = 'play'; show(null); setAudioGains();
   const m = S.moon;
+  $('hpIco').innerHTML = ico('i_murallas', 26); $('chestPop').hidden = true;
   $('activeIco').innerHTML = ico(m.ico, 42); $('activeLbl').textContent = S.mods.noActive ? 'Dormida' : m.active;
   MUS.intensity = 0; MUS.boss = false; musicStart();
   if (runMode === 'island') banner(S.isl.name, S.danger ? DANGER_TXT[S.danger] : ISLANDS[islIdx].sub, 2);
@@ -3741,17 +4227,46 @@ function beginRun(runMode, islIdx) {
 function pause() {
   if (mode !== 'play') return;
   mode = 'paused'; dragId = null;
-  renderPause(); pauseTab(pauseOn);
+  closeConfirm(); renderPause(); pauseTab(pauseOn);
   show('scrPause'); setAudioGains();
 }
 let pauseOn = 'gear';
 function pauseTab(t) {
   pauseOn = t;
-  $('pTabGear').setAttribute('aria-selected', t === 'gear'); $('pTabCombo').setAttribute('aria-selected', t === 'combo');
-  $('pGear').hidden = t !== 'gear'; $('pCombo').hidden = t !== 'combo';
+  $('pTabGear').setAttribute('aria-selected', t === 'gear'); $('pTabCombo').setAttribute('aria-selected', t === 'combo'); $('pTabStats').setAttribute('aria-selected', t === 'stats');
+  $('pGear').hidden = t !== 'gear'; $('pCombo').hidden = t !== 'combo'; $('pStats').hidden = t !== 'stats';
 }
 $('pTabGear').onclick = () => pauseTab('gear');
 $('pTabCombo').onclick = () => pauseTab('combo');
+$('pTabStats').onclick = () => pauseTab('stats');
+// ending or restarting a run asks first
+let confirmAct = null;
+function askConfirm(act) {
+  confirmAct = act;
+  $('pConfirmTitle').textContent = act === 'quit' ? '¿Terminar la partida?' : '¿Empezar de nuevo?';
+  $('pConfirmTxt').textContent = act === 'quit' ? 'Cobras ahora todas las monedas ganadas en esta partida.' : 'Esta partida se pierde y no cobras nada de ella.';
+  $('pYes').textContent = act === 'quit' ? 'Terminar y cobrar' : 'Reiniciar';
+  $('pBtns').hidden = true; $('pConfirm').hidden = false; sfx('card');
+  $('pConfirm').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+function closeConfirm() { $('pBtns').hidden = false; $('pConfirm').hidden = true; confirmAct = null; }
+$('pNo').onclick = closeConfirm;
+$('pYes').onclick = () => { const a = confirmAct; closeConfirm(); if (a === 'quit') { if (S && !S.ended) endRun(false, true); } else if (a === 'restart') startRun(lastRun.mode, lastRun.isl); };
+// ---- damage per weapon (pause stats and the results chronicle)
+function srcInfo(k) {
+  if (k === 'luna') return { name: `${S.moon.active} y golpes de la luna`, ico: S.moon.ico };
+  if (k === 'mar') return { name: 'Marea y arrecife', ico: 'i_marea' };
+  if (UNIONS[k]) return { name: UNIONS[k].name, ico: UNIONS[k].ico };
+  const W0 = WEAPONS[k]; if (!W0) return { name: 'Otros', ico: 'i_estrella' };
+  const w = hasW(k); return w && w.evo ? { name: EVOS[W0.evo].name, ico: EVOS[W0.evo].ico } : { name: W0.name, ico: W0.ico };
+}
+const dmgRows = () => Object.entries(S.dmgDone).filter(([k, v]) => v >= 1 && k !== 'otros').map(([k, v]) => ({ k, v, ...srcInfo(k) })).sort((a, b) => b.v - a.v);
+const fmtN = v => v >= 1e6 ? `${(v / 1e6).toFixed(1).replace('.', ',')} M` : v >= 1e5 ? `${Math.round(v / 1e3)} mil` : Math.round(v).toLocaleString('es');
+const fmtT = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+function dmgBarsHtml(rows, n) {
+  const max = rows[0]?.v || 1;
+  return rows.slice(0, n).map((r, i) => `<div class="dbar${i === 0 ? ' top' : ''}">${ico(r.ico, 30)}<span><span class="nm">${r.name}</span><span class="tr"><i style="width:${Math.max(3, r.v / max * 100)}%;animation-delay:${i * 0.06}s"></i></span></span><span class="v">${fmtN(r.v)}</span></div>`).join('') || '<p class="lede small">Todavía no has hundido nada.</p>';
+}
 const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
 // weapons and passives as slots (empty ones too), tap one to read what it does
 function renderPause() {
@@ -3779,6 +4294,10 @@ function renderPause() {
     document.querySelectorAll('#pGear .slot.sel').forEach(x => x.classList.remove('sel'));
     b.classList.add('sel'); $('pInfo').innerHTML = info[+b.dataset.i];
   });
+  $('pSGrid').innerHTML = [[S.mode === 'island' ? `${S.wave}/20` : S.wave, 'Oleada'], [fmtT(S.t), 'Tiempo'], [S.kills.toLocaleString('es'), 'Hundidos'], [S.maxCombo, 'Racha máx.']].map(([v, l]) => `<span><b>${v}</b>${l}</span>`).join('');
+  const dr = dmgRows();
+  $('pDmgTot').textContent = dr.length ? `${fmtN(dr.reduce((a, r) => a + r.v, 0))} en total` : '';
+  $('pDmg').innerHTML = dmgBarsHtml(dr, 9);
   const rows = comboRows();
   $('pComboBadge').hidden = !rows.some(r => r.state === 'ready');
   $('pCombos').innerHTML = rows.map(r => `<div class="combo ${r.state}"><span class="rec"><span class="${r.a[1] ? '' : 'miss'}">${ico(r.a[0], 30)}</span>+<span class="${r.b[1] ? '' : 'miss'}">${ico(r.b[0], 30)}</span>→${ico(r.r, 34)}</span><span><span class="kind">${r.kind}</span><b>${r.name}</b><span class="cs">${r.txt}</span></span></div>`).join('');
@@ -3828,8 +4347,14 @@ function revive() {
   for (const p of S.proj) if (p.hostile) p.done = true;
 }
 function victory() { endRun(true); }
+// what sank the island, by the source key of islandDamage
+const CAUSE = { sloop: 'las balandras', galleon: 'los galeones', mortar: 'los morteros', pirate: 'los piratas', crab: 'los cangrejos', gull: 'las gaviotas', serpent: 'las serpientes', brulote: 'los brulotes', ghost: 'el Holandés Errante', lava: 'las rocas de lava', gold: 'el barco del tesoro' };
+const lowArt = n => n.replace(/^El /, 'el ').replace(/^La /, 'la ').replace(/^(Demonio|Kraken)/, 'el $1');
+let resultFace = 'calm';
 function endRun(won, quit) {
   if (S.ended) return; S.ended = true;
+  S.face = won ? 'cheer' : quit ? 'calm' : 'sad'; S.faceT = 9;
+  resultFace = won ? 'cheer' : quit ? 'happy' : 'sad';
   const unlocks = [];
   let bonus = 0;
   const ic = S.isl.coin;
@@ -3873,16 +4398,41 @@ function endRun(won, quit) {
   setTimeout(() => {
     $('rEyebrow').textContent = S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
     $('rTitle').textContent = won ? 'Isla salvada' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
-    const mm = Math.floor(S.t / 60), ss = String(Math.floor(S.t % 60)).padStart(2, '0');
-    const rows = [['Oleada', S.mode === 'island' ? `${won ? 20 : S.wave} / 20` : S.wave], ['Enemigos hundidos', S.kills.toLocaleString('es')], ['Racha máxima', S.maxCombo], ['Jefes derrotados', S.bossKills], ['Nivel alcanzado', S.lv], ['Tiempo', `${mm}:${ss}`],
-      ['Perlas recogidas', `<i class="pearl"></i>${Math.floor(S.pearlsGot).toLocaleString('es')}`],
-      ['Monedas por hundidos', `+${fromKills.toLocaleString('es')}`], ['Monedas por jefes', `+${fromBoss.toLocaleString('es')}`], ['Bonus de oleadas', `+${(waveBonus + bonus).toLocaleString('es')}`]];
-    if (fromPearls) rows.push(['Perlas cambiadas', `+${fromPearls.toLocaleString('es')}`]);
-    $('rTally').innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot">${coinBtn(total)}</dd>`;
+    const wv = S.mode === 'island' ? `Oleada ${won ? 20 : S.wave} de 20` : `Oleada ${S.wave}`;
+    $('rSum').textContent = `${wv} · ${fmtT(S.t)} · ${S.kills.toLocaleString('es')} hundidos`;
+    // the cause of a defeat: whatever did the most damage to the island
+    const hurt = Object.entries(S.dmgBy).sort((a, b) => b[1] - a[1]), all = hurt.reduce((a, h) => a + h[1], 0);
+    $('rCause').hidden = won || quit || !hurt.length;
+    if (hurt.length) { const [k, v] = hurt[0]; $('rCause').innerHTML = `${ico('i_calavera', 26)}<span>La isla cayó sobre todo por ${k === 'boss' ? lowArt(S.lastBoss || 'El jefe') : CAUSE[k] || 'el enemigo'} (${Math.round(v / all * 100)}% del daño).</span>`; }
+    const dr = dmgRows();
+    $('rStar').hidden = !dr.length;
+    if (dr.length) $('rStar').innerHTML = `<span class="hd">${ico(dr[0].ico, 40)}<span><small>Arma estrella</small><b>${dr[0].name}</b></span></span>${dmgBarsHtml(dr, 5)}`;
+    const rows = [['Oleada', S.mode === 'island' ? `${won ? 20 : S.wave} / 20` : S.wave], ['Enemigos hundidos', S.kills.toLocaleString('es')], ['Racha máxima', S.maxCombo], ['Jefes derrotados', S.bossKills], ['Nivel alcanzado', S.lv], ['Tiempo', fmtT(S.t)],
+      ['Perlas recogidas', `<i class="pearl"></i>${Math.floor(S.pearlsGot).toLocaleString('es')}`]];
+    $('rTally').innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
+    // the rewards roll up one after another
+    const coins = [['Monedas por hundidos', fromKills], ['Monedas por jefes', fromBoss], ['Bonus de oleadas', waveBonus + bonus]];
+    if (fromPearls) coins.push(['Perlas cambiadas', fromPearls]);
+    $('rCoins').dataset.total = total;
+    $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
     $('rBuild').innerHTML = buildHtml();
     $('rUnlocks').innerHTML = unlocks.map(t => `<div class="unlock">${t}</div>`).join('');
     show('scrResult');
+    countUp($('rCoins'));
   }, delay);
+}
+function countUp(root) {
+  if (reduceMotion) return;
+  const els = [...root.querySelectorAll('[data-v]')];
+  els.forEach(el => { el.textContent = `${el.dataset.pre ?? '+'}0`; });
+  let i = 0;
+  const next = () => {
+    const el = els[i++]; if (!el) return;
+    const v = +el.dataset.v, pre = el.dataset.pre ?? '+', t0 = performance.now(), dur = i === els.length ? 700 : 320;
+    const f = now => { const k = Math.min(1, (now - t0) / dur); el.textContent = pre + Math.round(v * (1 - (1 - k) ** 3)).toLocaleString('es'); if (k < 1) requestAnimationFrame(f); else { if (v) sfx('coin'); setTimeout(next, 90); } };
+    requestAnimationFrame(f);
+  };
+  setTimeout(next, 350);
 }
 
 // test coins: tap the coin counter on the title 7 times (only outside the Android app)
@@ -3898,6 +4448,8 @@ $('goSettings').onclick = () => { audioInit(); openSettings(); };
 $('setBack').onclick = () => openTitle();
 $('goStory').onclick = () => { audioInit(); openIntro(openSettings); };
 $('goDaily').onclick = () => { audioInit(); openDaily(); };
+$('goEndless').onclick = () => { audioInit(); if (save.intro) startRun('endless', 0); else openIntro(() => startRun('endless', 0)); };
+$('setFx').onclick = () => { save.fxLow = !save.fxLow; persist(); openSettings(); sfx('card'); };
 $('startDaily').onclick = () => startRun('daily', 0);
 $('goMoons').onclick = () => openMoons('title');
 $('goShop').onclick = () => openShop('title');
@@ -3912,9 +4464,9 @@ $('setVib').onclick = () => { save.vib = save.vib === false; persist(); openSett
 $('pauseBtn').onclick = pause;
 $('activeBtn').addEventListener('pointerdown', e => { e.preventDefault(); useActive(); });
 $('resumeBtn').onclick = resume;
-$('restartBtn').onclick = () => startRun(lastRun.mode, lastRun.isl);
+$('restartBtn').onclick = () => askConfirm('restart');
 // ending a run by choice still pays everything earned so far (the only way out of an endless run)
-$('quitBtn').onclick = () => { if (S && !S.ended) endRun(false, true); };
+$('quitBtn').onclick = () => askConfirm('quit');
 $('reviveBtn').onclick = revive;
 $('giveUpBtn').onclick = () => endRun(false);
 $('rAgain').onclick = () => startRun(lastRun.mode, lastRun.isl);
@@ -3925,7 +4477,8 @@ $('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
 window.lunaPause = () => { if (mode === 'play') pause(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
   if (mode === 'play') { pause(); return true; }
-  if (mode === 'paused') { resume(); return true; }
+  if (mode === 'paused') { if (!$('pConfirm').hidden) closeConfirm(); else resume(); return true; }
+  if (mode === 'fuse') { fuseEnd(); return true; }
   if (mode === 'levelup' || mode === 'revive' || mode === 'merchant') return true;
   if (mode === 'result') { openTitle(); return true; }
   if (!$('scrTitle').hidden) return false;
@@ -3940,7 +4493,7 @@ window.__luna = { get S() { return S; }, get mode() { return mode; }, pick: i =>
   maxw: () => { if (S) { S.weapons.forEach(w => { if (!w.union) w.lv = 3; }); syncEnts(); } }, start: (m, i) => { audioInit(); beginRun(m, i || 0); }, save: () => save, pairOf: id => WEAPONS[id].pair,
   buyMerchant: i => { const w = wares[i]; if (w && !w.sold && purse() >= wareCost(w)) { spend(wareCost(w)); buyWare(w); w.sold = true; renderMerchant(); } }, leaveMerchant: () => { if (mode === 'merchant') resume(); }, rerollMerchant: () => rerollWares(),
   bossAb: id => { const b = S && S.boss; if (b && !b.dead) { b.abQ = [BOSS_AB[b.type].find(a => a.id === id)]; b.abT = 0; b.busy = null; b.cast = null; } },
-  ev: src => eval(src), bounds: () => moonBounds(), get W() { return W; }, get H() { return H; }, levelY: l => levelY(l), art: () => artReady };
+  ev: src => eval(src), skipFuse: () => fuseEnd(), bounds: () => moonBounds(), get W() { return W; }, get H() { return H; }, levelY: l => levelY(l), art: () => artReady };
 
 // =====================================================================
 // LOOP
@@ -3959,10 +4512,20 @@ function loop(now) {
     // the last moments of a run play out in slow motion before the results come up
     S.endT -= dt; update(dt * 0.25);
   } else if (!S) {
-    // title screen: the moon drifts over the sea while the tide breathes
-    const B = moonBounds();
-    demo.x = W / 2 + Math.sin(T * 0.35) * W * 0.32; demo.y = B.y0 + (B.y1 - B.y0) * (0.55 + 0.35 * Math.sin(T * 0.6));
+    // title screen: the big moon floats between the title and the buttons, rising a little over the castle
+    const B = moonBounds(), r = MOON_R() * titleMoonK(), I = ISL();
+    const lo = titleGap ? titleGap[0] + r * 0.9 : B.y0, hi = Math.min(titleGap ? titleGap[1] - r - 12 : B.y1, I.top - 24 * u);
+    const x = W / 2 + Math.sin(T * 0.22) * W * 0.27, y = Math.max(lo, hi) - Math.max(0, hi - lo) * (0.5 + 0.5 * Math.sin(T * 0.5));
+    demo.x = x; demo.y = Math.max(lo - 6 * u, y - 16 * u * Math.exp(-(((x - W / 2) / (W * 0.16)) ** 2)));
     demo.level = (TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * Math.sin(T * 0.4);
+    placeSay();
+    if (!$('scrMoons').hidden) drawMoonCards();
+  }
+  if (!$('scrResult').hidden) {
+    const f = resultFace, c = $('rMoon'), id = S ? S.moon.id : save.moon;
+    if (f === 'cheer') moonPortrait(c, id, f, 1, -Math.abs(Math.sin(T * 4.5)) * 14 + 6);
+    else if (f === 'sad') moonPortrait(c, id, f, 0.97, 6 + Math.sin(T * 1.4) * 2, -0.1 + Math.sin(T * 0.9) * 0.03);
+    else moonPortrait(c, id, f, 1, Math.sin(T * 2.2) * 4);
   }
   if (S && S.intro > 0) S.intro = Math.max(0, S.intro - dt / 0.9);
   draw();

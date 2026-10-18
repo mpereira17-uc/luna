@@ -144,6 +144,109 @@ const FACES = {
     <path d="M30.5,44.4 Q37,46 42.6,41.6" ${stroke(2)}/>
     <path d="M41.6,40.2 Q43.6,41 43.6,43.2" ${stroke(1.4)}/>`,
 };
+// each moon's own resting face, the reactions every moon shares, and a closed-eye blink for the resting faces
+const eyesOpen = (rx = 3.3, ry = 4.2, dx = 0, dy = 0, s = 1) => `<ellipse cx="${L + dx}" cy="${EY + dy}" rx="${rx}" ry="${ry}" fill="${OUT}"/><ellipse cx="${Rr + dx}" cy="${EY + dy}" rx="${rx}" ry="${ry}" fill="${OUT}"/>${shine(L + dx, EY + dy, s)}${shine(Rr + dx, EY + dy, s)}`;
+const shut = (q = 3.2, w = 2) => `<path d="M22.6,${EY} Q${L},${EY + q} 30.4,${EY}" ${stroke(w)}/><path d="M41.6,${EY} Q${Rr},${EY + q} 49.4,${EY}" ${stroke(w)}/>`;
+const SWEAT = `<path d="M55.5,17 C57.6,20.6 58.8,22.6 58.8,24.4 A3.3,3.3 0 0 1 52.2,24.4 C52.2,22.6 53.4,20.6 55.5,17 Z" fill="#d6f3ff" ${stroke(1.2)}/><ellipse cx="54.4" cy="23.6" rx="0.8" ry="1.3" fill="#fff"/>`;
+const GRIN = (I) => `<defs><clipPath id="${I('g')}"><path d="M27,40.5 Q36,43 45,40.5 Q44,51 36,51 Q28,51 27,40.5 Z"/></clipPath></defs>
+    <path d="M27,40.5 Q36,43 45,40.5 Q44,51 36,51 Q28,51 27,40.5 Z" fill="${OUT}"/>
+    <g clip-path="url(#${I('g')})"><ellipse cx="36.5" cy="51.4" rx="7.5" ry="4.8" fill="#ff6f86"/><rect x="26" y="39.5" width="20" height="3.6" rx="1" fill="#fff"/></g>
+    <path d="M27,40.5 Q36,43 45,40.5 Q44,51 36,51 Q28,51 27,40.5 Z" ${stroke(1.6)}/>`;
+const IDLE = {
+  fierce: {
+    brows: `<path d="M20.5,25.2 Q25.5,25.4 31.8,28.6" ${stroke(2.5)}/><path d="M51.5,25.2 Q46.5,25.4 40.2,28.6" ${stroke(2.5)}/>`,
+    eyes: (I) => `<defs><clipPath id="${I('e')}"><path d="M19,29.2 L33,31 L33,40 L19,40 Z M53,29.2 L39,31 L39,40 L53,40 Z"/></clipPath></defs>
+      <g clip-path="url(#${I('e')})"><ellipse cx="${L}" cy="${EY + 0.4}" rx="3.6" ry="4.4" fill="${OUT}"/><ellipse cx="${Rr}" cy="${EY + 0.4}" rx="3.6" ry="4.4" fill="${OUT}"/></g>
+      <circle cx="${L + 1.3}" cy="${EY + 1}" r="1.2" fill="#fff"/><circle cx="${Rr + 1.3}" cy="${EY + 1}" r="1.2" fill="#fff"/>`,
+    shut: shut(2.4, 2.2),
+    mouth: `<path d="M30.5,43.8 Q37,46.4 42.8,41.4" ${stroke(2)}/><path d="M39,43.9 L40.3,46.6 L41.5,43.2 Z" fill="#fff" ${stroke(0.9)}/>`,
+    blush: 0.35,
+  },
+  serene: {
+    brows: `<path d="M22,24.4 Q26.5,22.6 31,24.2" ${stroke(1.6)}/><path d="M41,24.2 Q45.5,22.6 50,24.4" ${stroke(1.6)}/>`,
+    eyes: (I) => `<defs><clipPath id="${I('e')}"><rect x="19" y="32" width="34" height="10"/></clipPath></defs>
+      <g clip-path="url(#${I('e')})"><ellipse cx="${L}" cy="${EY + 0.6}" rx="3.4" ry="4.2" fill="${OUT}"/><ellipse cx="${Rr}" cy="${EY + 0.6}" rx="3.4" ry="4.2" fill="${OUT}"/></g>
+      <path d="M22.3,32.1 Q${L},30.9 30.7,32.1" ${stroke(1.9)}/><path d="M41.3,32.1 Q${Rr},30.9 49.7,32.1" ${stroke(1.9)}/>
+      <circle cx="${L + 1.2}" cy="${EY + 2}" r="0.9" fill="#fff"/><circle cx="${Rr + 1.2}" cy="${EY + 2}" r="0.9" fill="#fff"/>`,
+    shut: shut(2.6, 1.9),
+    mouth: `<path d="M32.4,43.6 Q36,45.6 39.6,43.6" ${stroke(1.8)}/>`,
+    extra: `${twinkle(55.5, 25, 2.4, '#ffffff', 0.95)}${twinkle(17, 45, 1.5, '#ffffff', 0.8)}`,
+    blush: 0.28,
+  },
+  sly: {
+    brows: `<path d="M21.8,27.2 Q26,26.4 30.6,27.4" ${stroke(1.8)}/><path d="M41.2,23.6 Q46,20.2 50.6,23.4" ${stroke(1.8)}/>`,
+    eyes: (I) => `<defs><clipPath id="${I('e')}"><path d="M19,31 L33,31 L33,40 L19,40 Z M39,26 L53,26 L53,40 L39,40 Z"/></clipPath></defs>
+      <g clip-path="url(#${I('e')})"><ellipse cx="${L + 1.2}" cy="${EY + 0.4}" rx="3.2" ry="4.1" fill="${OUT}"/><ellipse cx="${Rr + 1.2}" cy="${EY}" rx="3.2" ry="4.1" fill="${OUT}"/></g>
+      <path d="M22.4,31.1 H30.6" ${stroke(1.9)}/>
+      <circle cx="${L + 2.4}" cy="${EY + 1.2}" r="1" fill="#fff"/>${twinkle(Rr + 2.2, EY - 1, 1.5, '#fff')}`,
+    shut: `<path d="M22.6,32.4 Q${L},34.4 30.4,32.4" ${stroke(2)}/><path d="M41.6,31.8 Q${Rr},35 49.4,31.8" ${stroke(2)}/>`,
+    mouth: `<path d="M31.5,44 Q36.5,45 41.8,41.4" ${stroke(2)}/><path d="M41.2,40.2 Q42.9,41 42.7,42.9" ${stroke(1.4)}/>`,
+    blush: 0.32,
+  },
+  grumpy: {
+    brows: `<path d="M20.5,26.4 L31.6,29.2" ${stroke(3.1)}/><path d="M51.5,26.4 L40.4,29.2" ${stroke(3.1)}/>`,
+    eyes: () => `<ellipse cx="${L}" cy="${EY + 1.2}" rx="2.6" ry="3.1" fill="${OUT}"/><ellipse cx="${Rr}" cy="${EY + 1.2}" rx="2.6" ry="3.1" fill="${OUT}"/><circle cx="${L + 1}" cy="${EY}" r="0.9" fill="#fff"/><circle cx="${Rr + 1}" cy="${EY}" r="0.9" fill="#fff"/>`,
+    shut: `<path d="M22.8,33.4 H30.2" ${stroke(2.2)}/><path d="M41.8,33.4 H49.2" ${stroke(2.2)}/>`,
+    mouth: `<path d="M31,45.8 Q36,42.4 41,45.8" ${stroke(2)}/>`,
+    extra: `<path d="M49.5,13.2 Q51.6,15.3 49.5,17.4 M55.7,13.2 Q53.6,15.3 55.7,17.4 M50.5,12.2 Q52.6,14.3 54.7,12.2 M50.5,18.4 Q52.6,16.3 54.7,18.4" fill="none" stroke="#ff5f6d" stroke-width="1.5" stroke-linecap="round"/>`,
+    blush: 0.22,
+  },
+  greedy: {
+    brows: `<path d="M21.5,23.4 Q26,20.6 30.5,23" ${stroke(1.8)}/><path d="M41.5,23 Q46,20.6 50.5,23.4" ${stroke(1.8)}/>`,
+    eyes: () => `<ellipse cx="${L}" cy="${EY - 0.4}" rx="3.9" ry="4.8" fill="${OUT}"/><ellipse cx="${Rr}" cy="${EY - 0.4}" rx="3.9" ry="4.8" fill="${OUT}"/>${twinkle(L + 0.4, EY - 0.8, 2.7, '#ffe27a')}${twinkle(Rr + 0.4, EY - 0.8, 2.7, '#ffe27a')}<circle cx="${L + 2}" cy="${EY + 2.2}" r="0.7" fill="#fff"/><circle cx="${Rr + 2}" cy="${EY + 2.2}" r="0.7" fill="#fff"/>`,
+    shut: `<path d="M22.4,34 Q${L},29.8 30.6,34" ${stroke(2.2)}/><path d="M41.4,34 Q${Rr},29.8 49.6,34" ${stroke(2.2)}/>`,
+    mouth: GRIN,
+    extra: `${twinkle(57, 47, 2.2, '#fff2a8')}`,
+    blush: 0.6,
+  },
+  calm: {
+    brows: `<path d="M22.5,25.6 Q26.5,23.6 30.5,25.2" ${stroke(1.7)}/><path d="M41.5,25.2 Q45.5,23.6 49.5,25.6" ${stroke(1.7)}/>`,
+    eyes: () => eyesOpen(),
+    shut: shut(3.2, 2),
+    mouth: `<path d="M31,42.2 Q36,46.6 41,42.2" ${stroke(2)}/>`,
+    blush: 0.45,
+  },
+};
+const part = (v, I) => typeof v === 'function' ? v(I) : (v || '');
+for (const k of Object.keys(IDLE)) {
+  const F = IDLE[k];
+  const face = closed => I => `${BLUSH(F.blush)}${part(F.brows, I)}${closed ? F.shut : part(F.eyes, I)}${part(F.mouth, I)}${part(F.extra, I)}`;
+  if (k !== 'calm') FACES[k] = face(false);
+  FACES[k + '_blink'] = face(true);
+}
+Object.assign(FACES, {
+  worried: () => `
+    ${BLUSH(0.3)}
+    <path d="M21.5,26.6 Q26,25.8 30.6,22.6" ${stroke(1.8)}/><path d="M50.5,26.6 Q46,25.8 41.4,22.6" ${stroke(1.8)}/>
+    ${eyesOpen(3.1, 4, 0, 0.6, 0.9)}
+    <path d="M30.5,45.4 Q32.5,43.6 34.4,45.2 Q36.2,46.8 38,45.2 Q39.8,43.6 41.5,45.4" ${stroke(1.8)}/>
+    ${SWEAT}`,
+  surprised: () => `
+    ${BLUSH(0.35)}
+    <path d="M21.5,22.2 Q26,19.2 30.5,21.8" ${stroke(1.8)}/><path d="M41.5,21.8 Q46,19.2 50.5,22.2" ${stroke(1.8)}/>
+    <ellipse cx="${L}" cy="${EY}" rx="4.4" ry="5.2" fill="${OUT}"/><ellipse cx="${Rr}" cy="${EY}" rx="4.4" ry="5.2" fill="${OUT}"/>
+    <circle cx="${L + 1.4}" cy="${EY - 1.8}" r="1.9" fill="#fff"/><circle cx="${Rr + 1.4}" cy="${EY - 1.8}" r="1.9" fill="#fff"/><circle cx="${L - 1.3}" cy="${EY + 2}" r="0.8" fill="#fff"/><circle cx="${Rr - 1.3}" cy="${EY + 2}" r="0.8" fill="#fff"/>
+    <ellipse cx="36" cy="46" rx="3.3" ry="4" fill="${OUT}"/><ellipse cx="36" cy="47.6" rx="2" ry="1.6" fill="#ff6f86"/>`,
+  sad: () => `
+    ${BLUSH(0.3)}
+    <path d="M21.5,27 Q26,26.2 30.6,23" ${stroke(1.8)}/><path d="M50.5,27 Q46,26.2 41.4,23" ${stroke(1.8)}/>
+    <path d="M22.6,34.4 Q${L},31 30.4,34.4" ${stroke(2.1)}/><path d="M41.6,34.4 Q${Rr},31 49.4,34.4" ${stroke(2.1)}/>
+    <path d="M47.6,36.4 C49.2,39.4 50.2,41 50.2,42.4 A2.6,2.6 0 0 1 45,42.4 C45,41 46,39.4 47.6,36.4 Z" fill="#9fe3ff" ${stroke(1.1)}/>
+    <path d="M31,46.8 Q36,42.6 41,46.8" ${stroke(2)}/>`,
+  cheer: (I) => `
+    ${BLUSH(0.7)}
+    <path d="M21.5,22.8 Q26,19.8 30.5,22.4" ${stroke(1.8)}/><path d="M41.5,22.4 Q46,19.8 50.5,22.8" ${stroke(1.8)}/>
+    <path d="M22.2,34.6 Q${L},29.2 30.8,34.6" ${stroke(2.5)}/><path d="M41.2,34.6 Q${Rr},29.2 49.8,34.6" ${stroke(2.5)}/>
+    ${GRIN(I)}
+    ${twinkle(12, 22, 3, '#fff2a8')}${twinkle(60, 20, 2.4, '#fff2a8')}${twinkle(61, 52, 1.8, '#ffffff')}`,
+  effort: () => `
+    ${BLUSH(0.45)}
+    <path d="M20.5,25 Q25.5,25.6 31.6,29.4" ${stroke(2.3)}/><path d="M51.5,25 Q46.5,25.6 40.4,29.4" ${stroke(2.3)}/>
+    <path d="M22,31.4 Q${L},35.4 31,33.2" ${stroke(2.4)}/><path d="M50,31.4 Q${Rr},35.4 41,33.2" ${stroke(2.4)}/>
+    <path d="M27.6,42.4 Q36,40.6 44.4,42.4 L44,47.4 Q36,45.8 28,47.4 Z" fill="#fff" ${stroke(1.7)}/>
+    <path d="M28,44.9 Q36,43.3 44,44.9" ${stroke(1)}/><path d="M31.8,41.8 L32,46.7 M36,41.3 L36,46.1 M40.2,41.8 L40,46.7" ${stroke(1)}/>
+    <path d="M9,30 l-4,-1.5 M9.5,35 l-4.5,0.5 M63,30 l4,-1.5 M62.5,35 l4.5,0.5" ${stroke(1.6)}/>`,
+});
 for (const k of Object.keys(FACES)) S['face_' + k] = { w: 72, h: 72, ax: 36, ay: 36, draw: (I) => FACES[k](I) };
 
 

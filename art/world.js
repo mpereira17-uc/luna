@@ -432,7 +432,7 @@ function village(b) {
   return I => {
     if (b === 'coral') return `
       <path d="M100,62 V6" ${ol(3)}/><path d="M100,62 V6" stroke="#a2683a" stroke-width="1.5"/>
-      <path d="M100,7 C93,5 88,9 81,7 L82,17 C89,19 94,15 100,17 Z" fill="#2fb7c9" ${ol(1.4)}/>${moon(90, 12, 1.2)}
+      <!-- the flag itself waves on the canvas (flagAt in the game) -->
       <circle cx="100" cy="5" r="1.8" fill="#e8b04c" ${ol(1)}/>
       ${hut(I, 'h2', 40, 70, 34, 34, 76, 8)}
       ${win(I, 'w2', 45, 40, 6, 6, { round: true })}${win(I, 'w3', 59, 40, 6, 6, { round: true })}${door(51.5, 47, 7, 15)}
