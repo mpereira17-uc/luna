@@ -445,10 +445,11 @@ S.flag1 = { w: 240, h: 200, ax: 118, ay: 178, draw: flagship(1) };
 
 // ---------------------------------------------------------------- leviathan (head right, body trailing left, tail far left)
 const LV = {
-  hi: '#8fdce2', lt: '#5fb3c0', mid: '#468f9e', dk: '#2f6f7f', deep: '#1a4452',
-  belly: ['#e2f6ea', '#a8d8cc'], fin: ['#6fd0da', '#2c7f90'], spine: '#c8fbff',
-  glow: '#5ff0ff', core: '#eaffff', eye: ['#fffbd0', '#ffd84a', '#ff8a1a'], eyeGlow: '#ffd24a',
+  hi: '#a6f0e6', lt: '#56b3bc', mid: '#357e9a', dk: '#2a4d7c', deep: '#17204a',
+  belly: ['#f6efd6', '#cdbf94'], fin: ['#c9a2ff', '#5a34a8'], spine: '#f4ecff',
+  glow: '#5ff0ff', core: '#eaffff', eye: ['#fff6d0', '#ff9a3a', '#e0303a'], eyeGlow: '#ff6a3a',
   mouth: ['#2a0718', '#7a1c3c'], tongue: '#e0647e', fang: ['#ffffff', '#d8d2c0'],
+  bone: [[0, '#fffbea'], [0.5, '#ddd2ae'], [1, '#7d6f52']],
 };
 const rot = (p, c, a) => { const r = deg(a), dx = p[0] - c[0], dy = p[1] - c[1]; return [c[0] + dx * Math.cos(r) - dy * Math.sin(r), c[1] + dx * Math.sin(r) + dy * Math.cos(r)]; };
 // bioluminescent dot
@@ -462,8 +463,13 @@ function levHead(open) {
     const SKULL = 'M10,57 C4,51 2,41 5,31 C8,23 16,17.5 27,16 C38,14.5 49,16 57,20 C63,23 65,28 63,33 C61,38 57,42 51,45.5 C45,49 37,53 29,55.5 C22,57.5 15,59 10,57 Z';
     const SNOUT = 'M42,21 C56,19 72,24 85,30 C90.5,32.5 94,35.5 93.5,39 C93,41.5 90,42.5 86.5,42.5 C78,43 68,43.5 60,44.5 C52,45.5 44,47 38,47 Z';
     const JAW = 'M30,49 C42,47.5 60,47 74,47 C81,47 86,47.4 88.5,48.8 C89,51.5 85.5,54.5 79,56.5 C67,60 50,60.5 36,58 C30,57 25,55 25,52.5 Z';
-    const HORN1 = 'M19,20 C14,13.8 9.5,9.4 5,5.6 C13,6.2 22.5,10.2 34,16.2 Z';
-    const HORN2 = 'M7,29 C5.6,25.6 4.8,22.8 4.6,19 C8.2,20.8 11.6,22 16,22.6 Z';
+    const HORN1 = 'M20,21 C14,11 8,3 0,-5 C11,-2.5 23,5 37,16.4 Z';
+    const HORN2 = 'M7,31 C3,27 0,23 -3,16.5 C3.6,19.2 10,21.4 16.4,22.6 Z';
+    // the fan crest behind the skull: five spines webbed with a glowing membrane
+    const CR = [[-10, 31], [-12, 15], [-5, 1], [6, -9], [20, -12]];
+    const CREST = `M9,46 L${CR[0]} Q0,26 ${CR[1]} Q-1,12 ${CR[2]} Q6,0 ${CR[3]} Q15,-2 ${CR[4]} L33,18 Z`;
+    const BROW = 'M45,21.4 L47,12.6 L51.4,20.6 Z M54.4,21 L57.6,13.4 L60.8,22 Z M64,23.4 L68,17.2 L70,25.4 Z';
+    const PLATE = 'M13,24.6 C21,18.6 36,16 51,19.6 C47,23.6 39,25.6 30.6,26.6 C24,27.4 18,27.4 13,24.6 Z';
     const FRILL = 'M33,46 C24,45.5 14,46.5 4.5,49 C9.5,51.6 10,55.4 7.6,60 C12.6,59.8 15.4,62.6 16.6,66.6 C21,61.6 25.6,58 32,55 Z';
     const U = `rotate(${ua} ${UC[0]} ${UC[1]})`, Lr = `rotate(${la} ${LC[0]} ${LC[1]})`;
     // mouth interior wedge between the jaw lines (in world space)
@@ -474,7 +480,8 @@ function levHead(open) {
     const outl = d => `<path d="${d}" fill="${OUT}" stroke="${OUT}" stroke-width="4.6" stroke-linejoin="round"/>`;
     return `<defs>
       <linearGradient id="${I('g')}" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="60"><stop offset="0" stop-color="${LV.hi}"/><stop offset="0.3" stop-color="${LV.lt}"/><stop offset="0.7" stop-color="${LV.mid}"/><stop offset="1" stop-color="${LV.dk}"/></linearGradient>
-      ${lin(I('horn'), [[0, '#eafcff'], [0.5, '#9fd8de'], [1, '#3d7e8c']], 1, 1)}
+      ${lin(I('horn'), LV.bone, 1, 1)}
+      ${rad(I('crest'), [[0, '#2c1764'], [0.45, LV.fin[1]], [0.85, LV.fin[0]], [1, '#9ff8ff']], 0.9, 0.85, 1)}
       ${lin(I('fin'), [[0, LV.fin[0]], [1, LV.fin[1]]], 1, 0.4)}
       ${lin(I('bel'), [[0, LV.belly[0]], [1, LV.belly[1]]])}
       ${lin(I('mo'), [[0, LV.mouth[0]], [1, LV.mouth[1]]], 1, 0)}
@@ -484,11 +491,14 @@ function levHead(open) {
       <clipPath id="${I('jc')}"><path d="${JAW}"/></clipPath>
       <clipPath id="${I('kc')}"><path d="${SKULL}"/></clipPath>
     </defs>
-    <g transform="translate(14 40) scale(0.95) translate(-14 -40)">
-    ${outl(FRILL)}${outl(HORN2)}${outl(HORN1)}${outl(MOUTH)}
+    <g transform="translate(14 14)"><g transform="translate(14 40) scale(0.95) translate(-14 -40)">
+    ${outl(CREST)}${outl(FRILL)}${outl(HORN2)}${outl(HORN1)}${outl(MOUTH)}
     <g transform="${Lr}">${outl(JAW)}</g>
     ${outl(SKULL)}
     <g transform="${U}">${outl(SNOUT)}</g>
+    <path d="${CREST}" fill="url(#${I('crest')})"/>
+    ${CR.map((t, k) => { const b = [[9, 42], [9, 33], [13, 26], [20, 21], [28, 18]][k]; return `<path d="M${b} L${t}" stroke="${LV.spine}" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>`; }).join('')}
+    ${CR.map(t => bio(I, t[0], t[1], 1.3)).join('')}
     <path d="${FRILL}" fill="url(#${I('fin')})"/>
     <path d="M32,48 L6.5,49.4 M32,50.5 L9,59 M32,53 L16.2,65" stroke="${LV.spine}" stroke-width="1.3" stroke-linecap="round" opacity="0.75"/>
     ${bio(I, 6.5, 49.4, 1.1)}${bio(I, 9, 59, 1.1)}${bio(I, 16.2, 65, 1.1)}
@@ -506,6 +516,7 @@ function levHead(open) {
       ${fang(80, 47.6, 5.5, 1.5, -1).replace('url(#FANG)', `url(#${I('fang')})`)}${fang(68, 47.4, 4.4, 1.3, -1).replace('url(#FANG)', `url(#${I('fang')})`)}${fang(57, 47.6, 3.6, 1.1, -1).replace('url(#FANG)', `url(#${I('fang')})`)}
     </g>
     <g transform="${U}">
+      ${outl(BROW)}<path d="${BROW}" fill="url(#${I('horn')})"/>
       <path d="${SNOUT}" fill="url(#${I('g')})"/>
       ${fang(85, 42.4, 7.4, 1.8, 1).replace('url(#FANG)', `url(#${I('fang')})`)}${fang(74, 43, 5.2, 1.4, 1).replace('url(#FANG)', `url(#${I('fang')})`)}${fang(63, 44, 4.4, 1.2, 1).replace('url(#FANG)', `url(#${I('fang')})`)}
       <path d="M86,33.6 C87.6,32.6 89.4,32.8 90.4,34" stroke="${OUT}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
@@ -518,6 +529,8 @@ function levHead(open) {
     <g clip-path="url(#${I('kc')})">
       <path d="${SKULL}" transform="translate(-5 -4)" fill="none" stroke="${LV.deep}" stroke-width="9" opacity="0.3"/>
     </g>
+    <path d="${PLATE}" fill="${LV.dk}" opacity="0.75" ${ol(1.2)}/>
+    <path d="M17,23.4 C25,19.6 36,18 47,20" stroke="${LV.hi}" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.6"/>
     <path d="M57.5,22 C62,26 63,31 61,35.5" stroke="${LV.dk}" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="${open ? 0.9 : 0.55}"/>
     <path d="M6,42 C4,32 9,22 20,18.6" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.38"/>
     ${bio(I, 16, 37.5, 1.3)}${bio(I, 24, 38.6, 1.4)}${bio(I, 32, 39.6, 1.3)}${bio(I, 39.5, 40.2, 1.1)}
@@ -528,52 +541,60 @@ function levHead(open) {
     <path d="M37.5,24.6 C43,${open ? 17.6 : 18.6} 54,${open ? 18.4 : 19.6} 61.5,${open ? 25 : 26.4} L58,${open ? 26.6 : 27.6} C52.5,${open ? 22.6 : 23.8} 45,${open ? 22.4 : 23.4} 40,${open ? 26.6 : 27}  Z" fill="${LV.mid}"/>
     <path d="M40,${open ? 26.6 : 27} C45,${open ? 22.4 : 23.4} 52.5,${open ? 22.6 : 23.8} 58,${open ? 26.6 : 27.6} L61.5,${open ? 25 : 26.4}" fill="none" ${ol(1.6)}/>
     <path d="M40.5,22.6 C46,18.6 53,19 58,22.6" stroke="${LV.hi}" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/>
-    </g>`;
+    </g></g>`;
   };
 }
-S.levHead = { w: 96, h: 70, ax: 14, ay: 40, pts: { mouth: [80, 46], eye: [48, 30] }, draw: levHead(false) };
-S.levHead_open = { w: 96, h: 70, ax: 14, ay: 40, pts: { mouth: [79, 45], eye: [48, 30] }, draw: levHead(true) };
+S.levHead = { w: 110, h: 84, ax: 28, ay: 54, pts: { mouth: [94, 60], eye: [62, 44] }, draw: levHead(false) };
+S.levHead_open = { w: 110, h: 84, ax: 28, ay: 54, pts: { mouth: [93, 59], eye: [62, 44] }, draw: levHead(true) };
 
-// body segment: round, dorsal fin growing out of its top (swept back = left), lighter belly; seamless chain outline
-S.levBody = {
-  w: 54, h: 54, ax: 27, ay: 27, draw: (I) => {
-    const cx = 27, cy = 27, r = 17;
+// body segment: armoured scales, a webbed dorsal sail swept back (left) and a pale belly; the flipper variant
+// adds a paddle fin underneath. Seamless chain outline (no outline where segments overlap)
+function levSeg(flip) {
+  return (I) => {
+    const cx = 30, cy = 36, r = 17;
     const A = a => [cx + r * Math.cos(deg(a)), cy - r * Math.sin(deg(a))];
-    const FIN = `M${pt(A(58))} C33,9.5 25,5.8 13.5,5 C17.5,8 19.5,11 ${pt(A(124))} Z`;
+    const SAIL = `M${pt(A(52))} L33,6 Q29,15 20,5 Q19,14 7,11 L${pt(A(150))} Z`;
+    const FLIP = 'M31,48 C30,56 24,63 12,66 C14,62 15.6,58 15,53 C19,52 24,50 26,46 Z';
     const top = `M${pt(A(146))} A${r},${r} 0 0 1 ${pt(A(34))}`;
     const bot = `M${pt(A(214))} A${r},${r} 0 0 0 ${pt(A(326))}`;
+    const scales = [cy - 12, cy - 6].map((y, row) => [0, 1, 2, 3, 4].map(k => { const x = 14 + k * 8 + row * 4; return `M${x - 4},${y} a4,4 0 0 0 8,0`; }).join(' ')).join(' ');
     return `<defs>
       ${lin(I('g'), [[0, LV.hi], [0.3, LV.lt], [0.7, LV.mid], [1, LV.dk]])}
-      ${lin(I('fin'), [[0, LV.fin[0]], [1, LV.fin[1]]], 0.3, 1)}
+      ${lin(I('fin'), [[0, '#9ff8ff'], [0.2, LV.fin[0]], [1, '#3a2180']], 0.3, 1)}
       ${lin(I('bel'), [[0, LV.belly[0]], [1, LV.belly[1]]])}
       ${glow(I('bg'), LV.glow)}
       <linearGradient id="${I('o')}" gradientUnits="userSpaceOnUse" x1="${cx - r}" y1="0" x2="${cx + r}" y2="0">
         <stop offset="0.08" stop-color="${OUT}" stop-opacity="0"/><stop offset="0.24" stop-color="${OUT}"/><stop offset="0.76" stop-color="${OUT}"/><stop offset="0.92" stop-color="${OUT}" stop-opacity="0"/></linearGradient>
       <clipPath id="${I('c')}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>
     </defs>
-    <path d="${FIN}" fill="${OUT}" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/>
-    <path d="${FIN}" fill="url(#${I('fin')})"/>
-    <path d="M27,11.5 C24,8 19.5,6.2 15,5.4 M31,12 C29,9.6 26,8 22.4,7" stroke="${LV.spine}" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="0.8"/>
+    ${flip ? `<path d="${FLIP}" fill="${OUT}" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/><path d="${FLIP}" fill="url(#${I('fin')})"/>
+      <path d="M27,48 L14,63 M29,49 L20,60.6 M24.6,47.6 L15.6,55" stroke="${LV.spine}" stroke-width="1" stroke-linecap="round" opacity="0.7"/>${bio(I, 12.6, 65.4, 1)}` : ''}
+    <path d="${SAIL}" fill="${OUT}" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="${SAIL}" fill="url(#${I('fin')})"/>
+    <path d="M36,21 L33,6 M28,19.6 L20,5 M20,23 L7,11" stroke="${LV.spine}" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.9"/>
+    ${bio(I, 33, 6, 1.1)}${bio(I, 20, 5.4, 1.1)}${bio(I, 7, 11, 1.1)}
     <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${I('g')})"/>
     <g clip-path="url(#${I('c')})">
-      <rect x="0" y="${cy + 6}" width="54" height="20" fill="url(#${I('bel')})"/>
-      <rect x="0" y="${cy + 6}" width="54" height="1.2" fill="#fff" opacity="0.5"/>
-      ${[16, 22, 28, 34, 40].map(x => `<path d="M${x},${cy + 8} L${x},${cy + 17}" stroke="${LV.belly[1]}" stroke-width="0.9"/>`).join('')}
-      <rect x="0" y="${cy - r * 0.78}" width="54" height="3" fill="#fff" opacity="0.22"/>
-      <path d="M8,${cy - 1} L46,${cy - 1}" stroke="${LV.dk}" stroke-width="1" opacity="0.35"/>
+      <path d="${scales}" fill="none" stroke="${LV.dk}" stroke-width="1.1" opacity="0.55"/>
+      <rect x="0" y="${cy + 6}" width="60" height="20" fill="url(#${I('bel')})"/>
+      <rect x="0" y="${cy + 6}" width="60" height="1.2" fill="#fff" opacity="0.5"/>
+      ${[19, 25, 31, 37, 43].map(x => `<path d="M${x},${cy + 8} L${x},${cy + 17}" stroke="${LV.belly[1]}" stroke-width="0.9"/>`).join('')}
+      <rect x="0" y="${cy - r * 0.8}" width="60" height="3" fill="#fff" opacity="0.22"/>
     </g>
     <path d="${top}" fill="none" stroke="url(#${I('o')})" stroke-width="2.4" stroke-linecap="round"/>
     <path d="${bot}" fill="none" stroke="url(#${I('o')})" stroke-width="2.4" stroke-linecap="round"/>
-    ${bio(I, 20, cy - 5, 1.5)}${bio(I, 33, cy - 5, 1.5)}${bio(I, 27, cy + 2.5, 1)}`;
-  },
-};
+    ${bio(I, 23, cy + 1, 1.4)}${bio(I, 36, cy + 1, 1.4)}`;
+  };
+}
+S.levBody = { w: 60, h: 70, ax: 30, ay: 36, draw: levSeg(false) };
+S.levFlip = { w: 60, h: 70, ax: 30, ay: 36, draw: levSeg(true) };
 
 // tail: joint on the right (x=72), tail fin pointing left
 S.levTail = {
-  w: 80, h: 46, ax: 72, ay: 23, draw: (I) => {
+  w: 80, h: 48, ax: 72, ay: 23, draw: (I) => {
     const BODY = 'M72,10.5 C62,11.5 50,15 34,19 L34,28.5 C50,31 62,34.5 72,35.5 A6,12.5 0 0 0 72,10.5 Z';
-    const SPIKE = 'M58,14.2 C54,9.5 49,7.2 43,6.6 C46,9.4 47.5,12.6 47.6,16.6 Z';
-    const FIN = 'M37,19.5 C28,15 17,9 5,3.6 C9,10 12,16 15,23.5 C12,31 9,36 5,42.4 C17,37 28,31.6 37,28 Z';
+    const SPIKE = 'M64,12.4 C61,7.6 57,5 52,4.4 C54.6,7.4 55.6,10.6 55.4,14.4 Z M50,15.6 C47,11.6 43.4,9.6 39,9.2 C41.4,11.8 42.2,14.6 42,18 Z';
+    const FIN = 'M37,19.5 C28,13 18,5 3,0.6 C9,8.6 12.6,16 14,23.5 C12.6,31 9,38.4 3,46.4 C18,42 28,34 37,28 Z';
     return `<defs>
       ${lin(I('g'), [[0, LV.hi], [0.3, LV.lt], [0.7, LV.mid], [1, LV.dk]])}
       ${lin(I('fin'), [[0, LV.fin[0]], [1, LV.fin[1]]], 1, 0.5)}
@@ -588,10 +609,10 @@ S.levTail = {
     <path d="${BODY}" fill="none" stroke="url(#${I('o')})" stroke-width="4.4" stroke-linejoin="round"/>
     <path d="${FIN}" fill="url(#${I('fin')})"/>
     <g clip-path="url(#${I('fc')})">
-      <path d="M38,22 L8,6 M38,23 L12,13 M38,24 L15,23.5 M38,25 L12,34 M38,26 L8,41" stroke="${LV.spine}" stroke-width="1.1" opacity="0.75"/>
-      <path d="M5,3.6 C9,10 12,16 15,23.5 C12,31 9,36 5,42.4" stroke="${LV.glow}" stroke-width="2" fill="none" opacity="0.55"/>
+      <path d="M38,22 L6,3 M38,23 L11,12 M38,24 L14,23.5 M38,25 L11,35 M38,26 L6,44" stroke="${LV.spine}" stroke-width="1.1" opacity="0.75"/>
+      <path d="M3,0.6 C9,8.6 12.6,16 14,23.5 C12.6,31 9,38.4 3,46.4" stroke="${LV.glow}" stroke-width="2.4" fill="none" opacity="0.6"/>
     </g>
-    ${bio(I, 8.5, 6.6, 1)}${bio(I, 13.5, 16, 0.9)}${bio(I, 13.5, 31, 0.9)}${bio(I, 8.5, 40, 1)}
+    ${bio(I, 6, 3.4, 1.1)}${bio(I, 12, 14, 0.9)}${bio(I, 12, 33, 0.9)}${bio(I, 6, 44, 1.1)}
     <path d="${SPIKE}" fill="url(#${I('fin')})"/>
     <path d="M55,13.6 C52,10.6 49,8.8 45.5,7.8" stroke="${LV.spine}" stroke-width="1" fill="none" opacity="0.8"/>
     <path d="${BODY}" fill="url(#${I('g')})"/>
@@ -628,7 +649,7 @@ function flames(cx, cy, r0, n, off, lens, w, lean) {
   }
   return out;
 }
-function eclipse(fr) {
+function eclipse(fr, scared) {
   return (I) => {
     const C = 65, R = 35;
     const LO = fr ? [21, 15, 19, 13, 21, 16, 18, 14] : [16, 21, 14, 20, 15, 21, 13, 19];
@@ -639,7 +660,9 @@ function eclipse(fr) {
       .map(([x, y, r, a]) => `<path d="M${x},${y - r * 2.4} C${x + r},${y - r} ${x + r},${y + r} ${x},${y + r} C${x - r},${y + r} ${x - r},${y - r} ${x},${y - r * 2.4} Z" transform="rotate(${a} ${x} ${y})" fill="#b06aff" stroke="${OUT}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="${f1(r * 0.45)}" fill="#f4dcff"/>`).join('');
     const HORN = 'M90.4,49.1 C104,40 111,26 106.5,6.5 C100.5,17 90,26 71.2,35.7 Z';
     const top = [[33, 66], [45, 79.5], [85, 79.5], [97, 66]], bot = [[97, 66], [90, 103], [40, 103], [33, 66]];
-    const MOUTH = `M${pt(top[0])} C${pt(top[1])} ${pt(top[2])} ${pt(top[3])} C${pt(bot[1])} ${pt(bot[2])} ${pt(bot[3])} Z`;
+    // scared: a small wobbly open mouth instead of the grin
+    const MOUTH = scared ? 'M45,88 C48,82 53,86 57,82.5 C61,86 65,82 69,85.5 C73,82 77,86 81,82.5 C84,84 86,86 85,89 C83,99 75,104 65,104 C55,104 47,99 45,88 Z'
+      : `M${pt(top[0])} C${pt(top[1])} ${pt(top[2])} ${pt(top[3])} C${pt(bot[1])} ${pt(bot[2])} ${pt(bot[3])} Z`;
     const qb = (t, P) => { const u = 1 - t; return [0, 1].map(k => u * u * u * P[0][k] + 3 * u * u * t * P[1][k] + 3 * u * t * t * P[2][k] + t * t * t * P[3][k]); };
     const teeth = (P, ws, t0, t1, lens, dir) => {
       const r = [], tot = ws.reduce((x, y) => x + y, 0);
@@ -652,8 +675,11 @@ function eclipse(fr) {
       });
       return r;
     };
-    const up = teeth(top, [0.8, 1.1, 0.9, 1.3, 1, 1.25, 0.85, 1.1, 0.8], 0.05, 0.96, [4, 6.4, 4.6, 7.6, 5.2, 7.4, 4.4, 6.2, 3.8], 1);
-    const lo = teeth(bot, [0.9, 1.2, 1, 1.3, 0.9, 1.2, 0.9], 0.08, 0.94, [4.2, 6, 4.4, 6.8, 4.6, 5.8, 4], -1);
+    const up = scared ? [50, 58, 66, 74].map(x => `M${x - 3},84 L${x},${x % 8 ? 89 : 88} L${x + 3},84 Z`) : teeth(top, [0.8, 1.1, 0.9, 1.3, 1, 1.25, 0.85, 1.1, 0.8], 0.05, 0.96, [4, 6.4, 4.6, 7.6, 5.2, 7.4, 4.4, 6.2, 3.8], 1);
+    const lo = scared ? [] : teeth(bot, [0.9, 1.2, 1, 1.3, 0.9, 1.2, 0.9], 0.08, 0.94, [4.2, 6, 4.4, 6.8, 4.6, 5.8, 4], -1);
+    const BROW = scared ? 'M92.5,44.5 C84,42.6 75.5,39 67.4,33.6 C75.8,36.4 84.4,38 92.6,38.2 C93.6,40.2 93.6,42.6 92.5,44.5 Z' : 'M91.5,35.5 C84,37.5 74,41 66.2,46.6 C74.5,44.6 83.5,43.6 92.5,42.6 C93.4,40 93,37.4 91.5,35.5 Z';
+    const BROWHL = scared ? 'M91,40 C83.6,39.4 76,37.4 70,35' : 'M90.4,37.4 C83,39.2 75,42 69,45.4';
+    const drop = (x, y, r) => `<path d="M${x},${y - r * 2.2} C${x + r * 1.1},${y - r * 0.6} ${x + r},${y + r} ${x},${y + r} C${x - r},${y + r} ${x - r * 1.1},${y - r * 0.6} ${x},${y - r * 2.2} Z" fill="#bfefff" ${ol(1.2)}/><circle cx="${x - r * 0.35}" cy="${y}" r="${r * 0.3}" fill="#fff"/>`;
     const coG = (id, stops) => `<radialGradient id="${I(id)}" gradientUnits="userSpaceOnUse" cx="${C}" cy="${C}" r="62">${stops.map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('')}</radialGradient>`;
     return `<defs>
       ${rad(I('halo'), [[0.45, '#b46cff', 0.6], [0.72, '#7a2cd8', 0.25], [1, '#5a1aa8', 0]])}
@@ -691,8 +717,8 @@ function eclipse(fr) {
     <ellipse cx="${C}" cy="54" rx="20.5" ry="13" fill="url(#${I('sock')})" ${ol(2)}/>
     <path d="M47,60 C53,66.4 77,66.4 83,60" stroke="#8a4ae8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
     ${[0, 1].map(m => `<g ${m ? 'transform="translate(130 0) scale(-1 1)"' : ''}>
-      <path d="M91.5,35.5 C84,37.5 74,41 66.2,46.6 C74.5,44.6 83.5,43.6 92.5,42.6 C93.4,40 93,37.4 91.5,35.5 Z" fill="url(#${I('brow')})" ${ol(1.5)}/>
-      <path d="M90.4,37.4 C83,39.2 75,42 69,45.4" stroke="#c49aff" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="${m ? 0.5 : 0.8}"/>
+      <path d="${BROW}" fill="url(#${I('brow')})" ${ol(1.5)}/>
+      <path d="${BROWHL}" stroke="#c49aff" stroke-width="1.1" fill="none" stroke-linecap="round" opacity="${m ? 0.5 : 0.8}"/>
     </g>`).join('')}
     <ellipse cx="${C}" cy="85" rx="36" ry="18" fill="url(#${I('mg')})" opacity="0.5"/>
     <path d="${MOUTH}" fill="url(#${I('mo')})"/>
@@ -701,11 +727,26 @@ function eclipse(fr) {
       ${up.concat(lo).map(d => `<path d="${d}" fill="url(#${I('tooth')})" stroke="${OUT}" stroke-width="1" stroke-linejoin="round"/>`).join('')}
     </g>
     <path d="${MOUTH}" fill="none" ${ol(2)}/>
-    <path d="M32,61.4 L35.2,66.6 M98,61.4 L94.8,66.6" stroke="${OUT}" stroke-width="1.8" stroke-linecap="round"/>`;
+    ${scared ? `${drop(100, 50, 3.4)}${drop(28, 58, 2.6)}${drop(104, 66, 2.2)}` : '<path d="M32,61.4 L35.2,66.6 M98,61.4 L94.8,66.6" stroke="' + OUT + '" stroke-width="1.8" stroke-linecap="round"/>'}`;
   };
 }
 S.eclipse0 = { w: 130, h: 130, ax: 65, ay: 65, pts: { socket: [65, 54], mouth: [65, 85] }, draw: eclipse(0) };
 S.eclipse1 = { w: 130, h: 130, ax: 65, ay: 65, pts: { socket: [65, 54], mouth: [65, 85] }, draw: eclipse(1) };
+S.eclipse_scared = { w: 130, h: 130, ax: 65, ay: 65, pts: { socket: [65, 54], mouth: [65, 92] }, draw: eclipse(0, true) };
+// wide-open terrified eye with a pin-prick pupil
+S.eclEyeScared = {
+  w: 36, h: 28, ax: 18, ay: 14, draw: (I) => `<defs>
+      ${rad(I('e'), [[0, '#fff6e8'], [0.65, '#ffd2c2'], [1, '#ff8a7a']], 0.5, 0.45, 0.6)}
+      <clipPath id="${I('c')}"><ellipse cx="18" cy="14" rx="12.5" ry="11"/></clipPath>
+    </defs>
+    <ellipse cx="18" cy="14" rx="12.5" ry="11" fill="url(#${I('e')})" ${ol(1.6)}/>
+    <g clip-path="url(#${I('c')})">
+      <path d="M8,9 C14,4 22,4 28,9" stroke="#ff4a5a" stroke-width="0.8" fill="none" opacity="0.6"/>
+      <path d="M9,20 L13,18 M27,20 L23,18.4" stroke="#ff4a5a" stroke-width="0.8" opacity="0.6"/>
+      <circle cx="18" cy="14" r="3.6" fill="#e01a2a"/><circle cx="18" cy="14" r="1.8" fill="${OUT}"/>
+      <circle cx="14.5" cy="10.5" r="1.6" fill="#fff"/>
+    </g>`,
+};
 S.eclEye = {
   w: 36, h: 24, ax: 18, ay: 12, draw: (I) => `<defs>
       ${rad(I('h'), [[0, '#ff2a3a', 0.7], [0.55, '#ff1a2a', 0.25], [1, '#ff1a2a', 0]])}

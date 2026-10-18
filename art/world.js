@@ -716,6 +716,42 @@ S.farB = {
      ${tinyWin(120, 49)}${tinyWin(128, 47)}${tinyWin(90, 47)}`),
 };
 
+// distant sea stacks: tall rocks rising straight out of the sea, anchored at the sea floor so the tide always covers their foot.
+// The game stretches them vertically (sy) so their tops sit just above high water on every screen shape
+function seaStack(I, rocks, extras) {
+  const all = rocks.join(' ');
+  return `<defs>${lgu(I('f'), 0, 0, 0, 200, [[0, '#3a4d80'], [0.55, '#25335c'], [1, '#141c36']])}<clipPath id="${I('fc')}"><path d="${all}"/></clipPath></defs>
+    <path d="${all}" fill="${U(I('f'))}"/>
+    <g clip-path="url(#${I('fc')})">
+      <path d="${all}" transform="translate(-2 2)" fill="none" stroke="#6f86c0" stroke-width="2.4" opacity="0.5"/>
+      <path d="M0,70 C30,66 60,74 150,68 M0,104 C40,100 80,108 150,102 M0,138 C50,134 90,142 150,136 M0,170 C40,166 100,174 150,168" fill="none" stroke="#121a33" stroke-width="1.6" opacity="0.45"/>
+      <path d="M0,86 C40,84 90,90 150,86 M0,152 C50,150 100,156 150,152" fill="none" stroke="#5a6ea6" stroke-width="1.1" opacity="0.3"/>
+    </g>
+    <path d="${all}" fill="none" stroke="#121a33" stroke-width="1.5" stroke-linejoin="round"/>${extras}`;
+}
+const stackTuft = (x, y, w) => `<path d="M${x - w},${y + 2} C${x - w * 0.6},${y - 3} ${x - w * 0.2},${y - 4} ${x},${y - 2} C${x + w * 0.3},${y - 5} ${x + w * 0.7},${y - 3} ${x + w},${y + 2} Z" fill="#1f3a4a" stroke="#121a33" stroke-width="1"/>`;
+S.stackA = {
+  w: 150, h: 200, ax: 75, ay: 200,
+  draw: I => seaStack(I, [
+    'M38,200 L41,150 C38,120 43,92 41,64 C41,46 45,32 51,26 C57,21 67,20 75,22 C83,24 88,31 90,40 C92,56 90,76 94,100 C96,126 92,162 96,200 Z',
+    'M92,200 L96,162 C98,132 100,108 104,90 C108,80 118,77 126,82 C130,90 128,114 132,142 C134,170 132,186 136,200 Z',
+    'M6,200 C9,180 11,162 15,150 C19,140 27,137 33,142 C37,154 37,172 40,200 Z'],
+    `<path d="M61,23 L61,12 L65,8 L69,12 L69,23 Z" fill="#1b2546" stroke="#121a33" stroke-width="1"/><path d="M59.6,12.4 L65,6.6 L70.4,12.4" fill="none" stroke="#121a33" stroke-width="1.2"/>
+     ${tinyWin(64.4, 13.4)}${stackTuft(52, 26, 7)}${stackTuft(82, 27, 6)}${stackTuft(118, 81, 6)}${stackTuft(24, 141, 6)}
+     <path d="M108,64 l3,-2 l3,2 M116,58 l2.4,-1.6 l2.4,1.6" fill="none" stroke="#9fb0d8" stroke-width="1" stroke-linecap="round" opacity="0.7"/>`),
+};
+S.stackB = {
+  w: 150, h: 200, ax: 75, ay: 200,
+  draw: I => seaStack(I, [
+    'M8,200 C10,164 12,128 18,104 C24,88 38,82 54,86 C68,90 76,100 82,112 C88,126 90,146 94,164 C96,178 98,190 102,200 L84,200 C82,186 78,172 70,164 C62,156 50,156 42,164 C34,172 32,186 30,200 Z',
+    'M104,200 C106,172 108,142 110,114 C112,94 114,76 116,64 L140,64 C142,86 142,114 144,142 C146,170 146,190 148,200 Z'],
+    `${halo(I('lh'), 128, 33, 20, '#ffe9a0', 0.9)}
+     <path d="M128,33 L80,24 L80,42 Z" fill="#ffe9a0" opacity="0.09"/>
+     <path d="M123.6,64 L124.6,40 L131.4,40 L132.4,64 Z" fill="#aeb6cc" stroke="#121a33" stroke-width="1"/><rect x="124.2" y="47" width="7.6" height="3" fill="#a8464f"/><rect x="123.9" y="55" width="8.2" height="3" fill="#a8464f"/>
+     <rect x="124.4" y="33.6" width="7.2" height="6.6" fill="#ffe9a0" stroke="#121a33" stroke-width="0.9"/><path d="M123.4,34 L128,29.4 L132.6,34 Z" fill="#a8464f" stroke="#121a33" stroke-width="0.9"/>
+     ${stackTuft(40, 86, 8)}${stackTuft(66, 91, 6)}${stackTuft(112, 66, 5)}${stackTuft(143, 66, 4)}`),
+};
+
 // ================================================================ sea floor decor (anchor = bottom centre)
 // wavy ribbon blade growing from (x0, 68)
 function ribbon(x0, h, w0, ph) {

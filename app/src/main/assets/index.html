@@ -48,6 +48,14 @@ button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
   z-index: 20;
 }
 .screen.clear { background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--night) 55%, transparent) 50%, color-mix(in srgb, var(--night) 94%, transparent) 100%); backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* screens fade in and their content rises a little; the curtain covers the jump between menu and game */
+.screen.enter { animation: scrFade 0.24s ease-out both; }
+.screen.enter .inner { animation: scrRise 0.34s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+@keyframes scrFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scrRise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
+#curtain { position: fixed; inset: 0; z-index: 55; background: #0b0820; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
+#curtain.on { opacity: 1; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) { .screen.enter, .screen.enter .inner { animation: none; } #curtain { transition: none; } }
 .inner { width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 14px; margin-block: auto; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; max-width: 460px; margin-bottom: 8px; }
 .icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 85%, transparent); display: grid; place-items: center; font-size: 18px; flex: none; }
@@ -68,6 +76,7 @@ h2.st { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 
 .btn.center { justify-content: center; text-align: center; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pearl { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 34% 30%, #ffffff, #f1e4ff 40%, #c4a9e8 80%, #8a6cc2 100%); box-shadow: 0 0 0 1.5px #4a2e6e inset, 0 0 8px rgba(240,220,255,0.6); display: inline-block; flex: none; }
 .coin { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff6c8, #ffd36b 45%, #c98a22 100%); box-shadow: 0 0 0 1.5px #7a4d10 inset, 0 0 8px rgba(255,211,107,0.55); display: inline-block; flex: none; }
 .sp { display: inline-block; flex: none; background-repeat: no-repeat; vertical-align: middle; }
 .inl { display: inline !important; }
@@ -131,6 +140,8 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .buy { border: 0; border-radius: 12px; padding: 10px 12px; font-weight: 900; font-size: 14px; background: var(--moon); color: var(--night); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .buy:disabled { background: var(--line); color: var(--ink-dim); cursor: default; }
 .buy.claim { background: var(--ok); }
+.buy.sw { background: var(--panel-2); color: var(--ink-dim); box-shadow: 0 0 0 1px var(--line) inset; }
+.buy.sw.on { background: var(--ok); color: var(--night); box-shadow: none; }
 .moon-dot { width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 18px currentColor; background: currentColor; }
 .prog-mini { height: 5px; border-radius: 3px; background: var(--line); margin-top: 6px; overflow: hidden; }
 .prog-mini i { display: block; height: 100%; background: var(--gold); }
@@ -152,6 +163,36 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 .build { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .build > span { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 6px 9px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); font-weight: 700; }
 .build span.evo { border-color: var(--gold); color: var(--gold); }
+/* pause: gear (weapons and passives, like Vampire Survivors) and the combination book */
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); }
+.seg button { display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; padding: 10px 6px; font-size: 15px; font-weight: 800; background: none; color: var(--ink-dim); }
+.seg button[aria-selected="true"] { background: var(--panel-2); color: var(--ink); box-shadow: 0 0 0 1px var(--line) inset; }
+.sec2 { display: flex; align-items: baseline; justify-content: space-between; margin: 4px 0 8px; font-family: var(--display); font-weight: 400; font-size: 19px; color: var(--gold); }
+.sec2 small { font-family: var(--body); font-size: 13px; font-weight: 700; color: var(--ink-dim); }
+.gslots { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 6px; }
+.slot { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 0; padding: 8px 2px 6px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 92%, transparent); }
+.slot .nm { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700; color: var(--ink-dim); }
+.slot .lvs { font-size: 10px; }
+.slot.gold { border-color: var(--gold); box-shadow: 0 0 14px color-mix(in srgb, var(--gold) 22%, transparent); }
+.slot .tag { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); padding: 2px 5px; border-radius: 999px; font-size: 9px; font-weight: 900; letter-spacing: 0.06em; background: var(--gold); color: var(--night); }
+.slot.empty { border-style: dashed; opacity: 0.5; min-height: 76px; font-size: 20px; color: var(--ink-dim); }
+.slot.sel { box-shadow: 0 0 0 2px var(--moon) inset; }
+.pinfo { min-height: 46px; margin: 10px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--panel-2); font-size: 13px; line-height: 1.4; color: var(--ink-dim); }
+.pinfo b { color: var(--ink); }
+.lede.small { font-size: 13px; }
+.sect { margin: 10px 2px 2px; font: 800 13px/1.2 Figtree, system-ui, sans-serif; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); }
+.sect:first-child { margin-top: 0; }
+.combos { display: flex; flex-direction: column; gap: 8px; }
+.combo { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 92%, transparent); }
+.combo .rec { display: flex; align-items: center; gap: 1px; font-size: 13px; font-weight: 900; color: var(--ink-dim); }
+.combo .rec .miss { opacity: 0.32; filter: grayscale(1); }
+.combo .kind { display: block; font-size: 10px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.combo b { display: block; font-size: 15px; }
+.combo .cs { display: block; margin-top: 2px; font-size: 12px; line-height: 1.35; color: var(--ink-dim); }
+.combo.ready { border-color: var(--ok); box-shadow: 0 0 16px color-mix(in srgb, var(--ok) 18%, transparent); }
+.combo.ready .cs { color: var(--ok); font-weight: 800; }
+.combo.done .cs { color: var(--gold); font-weight: 800; }
+.combo.far, .combo.gone { opacity: 0.55; }
 
 /* ---------- level up ---------- */
 #levelUp { justify-content: center; background: color-mix(in srgb, #050915 78%, transparent); }
@@ -236,6 +277,9 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 #bossBar { display: flex; flex-direction: column; gap: 3px; }
 #bossName { font-family: var(--display); font-size: 15px; color: var(--danger); text-align: center; text-shadow: 0 0 12px rgba(255,95,109,0.6); }
 #bossBar .bar { flex: none; height: 10px; }
+#bossCast { font-weight: 800; font-size: 13px; color: var(--gold); text-align: center; letter-spacing: .02em; animation: castPulse .45s ease-in-out infinite alternate; }
+#bossCast.ok { color: #8ff0a4; }
+@keyframes castPulse { from { opacity: .65; transform: scale(.97); } to { opacity: 1; transform: scale(1.03); } }
 #bossFill { background: linear-gradient(90deg, #8d1e3a, #ff5f6d); }
 #combo { position: absolute; left: 14px; top: calc(env(safe-area-inset-top, 0px) + 136px); text-align: left; pointer-events: none; transform-origin: left center; }
 #comboNum { font-family: var(--display); font-size: 34px; line-height: 1; color: var(--gold); text-shadow: 0 0 20px rgba(255,211,138,0.6), 0 2px 0 #000; font-variant-numeric: tabular-nums; }
@@ -274,6 +318,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
 <canvas id="game" aria-label="Isla bajo asedio: mueve la luna para levantar el mar y defenderla"></canvas>
 
+<div id="curtain" aria-hidden="true"></div>
 <div id="hud" hidden>
   <div class="hud-top">
     <div class="hud-row">
@@ -284,10 +329,11 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
     <div class="hud-row">
       <span class="lv" id="lvText">Nv 1</span>
       <div class="bar xp"><i id="xpFill"></i></div>
-      <span class="coins-hud"><i class="coin"></i><span id="coinText">0</span></span>
+      <span class="coins-hud"><i class="pearl"></i><span id="coinText">0</span></span>
     </div>
     <div id="bossBar" hidden>
       <span id="bossName"></span>
+      <span id="bossCast" hidden></span>
       <div class="bar"><i id="bossFill"></i></div>
     </div>
   </div>
@@ -373,7 +419,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div class="screen" id="scrShop" hidden>
   <div class="topbar"><button class="icon-btn" id="shopBack" type="button" aria-label="Volver">←</button><h2 class="st">Taller</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
   <div class="inner" style="margin-block: 0 auto">
-    <p class="lede">Mejoras permanentes para todas las partidas. Las monedas caen de los enemigos: recógelas con la luna.</p>
+    <p class="lede">Mejoras permanentes para todas las partidas. Las monedas se ganan al terminar cada partida: por enemigos hundidos, jefes y oleadas.</p>
     <h3 class="sec">Arrecife</h3>
     <div class="reefs" id="reefList"></div>
     <h3 class="sec">Mejoras</h3>
@@ -407,7 +453,7 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div class="screen" id="scrMissions" hidden>
   <div class="topbar"><button class="icon-btn" data-go="title" type="button" aria-label="Volver">←</button><h2 class="st">Misiones</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
   <div class="inner" style="margin-block: 0 auto">
-    <p class="lede">Tres misiones nuevas cada día. El progreso se suma en todas tus partidas de hoy.</p>
+    <p class="lede">Cuatro misiones nuevas cada día y tres cada semana. El progreso se suma en todas tus partidas.</p>
     <div class="stack" id="misList"></div>
   </div>
 </div>
@@ -419,10 +465,11 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
       <span class="eyebrow">Ha atracado un barco</span>
       <div class="mship" id="mShip" aria-hidden="true"></div>
       <h3>Mercader</h3>
-      <p class="lede">Mejoras solo para esta partida. Pagas con tus monedas.</p>
-      <span class="chip"><i class="coin"></i><span id="mPurse">0</span></span>
+      <p class="lede">Mejoras solo para esta partida. Se pagan con las perlas que recoges en el mar.</p>
+      <span class="chip"><i class="pearl"></i><span id="mPurse">0</span></span>
     </div>
     <div class="stack" id="wares"></div>
+    <button class="btn center" id="mReroll" type="button">Otra mercancía · <i class="pearl"></i> <span id="mRerollCost">0</span></button>
     <button class="btn primary center" id="mDone" type="button">Zarpar</button>
   </div>
 </div>
@@ -441,11 +488,27 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 <div class="screen" id="scrPause" hidden>
   <div class="inner">
     <h2 class="st">Pausa</h2>
-    <div class="build" id="pauseBuild"></div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" id="pTabGear" aria-selected="true">Mejoras</button>
+      <button type="button" role="tab" id="pTabCombo" aria-selected="false">Combinaciones<span class="badge" id="pComboBadge" hidden>!</span></button>
+    </div>
+    <div id="pGear">
+      <h3 class="sec2">Armas <small id="pWCount"></small></h3>
+      <div class="gslots" id="pWeapons"></div>
+      <h3 class="sec2">Pasivas <small id="pPCount"></small></h3>
+      <div class="gslots" id="pPassives"></div>
+      <p class="pinfo" id="pInfo"></p>
+    </div>
+    <div id="pCombo" hidden>
+      <p class="lede small">Fusión: un arma a nivel 3 más su pasiva. Unión: dos armas a nivel 3 que se juntan en una.</p>
+      <div class="combos" id="pCombos"></div>
+    </div>
     <div class="stack">
       <button class="btn primary center" id="resumeBtn" type="button">Continuar</button>
-      <button class="btn ghost center" id="restartBtn" type="button">Reiniciar</button>
-      <button class="btn ghost center" id="quitBtn" type="button">Abandonar</button>
+      <div class="row">
+        <button class="btn ghost center" id="restartBtn" type="button">Reiniciar</button>
+        <button class="btn ghost center" id="quitBtn" type="button">Terminar y cobrar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -521,7 +584,7 @@ const ISLANDS = [
 const DANGER_MAX = 5;
 const DANGER_TXT = ['Normal', 'Peligro 1', 'Peligro 2', 'Peligro 3', 'Peligro 4', 'Peligro 5'];
 
-// coin: drop chance, cv: coins per drop
+// coin: chance to drop pearls (the run's currency), cv: pearls per drop
 const EN = {
   sloop:   { name: 'Balandra', hp: 20, spd: 64, kind: 'ship', draft: 0.08, dps: 4, xp: 1, r: 15, coin: 0.16, cv: 1 },
   galleon: { name: 'Galeón', hp: 115, spd: 30, kind: 'ship', draft: 0.30, dps: 10, xp: 4, r: 24, coin: 0.5, cv: 2 },
@@ -531,12 +594,32 @@ const EN = {
   gull:    { name: 'Gaviota pirata', hp: 13, spd: 84, kind: 'fly', dps: 1.8, xp: 1, r: 11, coin: 0.12, cv: 1 },
   serpent: { name: 'Serpiente', hp: 85, spd: 48, kind: 'swim', dps: 8, xp: 3, r: 18, coin: 0.45, cv: 2 },
   gold:    { name: 'Barco del tesoro', hp: 150, spd: 62, kind: 'ship', draft: 0.12, dps: 0, xp: 6, r: 17, flee: true, coin: 0, cv: 0 },
+  // a fire ship loaded with powder: it blows up against the island unless it is sunk first
+  brulote: { name: 'Brulote', hp: 75, spd: 66, kind: 'ship', draft: 0.1, dps: 0, xp: 3, r: 16, coin: 0.5, cv: 2, fuse: true },
+  // endless only: it can't be sunk, only pushed back; if it reaches the island it wrecks it
+  ghost:   { name: 'Holandés Errante', hp: 1400, spd: 15, kind: 'ship', draft: 0, dps: 0, xp: 0, r: 26, coin: 0, cv: 0, ghost: true },
 };
+// traits: from wave 6 on, enemies can come with one (two later on); some waves give the same trait to all
+const TRAITS = {
+  acorazado: { name: 'Acorazado', col: '#c3d2e6', w: 6, tip: 'Su coraza aguanta la mitad de cada golpe hasta que la rompes' },
+  veloz:     { name: 'Veloz', col: '#ffe066', w: 6, tip: 'Va mucho más rápido: frénalo antes de que llegue' },
+  igneo:     { name: 'Ígneo', col: '#ff8a3d', w: 8, tip: 'Arde: el hielo no lo congela ni lo frena' },
+  gigante:   { name: 'Gigante', col: '#ff5f6d', w: 10, tip: 'Enorme, duro y pega muy fuerte' },
+  espectral: { name: 'Espectral', col: '#c9a8ff', w: 13, tip: 'A ratos se vuelve intangible y nada le hace daño' },
+};
+const THEMES = [
+  { id: 'acorazada', name: 'Flota acorazada', sub: 'Todos llevan coraza', w: 6, tr: 'acorazado' },
+  { id: 'rapida', name: 'Asalto relámpago', sub: 'Llegan más rápido que nunca', w: 6, tr: 'veloz' },
+  { id: 'ignea', name: 'Flota de fuego', sub: 'No se congelan y vienen brulotes', w: 8, tr: 'igneo' },
+  { id: 'bombardeo', name: 'Bombardeo', sub: 'Intercepta las balas con la luna', w: 9 },
+  { id: 'gigantes', name: 'Marea de gigantes', sub: 'Pocos, pero enormes', w: 10, tr: 'gigante' },
+  { id: 'espectral', name: 'Barcos fantasma', sub: 'Se vuelven intangibles a ratos', w: 13, tr: 'espectral' },
+];
 const BOSS = {
-  kraken:   { name: 'El Kraken', hp: 3200, r: 58 },
-  armada:   { name: 'La Armada Negra', hp: 4400, r: 50 },
-  leviatan: { name: 'El Leviatán', hp: 3800, r: 44 },
-  eclipse:  { name: 'Demonio del Eclipse', hp: 7000, r: 44 },
+  kraken:   { name: 'El Kraken', hp: 5200, r: 58 },
+  armada:   { name: 'La Armada Negra', hp: 7000, r: 50 },
+  leviatan: { name: 'El Leviatán', hp: 6200, r: 44 },
+  eclipse:  { name: 'Demonio del Eclipse', hp: 10500, r: 64 },
 };
 
 // every weapon has 3 levels; lv[0] describes level 1, lv[1] and lv[2] what levels 2 and 3 add
@@ -549,6 +632,8 @@ const WEAPONS = {
   faro:     { name: 'Faro', ico: 'i_faro', desc: 'Un láser barre el mar y el cielo de lado a lado.', lv: ['Un haz que quema', 'Barre más rápido y quema más', 'Haz más ancho y +40% de daño'], pair: 'lente', evo: 'solar' },
   canon:    { name: 'Cañones', ico: 'i_canon', desc: 'Los cañones del puerto lanzan balas explosivas.', lv: ['1 bala explosiva', '2 balas y más daño', '3 balas más rápidas'], pair: 'polvora', evo: 'bombarda' },
   tormenta: { name: 'Tormenta', ico: 'i_tormenta', desc: 'Rayos caen cerca de la luna y saltan entre enemigos.', lv: ['Un rayo cada 2,4 s', 'Más frecuente y salta a 1 enemigo', 'Salta a 3 enemigos y más daño'], pair: 'caracola', evo: 'poseidon' },
+  ancla:    { name: 'Ancla', ico: 'i_ancla', desc: 'Un ancla cuelga de la luna y golpea todo lo que toca al balancearse.', lv: ['Un ancla que golpea y empuja', 'Más grande y pega más fuerte', 'Dos anclas en sentidos opuestos'], pair: 'cadena', evo: 'abisal' },
+  medusa:   { name: 'Medusas', ico: 'i_medusa', desc: 'Siembra medusas eléctricas bajo la luna que pican a quien pasa.', lv: ['Una medusa cada 4 s', 'Pican más fuerte y más veces', 'Dos medusas a la vez'], pair: 'veneno', evo: 'plaga' },
 };
 const PASSIVES = {
   espejo:   { name: 'Espejo de plata', ico: 'i_espejo', desc: '+16% de daño' },
@@ -559,6 +644,9 @@ const PASSIVES = {
   lente:    { name: 'Lente de cristal', ico: 'i_lente', desc: '-11% de tiempo de recarga' },
   polvora:  { name: 'Pólvora negra', ico: 'i_polvora', desc: '+16% de explosión y +1 proyectil en los niveles 2 y 3' },
   caracola: { name: 'Caracola de trueno', ico: 'i_caracola', desc: '+20% de experiencia' },
+  cadena:   { name: 'Cadena de hierro', ico: 'i_cadena', desc: '+30% de empuje: los golpes alejan a los enemigos de la isla' },
+  veneno:   { name: 'Tinta venenosa', ico: 'i_veneno', desc: 'Los golpes envenenan y quitan vida durante 3 s' },
+  nacar:    { name: 'Corazón de nácar', ico: 'i_nacar', desc: '+15% de vida de la isla, -6% de daño recibido y +0,5 de vida por segundo' },
 };
 const EVOS = {
   estrellas: { name: 'Lluvia de estrellas', ico: 'i_estrellas', desc: 'Estrellas fugaces explosivas sin descanso.' },
@@ -569,6 +657,8 @@ const EVOS = {
   solar:     { name: 'Faro solar', ico: 'i_solar', desc: 'Dos haces abrasadores barren ambos lados sin parar.' },
   bombarda:  { name: 'Bombarda', ico: 'i_bombarda', desc: 'Andanadas de seis balas con explosiones enormes.' },
   poseidon:  { name: 'Ira de Poseidón', ico: 'i_poseidon', desc: 'Una tormenta continua que electrocuta a toda la flota.' },
+  abisal:    { name: 'Ancla abisal', ico: 'i_abisal', desc: 'Un ancla gigante barre el mar y se estrella con ondas de choque.' },
+  plaga:     { name: 'Plaga de medusas', ico: 'i_plaga', desc: 'Un enjambre de medusas cuyas picaduras saltan entre enemigos.' },
 };
 // two weapons at level 3 merge into one union weapon (frees a slot)
 const UNIONS = {
@@ -576,6 +666,10 @@ const UNIONS = {
   prisma:     { a: 'escarcha', b: 'faro', name: 'Prisma helado', ico: 'i_prisma', desc: 'El faro se divide en tres haces que congelan.' },
   truenos:    { a: 'canon', b: 'tormenta', name: 'Bombas de trueno', ico: 'i_truenos', desc: 'Andanadas cuyas explosiones sueltan cadenas de rayos.' },
   estelar:    { a: 'rayo', b: 'coral', name: 'Arrecife estelar', ico: 'i_estelar', desc: 'Rayos lunares que estallan en púas de coral.' },
+  galvana:    { a: 'ancla', b: 'medusa', name: 'Ancla galvánica', ico: 'i_galvana', desc: 'Un ancla electrificada que suelta rayos al golpear y deja medusas.' },
+  tempestad:  { a: 'medusa', b: 'tormenta', name: 'Medusas de tormenta', ico: 'i_tempestad', desc: 'Medusas enormes cuyas picaduras desatan cadenas de rayos.' },
+  encadenadas:{ a: 'canon', b: 'ancla', name: 'Balas encadenadas', ico: 'i_encadenadas', desc: 'Los cañones disparan balas unidas por cadenas que atraviesan la flota.' },
+  torbellino: { a: 'remolino', b: 'escarcha', name: 'Torbellino helado', ico: 'i_torbellino', desc: 'Remolinos de hielo en los dos arrecifes que frenan y congelan.' },
 };
 const MOONS = [
   { id: 'llena', name: 'Luna llena', color: '#f4ecd0', cost: 0, weapon: 'rayo', active: 'Tsunami', ico: 'i_tsunami', activeDesc: 'Una ola gigante barre los dos lados y empuja a todos lejos.', perk: 'Equilibrada.' },
@@ -583,15 +677,15 @@ const MOONS = [
   { id: 'hielo', name: 'Luna de hielo', color: '#9fe3ff', cost: 800, weapon: 'escarcha', active: 'Ventisca', ico: 'i_ventisca', activeDesc: 'Congela a todos los enemigos durante 4 s.', perk: '+30% de duración de frenado, pero -10% de daño.' },
   { id: 'nueva', name: 'Luna nueva', color: '#b49cff', cost: 1400, weapon: 'tiburon', active: 'Eclipse', ico: 'i_eclipse', activeDesc: '6 s en los que la isla es invulnerable y los enemigos reciben +60% de daño.', perk: '+20% de experiencia, pero la habilidad carga un 15% más lento.' },
   { id: 'tormenta', name: 'Luna de tormenta', color: '#8fa8d8', cost: 2200, weapon: 'tormenta', active: 'Diluvio', ico: 'i_diluvio', activeDesc: '6 s de rayos cayendo por todo el mar.', perk: 'Lleva 6 armas en vez de 5, pero -20% de experiencia.' },
-  { id: 'dorada', name: 'Luna dorada', color: '#ffd36b', cost: 3000, weapon: 'faro', active: 'Fiebre del oro', ico: 'i_tesoro', activeDesc: '7 s en los que cada enemigo hundido suelta una moneda y el imán cubre todo el mar.', perk: '+50% de monedas, pero -30% de vida de la isla.' },
+  { id: 'dorada', name: 'Luna dorada', color: '#ffd36b', cost: 3000, weapon: 'faro', active: 'Fiebre del oro', ico: 'i_tesoro', activeDesc: '7 s en los que cada enemigo hundido suelta una perla y el imán cubre todo el mar.', perk: '+50% de perlas y de monedas, pero -30% de vida de la isla.' },
 ];
-// permanent workshop upgrades bought with coins
+// permanent workshop upgrades bought with coins (earned at the end of each run)
 const META = [
   { id: 'muralla', name: 'Murallas', ico: 'i_murallas', desc: '+12 de vida máxima de la isla', base: 30, max: 10 },
   { id: 'poder', name: 'Poder lunar', ico: 'i_poder', desc: '+5% de daño', base: 40, max: 10 },
   { id: 'roca', name: 'Roca dura', ico: 'i_roca', desc: '+12% de daño del arrecife y de la marea', base: 30, max: 10 },
-  { id: 'iman', name: 'Imán lunar', ico: 'i_iman', desc: '+20% de alcance para recoger monedas', base: 25, max: 5 },
-  { id: 'codicia', name: 'Codicia', ico: 'i_codicia', desc: '+10% de probabilidad de que caigan monedas', base: 40, max: 10 },
+  { id: 'iman', name: 'Imán lunar', ico: 'i_iman', desc: '+20% de alcance para recoger perlas', base: 25, max: 5 },
+  { id: 'codicia', name: 'Codicia', ico: 'i_codicia', desc: '+10% de perlas en la partida y de monedas al terminar', base: 40, max: 10 },
   { id: 'sabio', name: 'Sabiduría', ico: 'i_sabio', desc: '+5% de experiencia', base: 35, max: 10 },
   { id: 'coraza', name: 'Coraza de nácar', ico: 'i_coraza', desc: '-4% de daño recibido', base: 60, max: 5 },
   { id: 'vigor', name: 'Manantial', ico: 'i_manantial', desc: 'La isla recupera 0,25 de vida por segundo', base: 50, max: 5 },
@@ -631,29 +725,69 @@ const ACH = [
   { id: 'reef4', name: 'Arrecife legendario', desc: 'Compra el Géiser volcánico.', goal: 4, stat: 'reef', reward: 300 },
   { id: 'moons', name: 'Todas las fases', desc: 'Desbloquea las 6 lunas.', goal: 6, stat: 'moonsOwned', reward: 300 },
 ];
-// daily missions: three a day from this pool, progress adds up across that day's runs
+// daily missions: four a day from this pool, progress adds up across that day's runs
 const MISSIONS = [
   { id: 'galleon', txt: n => `Hunde ${n} galeones`, goals: [15, 25, 40], reward: 70 },
   { id: 'sloop', txt: n => `Hunde ${n} balandras`, goals: [60, 100, 160], reward: 60 },
   { id: 'pirate', txt: n => `Ahoga a ${n} piratas`, goals: [60, 100, 150], reward: 60 },
   { id: 'gull', txt: n => `Derriba ${n} gaviotas`, goals: [25, 45, 70], reward: 60 },
-  { id: 'coins', txt: n => `Recoge ${n} monedas`, goals: [60, 120, 200], reward: 80 },
+  { id: 'coins', txt: n => `Recoge ${n} perlas`, goals: [60, 120, 200], reward: 80 },
   { id: 'wave', txt: n => `Llega a la oleada ${n}`, goals: [8, 12, 16], reward: 90 },
   { id: 'boss', txt: n => `Derrota ${n === 1 ? 'a un jefe' : `a ${n} jefes`}`, goals: [1, 1, 2], reward: 120 },
   { id: 'gold', txt: n => `Hunde ${n === 1 ? 'un barco del tesoro' : `${n} barcos del tesoro`}`, goals: [1, 1, 2], reward: 100 },
   { id: 'combo', txt: n => `Haz una racha de ${n}`, goals: [50, 80, 120], reward: 80 },
   { id: 'chest', txt: n => `Abre ${n} cofres`, goals: [2, 3, 5], reward: 80 },
+  { id: 'brulote', txt: n => `Hunde ${n} brulotes`, goals: [6, 10, 16], reward: 80 },
+  { id: 'intercept', txt: n => `Detén ${n} balas con la luna`, goals: [3, 6, 10], reward: 90 },
+  { id: 'elite', txt: n => `Hunde ${n} enemigos de élite`, goals: [4, 8, 12], reward: 80 },
+  { id: 'trait', txt: n => `Hunde ${n} enemigos con rasgo`, goals: [30, 60, 100], reward: 80 },
+  { id: 'freeze', txt: n => `Congela a ${n} enemigos`, goals: [30, 60, 100], reward: 70 },
+  { id: 'active', txt: n => `Usa la habilidad de la luna ${n} veces`, goals: [4, 7, 10], reward: 70 },
+  { id: 'merchant', txt: n => `Compra ${n} cosas al mercader`, goals: [2, 4, 6], reward: 70 },
+  { id: 'shield', txt: n => `Rompe ${n === 1 ? 'el escudo de un jefe' : `${n} escudos de jefe`}`, goals: [1, 2, 3], reward: 110 },
+  { id: 'nohit', txt: n => `Supera ${n} oleadas sin recibir daño`, goals: [3, 5, 8], reward: 90 },
+  { id: 'crab', txt: n => `Ahoga a ${n} cangrejos`, goals: [15, 25, 40], reward: 60 },
+  { id: 'serpent', txt: n => `Hunde ${n} serpientes`, goals: [10, 20, 30], reward: 60 },
+  { id: 'mortar', txt: n => `Hunde ${n} morteros`, goals: [10, 18, 28], reward: 70 },
+  { id: 'endless', txt: n => `Llega a la oleada ${n} en Marea sin fin`, goals: [15, 22, 30], reward: 120, needs: 'endless' },
+];
+// weekly missions: three a week, bigger goals and bigger rewards
+const WEEKLY = [
+  { id: 'kill', txt: n => `Hunde ${n.toLocaleString('es')} enemigos`, goals: [1500, 2500, 4000], reward: 400 },
+  { id: 'boss', txt: n => `Derrota a ${n} jefes`, goals: [4, 6, 8], reward: 450 },
+  { id: 'brulote', txt: n => `Hunde ${n} brulotes`, goals: [40, 70, 100], reward: 350 },
+  { id: 'trait', txt: n => `Hunde ${n} enemigos con rasgo`, goals: [200, 350, 500], reward: 380 },
+  { id: 'shield', txt: n => `Rompe ${n} escudos de jefe`, goals: [4, 7, 10], reward: 420 },
+  { id: 'intercept', txt: n => `Detén ${n} balas con la luna`, goals: [20, 35, 50], reward: 380 },
+  { id: 'clear', txt: n => `Supera ${n === 1 ? 'una isla' : `${n} islas`}`, goals: [1, 2, 3], reward: 500 },
+  { id: 'gold', txt: n => `Hunde ${n} barcos del tesoro`, goals: [5, 8, 12], reward: 400 },
+  { id: 'coins', txt: n => `Recoge ${n.toLocaleString('es')} perlas`, goals: [800, 1400, 2200], reward: 380 },
+  { id: 'daily', txt: n => `Juega ${n} retos diarios`, goals: [2, 3, 5], reward: 400 },
+  { id: 'endless', txt: n => `Llega a la oleada ${n} en Marea sin fin`, goals: [25, 30, 40], reward: 500, needs: 'endless' },
+  { id: 'ghost', txt: n => `Haz retroceder ${n} veces al Holandés Errante`, goals: [2, 4, 6], reward: 600, needs: 'ghost' },
 ];
 // merchant offers: run-only boosts paid from the coin purse
+// the merchant sells with pearls, the currency collected during the run
 const WARES = [
-  { id: 'heal', name: 'Reparar la isla', ico: 'i_vida', desc: 'Recupera toda la vida.', cost: 40 },
-  { id: 'wup', name: 'Forja', ico: 'i_arsenal', desc: 'Sube de nivel un arma al azar.', cost: 60 },
-  { id: 'wnew', name: 'Arma de contrabando', ico: 'i_canon', desc: 'Un arma nueva al azar.', cost: 70 },
-  { id: 'pnew', name: 'Reliquia', ico: 'i_caracola', desc: 'Una pasiva nueva o sube una que ya tengas.', cost: 55 },
-  { id: 'dmg', name: 'Pólvora fina', ico: 'i_polvora', desc: '+20% de daño durante esta partida.', cost: 90 },
-  { id: 'maxhp', name: 'Empalizada', ico: 'i_murallas', desc: '+30% de vida máxima durante esta partida.', cost: 80 },
-  { id: 'revive', name: 'Amuleto', ico: 'i_vida', desc: 'Un revivir extra en esta partida.', cost: 120 },
-  { id: 'magnet', name: 'Imán gigante', ico: 'i_iman', desc: 'El doble de alcance para recoger monedas.', cost: 45 },
+  { id: 'heal', name: 'Reparar la isla', ico: 'i_vida', desc: 'Recupera toda la vida.', cost: 20 },
+  { id: 'wup', name: 'Forja', ico: 'i_arsenal', desc: 'Sube de nivel un arma al azar.', cost: 30 },
+  { id: 'wnew', name: 'Arma de contrabando', ico: 'i_canon', desc: 'Un arma nueva al azar.', cost: 35 },
+  { id: 'pnew', name: 'Reliquia', ico: 'i_caracola', desc: 'Una pasiva nueva o sube una que ya tengas.', cost: 30 },
+  { id: 'dmg', name: 'Pólvora fina', ico: 'i_polvora', desc: '+20% de daño durante esta partida.', cost: 45 },
+  { id: 'maxhp', name: 'Empalizada', ico: 'i_murallas', desc: '+30% de vida máxima durante esta partida.', cost: 40 },
+  { id: 'revive', name: 'Amuleto', ico: 'i_vida', desc: 'Un revivir extra en esta partida.', cost: 60 },
+  { id: 'magnet', name: 'Imán gigante', ico: 'i_iman', desc: 'El doble de alcance para recoger perlas.', cost: 20 },
+  { id: 'card', name: 'Carta del destino', ico: 'i_baraja', desc: 'Subes un nivel en cuanto zarpe el barco.', cost: 35 },
+  { id: 'reroll', name: 'Baraja marcada', ico: 'i_baraja', desc: '+2 cambios de cartas.', cost: 15 },
+  { id: 'charge', name: 'Marea llena', ico: 'i_motor', desc: 'La habilidad de la luna queda cargada.', cost: 20 },
+  { id: 'reef', name: 'Roca afilada', ico: 'i_roca', desc: '+30% de daño del arrecife y de la marea.', cost: 35 },
+  { id: 'crit', name: 'Diente de tiburón', ico: 'i_critico', desc: '+8% de probabilidad de crítico.', cost: 30 },
+  { id: 'cd', name: 'Engranajes de nácar', ico: 'i_lente', desc: '-10% de tiempo de recarga de las armas.', cost: 40 },
+  { id: 'xp', name: 'Pergamino antiguo', ico: 'i_sabio', desc: '+25% de experiencia.', cost: 30 },
+  { id: 'coins', name: 'Cambista', ico: 'i_codicia', desc: 'Cambia estas perlas por monedas del taller: te da un 60% más al terminar.', cost: 25 },
+  { id: 'chest', name: 'Cofre sellado', ico: 'i_regalo', desc: 'Ábrelo ya: sube un arma o una pasiva.', cost: 30 },
+  { id: 'armor', name: 'Escudo de concha', ico: 'i_coraza', desc: '-15% de daño recibido.', cost: 40 },
+  { id: 'regen', name: 'Fuente de agua dulce', ico: 'i_manantial', desc: 'La isla recupera 1 de vida por segundo.', cost: 35 },
 ];
 const DAILY_MODS = [
   { id: 'enjambre', name: 'Enjambre', desc: 'Casi el doble de enemigos, pero más débiles.', apply: m => { m.spawn = 1.8; m.hp = 0.55; } },
@@ -662,7 +796,7 @@ const DAILY_MODS = [
   { id: 'acorazados', name: 'Acorazados', desc: 'Solo galeones, morteros y cangrejos.', apply: m => { m.heavy = true; } },
   { id: 'dormida', name: 'Luna dormida', desc: 'Sin habilidad de luna, pero +50% de experiencia.', apply: m => { m.noActive = true; m.xp = 1.5; } },
   { id: 'temporal', name: 'Temporal', desc: 'La marea cambia a sacudidas imprevisibles.', apply: m => { m.storm = true; } },
-  { id: 'tesoro', name: 'Tesoro hundido', desc: 'Caen el doble de monedas.', apply: m => { m.coins = 2; } },
+  { id: 'tesoro', name: 'Tesoro hundido', desc: 'Caen el doble de perlas y ganas el doble de monedas.', apply: m => { m.coins = 2; } },
   { id: 'viento', name: 'Viento a favor', desc: 'Los enemigos van un 30% más rápido.', apply: m => { m.spd = 1.3; } },
 ];
 const COMBO_TXT = [[10, '¡Racha!'], [25, '¡Brutal!'], [50, '¡Masacre!'], [100, '¡Imparable!'], [200, '¡Dios del mar!'], [300, '¡Cataclismo!'], [500, '¡Leyenda!']];
@@ -672,7 +806,9 @@ const COMBO_TXT = [[10, '¡Racha!'], [25, '¡Brutal!'], [50, '¡Masacre!'], [100
 // =====================================================================
 const DEF_SAVE = { coins: 0, meta: {}, reef: 0, moons: ['llena'], moon: 'llena', isl: {}, endlessBest: 0,
   stats: { kills: 0, bosses: 0, evos: [], unions: [], golds: 0, maxCombo: 0, dailies: 0, dangerBest: 0 }, ach: {}, daily: { date: '', best: 0, played: false },
-  missions: { date: '', list: [] }, music: true, sfx: true, vib: true, tips: {}, intro: false };
+  missions: { date: '', list: [] }, weekly: { week: '', list: [] }, music: true, sfx: true, vib: true, tips: {}, intro: false, reefOff: [] };
+// reef designs bought and left switched on in the workshop (tier 0, plain rock, is always there)
+const reefActive = () => { const out = []; for (let t = 1; t <= (save.reef || 0); t++) if (!(save.reefOff || []).includes(t)) out.push(t); return out; };
 let save = JSON.parse(JSON.stringify(DEF_SAVE));
 function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') a[k] = deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
 try {
@@ -693,6 +829,8 @@ if (window.claude?.hot?.data?.save) save = deepMerge(save, window.claude.hot.dat
 window.claude?.hot?.snapshot?.(() => ({ save }));
 const persist = () => { try { localStorage.setItem('luna-v4', JSON.stringify(save)); } catch (e) {} };
 const metaLv = id => save.meta[id] || 0;
+// monday of this week, as the key the weekly missions change on
+const weekKey = () => { const d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 
 // =====================================================================
@@ -837,6 +975,7 @@ function sfx(name, arg) {
     case 'evo': [784, 988, 1175, 1568, 1976].forEach((f, i) => osc(f, 0.4, 'sine', 0.12, null, null, AU.ctx.currentTime + i * 0.07)); break;
     case 'tsunami': noise(1.4, 0.8, 'lowpass', 200, 3000); osc(55, 1.2, 'sine', 0.5, 30); break;
     case 'roar': osc(70, 1.4, 'sawtooth', 0.25, 45); noise(1.2, 0.3, 'lowpass', 500, 100); break;
+    case 'warn': if (gate(name, 300)) { osc(740, 0.1, 'square', 0.05, 560); osc(740, 0.12, 'square', 0.05, 560, null, null, AU.ctx.currentTime + 0.15); } break;
     case 'freeze': osc(2400, 0.5, 'sine', 0.08, 600); noise(0.5, 0.15, 'highpass', 5000); break;
     case 'combo': [660, 880, 1320].forEach((f, i) => osc(f, 0.18, 'square', 0.05, null, null, AU.ctx.currentTime + i * 0.05)); break;
     case 'coin': if (gate(name, 60)) { osc(1568, 0.08, 'square', 0.04); osc(2093, 0.12, 'square', 0.04, null, null, AU.ctx.currentTime + 0.06); } break;
@@ -902,16 +1041,17 @@ function newRun(runMode, islIdx) {
     mode: runMode, islIdx: runMode === 'island' ? islIdx : 0, isl, palIdx: runMode === 'island' ? islIdx : 0, moon, mods, dailyList: dm, danger,
     t: 0, dmgBy: {}, wave: 1, waveT: 0, bossSpawned: false, bossClearT: 0, spawnAcc: 0,
     enemies: [], dying: [], proj: [], fx: [], parts: [], nums: [], ents: [], threat: [], seaT: [], coins: [], chests: [],
-    mx: W * 0.3, my: (B.y0 + B.y1) / 2, pull: 0.2, tideP: -Math.PI / 2, level: TIDE_LO, tideDir: 1, moonLock: 0, face: 'calm', faceT: 0,
+    mx: W * 0.3, my: (B.y0 + B.y1) / 2, pull: 0.2, tideP: -Math.PI / 2, level: TIDE_LO, tideDir: 1, moonLock: 0, moonSlow: 0, moonSlowK: 'ink', night: 0, face: 'calm', faceT: 0,
     hp: maxHp, maxHp, regen: 0.25 * metaLv('vigor'), hurtAcc: 0, hurtT: 0, hurtFace: 0,
     xp: 0, lv: 1, need: xpNeed(1), weapons: [], passives: {}, slots: moon.id === 'tormenta' ? 6 : 5,
     charge: 0, chargeMul: (1 + 0.1 * metaLv('motor')) * (moon.id === 'nueva' ? 0.85 : 1) * (mods.noActive ? 0 : 1), furia: 0, eclipse: 0, diluvio: 0, fiebre: 0,
     kills: 0, killsBy: {}, bossKills: 0, golds: 0, chestsOpened: 0, combo: 0, comboT: 0, maxCombo: 0, comboShown: 0,
-    coinsRun: 0, coinMul: (1 + (moon.id === 'dorada' ? 0.5 : 0)) * (mods.coins || 1),
+    pearls: 0, pearlsGot: 0, coinMul: (1 + (moon.id === 'dorada' ? 0.5 : 0)) * (mods.coins || 1),
     hitstop: 0, slowmo: 0, shake: 0, flash: 0, boss: null, revives: 1, ended: false,
     rerolls: metaLv('suerte'), frozenSea: 0, hazardT: rand(18, 24), iceWarned: false, lavaT: 2,
-    reefT: save.reef || 0, reefCd: { zap: 1.5, clam: 2.5, vent: 3.5 },
+    reefOn: reefActive(), reefT: Math.max(0, ...reefActive()), reefCd: { zap: 1.5, clam: 2.5, vent: 3.5 },
     seen: {}, faroBeams: [], coralWall: false, spdMul: (mods.spd || 1) * isl.spd, runDmg: 1, magnetMul: 1, merchantDone: false,
+    warn: [], theme: null, ghostT: null, waveHurt: 0, bonusCoins: 0, intro: 0, bought: 0, runCd: 1, runCrit: 0, runXp: 1, runReef: 1, runTaken: 1, intercepts: 0,
   };
   addWeapon(moon.weapon);
   if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
@@ -922,21 +1062,23 @@ const xpNeed = lv => Math.round(7 + lv * 6 + lv * lv * 0.8);
 const scaleW = () => 1 + 0.08 * (S.wave - 1);
 // tide and reef damage keep pace with tougher islands so the sea stays a weapon
 const tideW = () => (1 + 0.1 * (S.wave - 1) + 0.003 * (S.wave - 1) ** 2) * (1 + (S.isl.hp - 1) * 0.6) * (1 + 0.15 * S.danger);
-function hpMul() { const w1 = S.wave - 1; let m = (1 + 0.15 * w1 + 0.02 * w1 * w1) * S.isl.hp * (S.mods.hp || 1) * (1 + 0.25 * S.danger); if (S.mode !== 'island') m *= Math.pow(1.045, Math.max(0, S.wave - 15)) * (1 + Math.floor((S.wave - 1) / 10) * 0.35); return m; }
+function hpMul() { const w1 = S.wave - 1; let m = (1 + 0.18 * w1 + 0.026 * w1 * w1) * S.isl.hp * (S.mods.hp || 1) * (1 + 0.25 * S.danger); if (S.mode !== 'island') m *= Math.pow(1.045, Math.max(0, S.wave - 15)) * (1 + Math.floor((S.wave - 1) / 10) * 0.35); return m; }
 
 function recompute() {
   const p = S.passives, lv = id => p[id] || 0, moon = S.moon.id;
   S.st = {
     dmg: (1 + 0.16 * lv('espejo')) * (1 + 0.05 * metaLv('poder')) * ({ roja: 1.2, hielo: 0.9 }[moon] || 1) * (S.mods.dmg || 1) * S.runDmg,
     area: 1 + 0.2 * lv('marea'),
-    reef: (1 + 0.45 * lv('arrecife')) * (1 + 0.12 * metaLv('roca')),
-    crit: 0.05 + 0.09 * lv('sangre') + 0.03 * metaLv('critico'),
+    reef: (1 + 0.45 * lv('arrecife')) * (1 + 0.12 * metaLv('roca')) * S.runReef,
+    crit: 0.05 + 0.09 * lv('sangre') + 0.03 * metaLv('critico') + S.runCrit,
     cc: (1 + 0.25 * lv('hielo')) * (moon === 'hielo' ? 1.3 : 1),
-    cd: 1 - 0.11 * lv('lente'),
+    cd: (1 - 0.11 * lv('lente')) * S.runCd,
     proj: lv('polvora') >= 2 ? lv('polvora') - 1 : 0,
     boom: 1 + 0.16 * lv('polvora'),
-    xp: (1 + 0.2 * lv('caracola')) * (1 + 0.05 * metaLv('sabio')) * ({ nueva: 1.2, tormenta: 0.8 }[moon] || 1) * (S.mods.xp || 1),
-    taken: 1 - 0.04 * metaLv('coraza'),
+    xp: (1 + 0.2 * lv('caracola')) * (1 + 0.05 * metaLv('sabio')) * ({ nueva: 1.2, tormenta: 0.8 }[moon] || 1) * (S.mods.xp || 1) * S.runXp,
+    taken: (1 - 0.04 * metaLv('coraza')) * S.runTaken * (1 - 0.06 * lv('nacar')),
+    kb: 1 + 0.3 * lv('cadena'),
+    poison: 0.07 * lv('veneno'),
     magnet: 42 * (1 + 0.2 * metaLv('iman')) * S.magnetMul,
   };
 }
@@ -949,6 +1091,7 @@ let dragId = null, dragX = 0, dragY = 0;
 const DRAG_GAIN = 1.25;
 function moveMoon(dx, dy) {
   if (!S || S.moonLock > 0) return;
+  if (S.moonSlow > 0) { dx *= 0.4; dy *= 0.4; }   // inked or frozen by a boss
   const B = moonBounds();
   S.mx = clamp(S.mx + dx, B.x0, B.x1); S.my = clamp(S.my + dy, B.y0, B.y1);
 }
@@ -984,29 +1127,58 @@ function keyMove(dt) {
 // =====================================================================
 // SPAWNING / WAVES
 // =====================================================================
+// chance that a new enemy brings a trait: none before wave 6, then more and more (endless keeps climbing)
+const traitP = () => clamp((S.wave - 5) * 0.025, 0, S.mode === 'island' ? 0.45 : 0.7) + (S.wave >= 6 ? 0.04 * S.danger : 0);
+function addTrait(e, id) {
+  if (!e.tr) e.tr = {};
+  if (e.tr[id]) return;
+  e.tr[id] = 1;
+  if (id === 'veloz') e.spd *= 1.6;
+  else if (id === 'igneo') { e.hp *= 1.2; e.maxHp = e.hp; e.dpsK *= 1.3; }
+  else if (id === 'gigante') { e.hp *= 2.4; e.maxHp = e.hp; e.r *= 1.35; e.spd *= 0.85; e.dpsK *= 1.8; e.xpK *= 3; }
+  else if (id === 'espectral') e.phaseT = rand(1, 3);
+  tip('tr_' + id, `Rasgo: ${TRAITS[id].name}`, TRAITS[id].tip);
+}
 function spawnEnemy(type, side, k = 0, x0) {
   const def = EN[type], dir = side < 0 ? 1 : -1;
   const x = x0 !== undefined ? x0 : (side < 0 ? -30 * u - k * 16 * u - rand(0, 30) * u : W + 30 * u + k * 16 * u + rand(0, 30) * u);
   const hp = def.hp * hpMul();
   const e = { type, def, dir, x, y: levelY(0.5), hp, maxHp: hp, spd: def.spd * rand(0.9, 1.1) * (1 + 0.01 * Math.min(S.wave - 1, 40)), r: def.r, t: 0, wob: rand(0, TAU),
-    flash: 0, slow: 0, slowAmt: 0, frozen: 0, shatter: 0, atIsland: false, dotAcc: 0, dotT: 0, fireT: rand(1, 2), bleed: 0, air: null };
-  if (x0 === undefined && type !== 'gold' && S.wave >= 5 && Math.random() < 0.04 + 0.004 * S.wave + 0.03 * S.danger) { e.elite = true; e.hp *= 3; e.maxHp = e.hp; e.r *= 1.3; e.spd *= 0.9; }
+    flash: 0, slow: 0, slowAmt: 0, frozen: 0, shatter: 0, atIsland: false, dotAcc: 0, dotT: 0, fireT: rand(1, 2), bleed: 0, air: null, dpsK: 1, xpK: 1, shots: 0 };
+  if (def.ghost) { e.life = 42; e.back = 0; e.repels = 0; }
+  else if (x0 === undefined && type !== 'gold' && S.wave >= 5 && Math.random() < 0.04 + 0.004 * S.wave + 0.03 * S.danger) { e.elite = true; e.hp *= 3; e.maxHp = e.hp; e.r *= 1.3; e.spd *= 0.9; }
+  if (type === 'brulote') e.tr = { igneo: 1 };
+  else if (!def.ghost && type !== 'gold') {
+    const pool = Object.keys(TRAITS).filter(id => S.wave >= TRAITS[id].w);
+    if (S.theme && S.theme.tr) addTrait(e, S.theme.tr);
+    else if (pool.length && Math.random() < traitP()) {
+      addTrait(e, pick(pool));
+      if (S.wave >= 14 && Math.random() < traitP() * 0.4) addTrait(e, pick(pool));
+    }
+  }
+  if (e.tr && e.tr.acorazado) e.armor = e.maxHp * 0.45;
   S.enemies.push(e);
   if (!S.seen[type]) { S.seen[type] = 1; tipFor(type); }
-  if (e.elite && !S.seen.eliteTip) { S.seen.eliteTip = 1; tip('elite', '¡Enemigo de élite!', 'Brilla en dorado: aguanta más y suelta monedas y cofres'); }
+  if (e.elite && !S.seen.eliteTip) { S.seen.eliteTip = 1; tip('elite', '¡Enemigo de élite!', 'Brilla en dorado: aguanta más y suelta perlas y cofres'); }
+  if (type === 'brulote') { S.warn.push({ side, t: 0, life: 2.2, c: '#ff8a3d' }); sfx('warn'); }
   return e;
 }
 function spawnGroup() {
-  const w = S.wave, wt = { sloop: 5 };
+  const w = S.wave, wt = { sloop: 5 }, th = S.theme && S.theme.id;
   if (w >= 2) wt.pirate = 4;
   if (w >= 3) wt.gull = 1.8;
   if (w >= 4) wt.galleon = 2 + w * 0.05;
   if (w >= 5) wt.crab = 2;
   if (w >= 6) wt.mortar = 1.4;
+  if (w >= 7) wt.brulote = 0.7 + Math.min(1.3, (w - 7) * 0.08);
   if (w >= 8) wt.serpent = 1.8;
   if (S.mods.heavy) { delete wt.sloop; delete wt.pirate; delete wt.gull; wt.galleon = 4; wt.crab = 3; wt.mortar = 2; }
+  if (th === 'ignea') wt.brulote = (wt.brulote || 1) * 3.5;
+  if (th === 'bombardeo') wt.mortar = (wt.mortar || 1.4) * 3.5;
+  if (th === 'rapida') { wt.sloop *= 1.6; wt.gull = (wt.gull || 1.8) * 2; }
   const type = pickW(wt), side = Math.random() < 0.5 ? -1 : 1;
-  const n = type === 'pirate' ? randi(3, 5) : type === 'gull' ? (w >= 10 ? 3 : 2) : type === 'sloop' ? (Math.random() < 0.4 ? 2 : 1) : 1;
+  let n = type === 'pirate' ? randi(3, 5) : type === 'gull' ? (w >= 10 ? 3 : 2) : type === 'sloop' ? (Math.random() < 0.4 ? 2 : 1) : 1;
+  if (th === 'gigantes') n = Math.max(1, Math.ceil(n / 2));
   for (let i = 0; i < n; i++) spawnEnemy(type, side, i);
 }
 function isBossWave(w) { return S.mode === 'island' ? (w === 10 || w === 20) : (w % 10 === 0); }
@@ -1023,6 +1195,7 @@ function waves(dt) {
     for (let i = 0; i < 6; i++) spawnEnemy('sloop', sd, i * 2);
     for (let i = 0; i < 8; i++) spawnEnemy('pirate', sd, i);
     if (big) { spawnEnemy('galleon', sd, 12); spawnEnemy(S.wave >= 12 ? 'mortar' : 'crab', sd, 14); }
+    if (S.wave >= 11) spawnEnemy('brulote', sd, 16);
     S.horde = null;
   }
   if (S.goldT !== null && S.goldT !== undefined && (S.goldT -= dt) <= 0) {
@@ -1032,114 +1205,313 @@ function waves(dt) {
     banner('¡Barco del tesoro!', 'Húndelo antes de que escape', 1.6);
     sfx('coin'); vib([20, 30, 20]);
   }
-  const endlessRamp = S.mode === 'island' ? 1 : 1 + Math.max(0, S.wave - 15) * 0.03;
-  const rate = (0.6 + 0.2 * Math.min(S.wave, 30)) * (S.mods.spawn || 1) * (bw ? 0.45 : 1) * endlessRamp * (1 + 0.08 * S.danger);
+  if (S.ghostT !== null && S.ghostT !== undefined && (S.ghostT -= dt) <= 0) {
+    S.ghostT = null;
+    const two = S.wave >= 60, sd = Math.random() < 0.5 ? -1 : 1;
+    spawnEnemy('ghost', sd); if (two) spawnEnemy('ghost', -sd);
+    banner('¡El Holandés Errante!', 'Es inmortal: quítale la vida para que retroceda', 2.4, true);
+    sfx('roar'); vib([80, 60, 160]); S.shake = Math.max(S.shake, 0.5);
+  }
+  // past wave 30 the endless modes keep adding enemies instead of levelling off
+  const endlessRamp = S.mode === 'island' ? 1 : 1 + Math.max(0, S.wave - 15) * 0.03 + Math.max(0, S.wave - 30) * 0.03;
+  const rate = (0.6 + 0.2 * Math.min(S.wave, 30)) * (S.mods.spawn || 1) * (bw ? 0.45 : 1) * endlessRamp * (1 + 0.08 * S.danger) * (S.theme && S.theme.id === 'gigantes' ? 0.75 : 1);
   if (S.enemies.length < 170) { S.spawnAcc += rate * dt; while (S.spawnAcc >= 1) { S.spawnAcc -= 1; spawnGroup(); } }
+}
+function pickTheme() {
+  const w = S.wave;
+  if (isBossWave(w) || w < 6 || S.mods.heavy) return null;
+  // one wave in three on average (a little more often later), never two in a row
+  if (S.theme || Math.random() > 0.3 + Math.min(0.2, (w - 6) * 0.01)) return null;
+  const pool = THEMES.filter(t => w >= t.w);
+  return pool.length ? pick(pool) : null;
 }
 function nextWave() {
   if (S.mode === 'island' && S.wave >= 20) { victory(); return; }
   S.wave++; S.waveT = 0; S.bossSpawned = false; S.bossClearT = 0; S.boss = null;
   for (const c of S.coins) c.home = true;
   for (const c of S.chests) c.home = true;
+  if (S.waveHurt === 0 && S.wave > 2) missionProgress('nohit', 1);
+  S.waveHurt = 0;
+  S.theme = pickTheme();
   S.horde = (!isBossWave(S.wave) && S.wave >= 4 && (S.wave % 5 === 3 || Math.random() < 0.22)) ? { t: rand(4, 9), side: Math.random() < 0.5 ? -1 : 1 } : null;
   S.goldT = (!isBossWave(S.wave) && S.wave >= 3 && Math.random() < 0.2) ? rand(3, 10) : null;
+  // endless: the Flying Dutchman haunts wave 25, 35, 45... and later almost any wave
+  const gw = S.mode === 'endless' && !isBossWave(S.wave) && S.wave >= 25 && (S.wave % 10 === 5 || (S.wave >= 50 && Math.random() < 0.35));
+  S.ghostT = gw ? rand(2, 5) : null;
   if (S.mode !== 'island') S.palIdx = Math.floor((S.wave - 1) / 10) % 4;
   if (isBossWave(S.wave)) banner('¡Se acerca un jefe!', '', 1.8, true);
+  else if (S.theme) { banner(S.theme.name, `Oleada ${S.wave} · ${S.theme.sub}`, 2, true); sfx('warn'); }
   else if (S.wave % 5 === 1 || S.wave <= 3) banner(`Oleada ${S.wave}`, S.mode === 'island' ? S.isl.name : '', 1.4);
   MUS.intensity = Math.min(3, Math.floor(S.wave / 4));
   missionProgress('wave', S.wave, true);
-  // the merchant docks after each boss
-  if (S.wave % 10 === 1 && S.wave > 1) S.merchantDue = 1.2;
+  if (S.mode === 'endless') missionProgress('endless', S.wave, true);
+  // the merchant docks every 5 waves (after waves 5, 10 and 15 on an island)
+  if (S.wave % 5 === 1 && S.wave > 1) S.merchantDue = 1.2;
 }
-
 // =====================================================================
-// BOSSES
+// BOSSES: they come in from one side of the sea (the eclipse flies in), then cycle
+// through their own abilities; each one is announced under the health bar before it lands
 // =====================================================================
 function bossType() {
   if (S.mode === 'island') return S.wave === 10 ? S.isl.mini : S.isl.boss;
   return ['kraken', 'armada', 'leviatan', 'eclipse'][(S.wave / 10 - 1) % 4];
 }
+// cast = seconds of warning before the ability fires
+const BOSS_AB = {
+  kraken: [
+    { id: 'latigazo', name: 'Latigazo', tip: 'Levanta un tentáculo y golpea la isla', cast: 1.1 },
+    { id: 'tinta', name: 'Chorro de tinta', tip: 'Apunta a la luna: apártala o irá lenta 3 s', cast: 0.9 },
+    { id: 'crias', name: 'Crías', tip: 'Suelta tres serpientes marinas', cast: 0.8 },
+    { id: 'abrazo', name: 'Abrazo', tip: 'Estruja la isla: hazle mucho daño para que la suelte', cast: 1.0 },
+  ],
+  armada: [
+    { id: 'andanada', name: 'Andanada', tip: 'Cinco cañonazos contra la isla', cast: 1.0 },
+    { id: 'refuerzos', name: 'Refuerzos', tip: 'Llama a más barcos piratas', cast: 0.8 },
+    { id: 'abordaje', name: 'Abordaje', tip: 'Embiste la isla a toda vela', cast: 1.0 },
+  ],
+  leviatan: [
+    { id: 'embestida', name: 'Embestida', tip: 'Sale a la superficie y carga contra la isla', cast: 0.9 },
+    { id: 'hielo', name: 'Aliento helado', tip: 'Escupe hielo a la luna: si la toca, irá lenta', cast: 0.9 },
+    { id: 'ola', name: 'Coletazo', tip: 'Levanta una ola que rompe contra la isla', cast: 1.0 },
+  ],
+  eclipse: [
+    { id: 'lluvia', name: 'Lluvia de sombras', tip: 'Una ráfaga de orbes contra la isla', cast: 1.0 },
+    { id: 'rayo', name: 'Rayo oscuro', tip: 'Persigue a la luna: si la alcanza, la paraliza', cast: 1.4 },
+    { id: 'cadenas', name: 'Cadenas', tip: 'Atrapa a la luna 3 s y llama gaviotas', cast: 1.0 },
+    { id: 'noche', name: 'Noche total', tip: 'Apaga el mar: solo se ve cerca de la luna', cast: 0.8 },
+  ],
+};
+const BOSS_CD = { kraken: 2.6, armada: 3.4, leviatan: 1.6, eclipse: 2.4 };
+const BOSS_INTRO = {
+  kraken: 'Se acerca nadando: esquiva su tinta con la luna',
+  armada: 'Llega a toda vela con su flota',
+  leviatan: 'Solo es vulnerable cuando sale a la superficie',
+  eclipse: 'Es inmune en lo alto: atácalo cuando se ponga en el mar',
+};
+const magmaBoss = b => b.name === 'Kraken de magma';
+const bossAbName = (b, ab) => ab.id === 'tinta' && magmaBoss(b) ? 'Escupitajo de lava' : ab.name;
+// where each boss settles: a fair distance from the island, never off screen
+function bossPost(b, f) { const I = ISL(); return b.side < 0 ? Math.max(W * f, I.l - 200 * u) : Math.min(W * (1 - f), I.r + 200 * u); }
 function spawnBoss() {
   const type = bossType(), def = BOSS[type], side = Math.random() < 0.5 ? -1 : 1;
-  const hp = def.hp * S.isl.hp * (1 + 0.05 * S.wave) * (S.mods.hp || 1) * (S.mode === 'island' && S.wave === 10 ? 0.6 : 1) * (S.mode !== 'island' ? (1 + Math.floor((S.wave - 1) / 10) * 0.6) : 1);
+  const mini = S.mode === 'island' && S.wave === 10;
+  const hp = def.hp * S.isl.hp * (1 + 0.07 * S.wave) * (S.mods.hp || 1) * (mini ? 0.6 : 1) * (S.mode !== 'island' ? (1 + Math.floor((S.wave - 1) / 10) * 0.6) : 1);
   const name = (S.mode === 'island' && type === S.isl.boss && S.isl.bossName) || def.name;
+  const off = side < 0 ? -150 * u : W + 150 * u;
   const b = { isBoss: true, type, name, def, hp, maxHp: hp, r: def.r, side, dir: side < 0 ? 1 : -1, t: 0, flash: 0, dotAcc: 0, dotT: 0, frozen: 0,
-    sea: type !== 'eclipse', x: side < 0 ? W * 0.15 : W * 0.85, y: levelY(0.5), slamT: 3.5, raised: false, spawnT: 3, st: 'dive', stT: 2, tx: 0, fireT: 2, lockT: 9, emerge: 0, invuln: false };
-  if (type === 'armada') b.x = side < 0 ? -80 * u : W + 80 * u;
-  if (type === 'leviatan') { b.invuln = true; b.x = W * (side < 0 ? 0.2 : 0.8); b.tx = b.x; }
-  if (type === 'eclipse') { b.x = W / 2; b.y = -80; }
+    sea: type !== 'eclipse', x: off, x0: off, y: levelY(0.5), ph: 'enter', enT: 0, invuln: true, mini,
+    cd: BOSS_CD[type] * (mini ? 1.3 : 1) * (1 - 0.05 * S.danger), abT: 1.2, abQ: [], last: null, cast: null, busy: null,
+    raised: false, sink: 70 * u, st: 'swim', tx: 0, fireT: 2.4, spawnT: 5, volley: 0, volT: 0, wave: null, beam: null, slamFx: 0, mouth: 0, abN: 0, setSide: 0, setX: 0, open: false, gIdx: 0, shield: false, shieldT: 0, enraged: false, scared: false, trX: 0 };
+  if (type === 'kraken') b.post = bossPost(b, 0.15);
+  if (type === 'armada') { b.invuln = false; b.x = side < 0 ? -80 * u : W + 80 * u; }
+  if (type === 'leviatan') { b.tx = bossPost(b, 0.2); b.y = levelY(0.3); }
+  if (type === 'eclipse') { b.x = side < 0 ? -90 * u : W + 90 * u; b.y = levelY(2.1); }
   S.boss = b;
-  banner(name, type === 'leviatan' ? 'Solo es vulnerable cuando sale a la superficie' : type === 'eclipse' ? 'Tápalo con la luna para quemarlo' : type === 'kraken' ? 'Golpea la isla con sus tentáculos' : 'Con marea baja también encalla en el arrecife', 2.6, true);
+  banner(name, BOSS_INTRO[type], 2.6, true);
   MUS.boss = true; MUS.intensity = 3;
   sfx('roar'); vib([80, 60, 160]);
   S.shake = Math.max(S.shake, 0.6);
 }
-function bossScale() { return (1 + 0.05 * S.wave) * (S.mode !== 'island' ? 1 + Math.floor((S.wave - 1) / 10) * 0.3 : 1); }
+// boss damage grows with the wave, gently: past wave 30 the endless modes used to one-shot the island
+function bossScale() { return (1 + 0.04 * S.wave) * (S.mode !== 'island' ? 1 + Math.floor((S.wave - 1) / 10) * 0.15 : 1) * (S.boss && S.boss.enraged ? 1.25 : 1); }
+// sea bosses raise a shield at 2/3 and 1/3 of their health (half, once, for the mid-island boss) and call an escort;
+// sinking the escort breaks the shield and stuns them
+const guardAt = b => b.mini ? [0.5] : [0.66, 0.33];
+function raiseGuard(b) {
+  b.gIdx++; b.shield = true; b.shieldT = 16; b.cast = null; b.raised = false;
+  if (b.busy) bossEndBusy(b);
+  const kinds = b.type === 'armada' ? ['galleon', 'mortar', 'galleon'] : b.type === 'leviatan' ? ['serpent', 'serpent', 'serpent'] : ['serpent', 'crab', 'serpent'];
+  const tr = b.type === 'leviatan' ? 'veloz' : magmaBoss(b) ? 'igneo' : 'acorazado';
+  kinds.forEach((k, i) => {
+    const e = spawnEnemy(k, b.side, i, clamp(b.x - b.dir * (10 + i * 30) * u, -40 * u, W + 40 * u));
+    e.hp *= 1.4; e.maxHp = e.hp; addTrait(e, tr); if (e.tr.acorazado) e.armor = e.maxHp * 0.45; e.guard = b;
+  });
+  banner('¡Escudo!', 'Hunde a su escolta para romperlo', 1.8, true); sfx('roar'); vib([60, 40, 60]);
+  S.shake = Math.max(S.shake, 0.4);
+}
+function breakShield(b, won) {
+  b.shield = false;
+  for (const e of S.enemies) if (e.guard === b) e.guard = null;
+  burst(b.x, b.y - 30 * u, 30, '#bff3ff', 260); sfx('crash');
+  if (won) { b.frozen = Math.max(b.frozen, 1.8); banner('¡Escudo roto!', 'Está aturdido: ¡a por él!', 1.4); missionProgress('shield', 1); vib([30, 30, 80]); }
+  else banner('El escudo se apaga', '', 1);
+}
+// next ability: each one comes up once per round, in a shuffled order, never twice in a row
+function bossCast(b) {
+  if (!b.abQ.length) { b.abQ = BOSS_AB[b.type].slice().sort(() => Math.random() - 0.5); if (b.abQ[0] === b.last && b.abQ.length > 1) b.abQ.push(b.abQ.shift()); }
+  const ab = b.abQ.shift(); b.last = ab;
+  b.cast = { ab, t: ab.cast, T: ab.cast };
+  tip(`ab_${ab.id}`, bossAbName(b, ab), ab.tip);
+  sfx('warn');
+  if (ab.id === 'latigazo') b.raised = true;
+  if (ab.id === 'rayo') b.beam = { x: moonPos().x, fire: 0 };
+  if (b.type === 'leviatan' && ab.id !== 'embestida') bossSurface(b);
+}
+function bossFree(b) { b.busy = null; b.abT = b.cd; }
+function bossSurface(b) { if (b.st !== 'surface') { b.st = 'surface'; b.invuln = false; b.dir = b.x < W / 2 ? 1 : -1; splash(b.x, waveY(b.x), 26); } }
+function bossDive(b) { b.st = 'swim'; b.invuln = true; b.tx = bossPost(b, rand(0.08, 0.24)); if (Math.random() < 0.5) b.tx = W - b.tx; splash(b.x, waveY(b.x), 24); }
+const bossMouth = b => b.type === 'kraken' ? { x: b.x, y: b.y - 15 * u } : b.type === 'leviatan' ? { x: b.x + b.dir * 46 * u, y: b.y + 4 * u } : { x: b.x, y: b.y + 14 * u };
+function spitAt(b, k, spread) {
+  const m = moonPos(), o = bossMouth(b), a0 = Math.atan2(m.y - o.y, m.x - o.x), sp = 300 * u;
+  for (const da of spread) S.proj.push({ type: 'spit', k, x: o.x, y: o.y, vx: Math.cos(a0 + da) * sp, vy: Math.sin(a0 + da) * sp, t: 0, life: 2.6, r: 9 * u, hostile: true });
+  b.mouth = 0.5; sfx('splash');
+}
+function fireBomb(b, dmg) {
+  const I = ISL(), g = 700 * u, Tf = 1.0, sx = b.x + b.dir * 34 * u, sy = b.y - 34 * u, tx = W / 2 + rand(-36, 36) * u, ty = I.top - 6 * u;
+  S.proj.push({ type: 'bomb', x0: sx, y0: sy, x: sx, y: sy, vx: (tx - sx) / Tf, vy: (ty - sy) / Tf - 0.5 * g * Tf, g, t: 0, T: Tf, dmg, hostile: true });
+  S.fx.push({ type: 'muzzle', x: sx, y: sy, t: 0, life: 0.15 }); sfx('boom');
+}
+function fireOrb(b, dmg) { S.proj.push({ type: 'orb', x: b.x, y: b.y, tx: W / 2 + rand(-34, 34) * u, ty: ISL().top - 10 * u, spd: 230 * u, dmg, hostile: true }); }
+// the ability lands
+function bossFire(b, ab) {
+  const I = ISL(), bs = bossScale(), edge = b.side < 0 ? I.l - 10 * u : I.r + 10 * u;
+  b.raised = false;
+  switch (ab.id) {
+    case 'latigazo':
+      islandDamage(12 * bs, true); S.shake = Math.max(S.shake, 0.7); sfx('boom'); vib(80);
+      burst(edge, waveY(edge), 26, '#cfe6ff', 260); b.slamFx = 0.35; break;
+    case 'tinta': spitAt(b, magmaBoss(b) ? 'lava' : 'ink', [0]); break;
+    case 'crias': for (let i = 0; i < 3; i++) spawnEnemy('serpent', b.side, 0, b.x - b.dir * i * 26 * u); splash(b.x, waveY(b.x), 20); break;
+    case 'abrazo': b.busy = { id: 'abrazo', t: 4, hp0: b.hp }; b.raised = true; sfx('roar'); S.shake = Math.max(S.shake, 0.5); return;
+    case 'andanada': b.volley = 5; b.volT = 0; break;
+    case 'refuerzos': spawnEnemy('sloop', b.side, 0); spawnEnemy('sloop', b.side, 1); spawnEnemy('mortar', b.side, 2); break;
+    case 'abordaje': b.busy = { id: 'abordaje', t: 2.2 }; sfx('crash'); return;
+    case 'embestida': bossSurface(b); b.st = 'lunge'; b.busy = { id: 'embestida', t: 4 }; return;
+    case 'hielo': spitAt(b, 'ice', [-0.2, 0, 0.2]); sfx('freeze'); b.busy = { id: 'superficie', t: 1.3 }; return;
+    case 'ola': b.wave = { x: b.x, dir: b.x < W / 2 ? 1 : -1, t: 0 }; sfx('tsunami'); S.shake = Math.max(S.shake, 0.4); b.busy = { id: 'superficie', t: 1.1 }; return;
+    case 'lluvia': b.volley = 5; b.volT = 0; break;
+    case 'rayo': {
+      const m = moonPos();
+      if (!b.beam) b.beam = { x: m.x, fire: 0 };
+      b.beam.fire = 0.4;
+      if (Math.abs(m.x - b.beam.x) < MOON_R() + 16 * u) { S.moonLock = 2.5; S.face = 'hurt'; S.faceT = 1.2; S.flash = Math.min(0.5, S.flash + 0.3); vib([60, 40, 120]); burst(m.x, m.y, 18, '#c79bff', 200); }
+      sfx('thunder'); break;
+    }
+    case 'cadenas':
+      S.moonLock = 3; banner('¡El eclipse atrapa a la luna!', 'No podrás moverla durante 3 s', 1.8, true);
+      for (let i = 0; i < 4; i++) spawnEnemy('gull', i % 2 ? 1 : -1, i);
+      sfx('roar'); break;
+    case 'noche': S.night = 5; sfx('roar'); break;
+  }
+  b.abT = b.cd;
+  if (b.type === 'eclipse' && ++b.abN % 2 === 0) {
+    const I2 = ISL(); b.setSide = b.setSide ? -b.setSide : (Math.random() < 0.5 ? -1 : 1);
+    b.setX = b.setSide < 0 ? Math.max(W * 0.2, I2.l - 150 * u) : Math.min(W * 0.8, I2.r + 150 * u);
+    b.busy = { id: 'ocaso', t: 10 };
+  } else if (b.type === 'eclipse' && b.abN > 1 && Math.random() < 0.4) {
+    // now and then it slips and drops into the sea by mistake, scared stiff without its shield
+    let x = b.x; if (Math.abs(x - W / 2) < 120 * u) x = W / 2 + (x < W / 2 ? -1 : 1) * 130 * u;
+    b.trX = clamp(x, W * 0.14, W * 0.86); b.busy = { id: 'tropiezo', t: 4.4 };
+  }
+}
+function bossEndBusy(b) {
+  const id = b.busy && b.busy.id;
+  b.raised = false; bossFree(b);
+  if (b.type === 'leviatan' && (id === 'embestida' || id === 'superficie')) bossDive(b);
+}
 function updBoss(b, dt) {
   b.t += dt; if (b.flash > 0) b.flash -= dt; if (b.dotT > 0) b.dotT -= dt;
+  if (b.slamFx > 0) b.slamFx -= dt; if (b.mouth > 0) b.mouth -= dt;
+  if (b.beam && b.beam.fire > 0) { b.beam.fire -= dt; if (b.beam.fire <= 0) b.beam = null; }
+  if (b.psn > 0) { b.psn -= dt; hit(b, b.psnD * dt, { dot: true, col: '#9be15d' }); if (b.dead) return; }
+  if (b.type !== 'eclipse' && !b.shield && b.ph === 'fight' && b.gIdx < guardAt(b).length && b.hp <= b.maxHp * guardAt(b)[b.gIdx]) raiseGuard(b);
+  if (b.shield) { b.shieldT -= dt; if (!S.enemies.some(e => e.guard === b && !e.dead)) breakShield(b, true); else if (b.shieldT <= 0) breakShield(b, false); }
+  if (!b.enraged && b.hp <= b.maxHp * 0.3) { b.enraged = true; b.cd *= 0.65; banner('¡Furioso!', 'Ataca más rápido y más fuerte', 1.6, true); sfx('roar'); S.shake = Math.max(S.shake, 0.5); }
   if (b.frozen > 0) { b.frozen -= dt; return; }
-  const I = ISL();
+  const I = ISL(), bs = bossScale();
+  // ability clock (stops while entering, casting or busy)
+  if (b.ph === 'fight') {
+    if (b.cast) { b.cast.t -= dt; if (b.cast.t <= 0) { const ab = b.cast.ab; b.cast = null; bossFire(b, ab); } }
+    else if (!b.busy) { b.abT -= dt; if (b.abT <= 0) bossCast(b); }
+    if (b.busy) { b.busy.t -= dt; if (b.busy.t <= 0) bossEndBusy(b); }
+  }
+  if (b.volley > 0 && (b.volT -= dt) <= 0) { b.volley--; b.volT = b.type === 'eclipse' ? 0.15 : 0.22; if (b.type === 'eclipse') fireOrb(b, 3 * bs); else fireBomb(b, 3 * bs); }
+  if (b.wave) {
+    const w = b.wave, stop = w.dir > 0 ? I.l - 6 * u : I.r + 6 * u;
+    w.t += dt; w.x += w.dir * 190 * u * dt;
+    if (Math.random() < 0.7) S.parts.push({ x: w.x + rand(-6, 6) * u, y: waveY(w.x) - 34 * u, vx: w.dir * rand(40, 140), vy: rand(-120, -20), t: 0, life: 0.5, c: '#f2fbff', s: 3, g: 400 });
+    if ((w.dir > 0 && w.x >= stop) || (w.dir < 0 && w.x <= stop)) { islandDamage(6 * bs, true); splash(stop, waveY(stop), 34); S.shake = Math.max(S.shake, 0.6); vib(70); b.wave = null; }
+  }
   if (b.type === 'kraken') {
-    b.emerge = Math.min(1, b.emerge + dt * 0.6);
-    b.y = waveY(b.x);
-    b.slamT -= dt;
-    if (b.slamT < 1.1) b.raised = true;
-    if (b.slamT <= 0) {
-      islandDamage(10 * bossScale(), true);
-      S.shake = Math.max(S.shake, 0.7); sfx('boom'); vib(80);
-      const ex = b.side < 0 ? I.l - 10 * u : I.r + 10 * u;
-      burst(ex, waveY(ex), 26, '#cfe6ff', 260);
-      b.slamT = 4.5; b.raised = false;
+    if (b.ph === 'enter') {
+      b.enT = Math.min(1, b.enT + dt / 3.2);
+      const f = 1 - Math.pow(1 - b.enT, 2.2);
+      b.x = b.x0 + (b.post - b.x0) * f;
+      if (Math.random() < dt * 26) S.parts.push({ x: b.x + rand(-30, 30) * u, y: waveY(b.x) - 2, vx: -b.dir * rand(20, 80), vy: rand(-90, -30), t: 0, life: 0.5, c: '#e6f8ff', s: rand(2, 3.4), g: 380 });
+      if (b.enT >= 1) { b.ph = 'fight'; b.invuln = false; splash(b.x, waveY(b.x), 40); sfx('roar'); S.shake = Math.max(S.shake, 0.6); vib([60, 40, 120]); }
     }
-    b.spawnT -= dt;
-    if (b.spawnT <= 0) { b.spawnT = 7; spawnEnemy('serpent', b.side, 0, b.x); }
+    // swims in low, head just breaking the surface (never deeper than the water allows)
+    const deep = Math.max(22 * u, Math.min(64 * u, floorY() - waveY(b.x) - 4 * u));
+    b.sink += ((b.ph === 'enter' ? deep : 22 * u) - b.sink) * Math.min(1, dt * 2.2);
+    b.y = waveY(b.x) + b.sink;
+    if (b.busy && b.busy.id === 'abrazo') {
+      islandDamage(3.5 * bs * dt, true);
+      if (Math.random() < dt * 3) S.shake = Math.max(S.shake, 0.25);
+      if (b.hp < b.busy.hp0 - 0.07 * b.maxHp) { banner('¡Suelta la isla!', 'Le has hecho daño suficiente', 1.4); sfx('crash'); bossEndBusy(b); }
+    }
   } else if (b.type === 'armada') {
     b.y = waveY(b.x);
-    let sp = 14 * u * S.spdMul;
-    if (inReef(b.x, b.r * u * 0.4) && levelAt(b.x) - REEF < 0.5) { sp *= 0.45; hit(b, reefDps() * 0.8 * dt, { dot: true, col: '#9fd8ff' }); if (Math.random() < dt * 8) sparks(b.x, b.y + 8 * u); }
+    const ram = b.busy && b.busy.id === 'abordaje';
+    let sp = 14 * u * S.spdMul * (ram ? 6 : 1);
+    if (inReef(b.x, b.r * u * 0.4) && levelAt(b.x) - REEF < 0.5) { sp *= ram ? 0.8 : 0.45; hit(b, reefDps() * 0.8 * dt, { dot: true, col: '#9fd8ff' }); if (Math.random() < dt * 8) sparks(b.x, b.y + 8 * u); }
     sp *= 1 - 0.6 * pullAt(b.x) / 0.3;
     const stop = b.dir > 0 ? I.l - 40 * u : I.r + 40 * u;
-    if ((b.dir > 0 && b.x < stop) || (b.dir < 0 && b.x > stop)) b.x += b.dir * sp * dt;
-    else islandDamage(6 * dt * bossScale());
+    const docked = !((b.dir > 0 && b.x < stop) || (b.dir < 0 && b.x > stop));
+    if (!docked) b.x += b.dir * sp * dt;
+    else islandDamage(4 * dt * bs);
+    if (ram) {
+      if (Math.random() < dt * 30) S.parts.push({ x: b.x + b.dir * 40 * u, y: b.y - 2, vx: b.dir * rand(20, 120), vy: rand(-140, -40), t: 0, life: 0.45, c: '#f2fbff', s: 3, g: 420 });
+      if (docked) { islandDamage(10 * bs, true); boomFx(stop + b.dir * 30 * u, b.y - 10 * u, 40 * u); S.shake = Math.max(S.shake, 0.8); sfx('bigboom'); vib(100); b.x -= b.dir * 60 * u; bossEndBusy(b); }
+    }
+    if (b.ph === 'enter' && b.x > 30 * u && b.x < W - 30 * u) { b.ph = 'fight'; b.abT = 1.5; }
     b.spawnT -= dt;
-    if (b.spawnT <= 0) { b.spawnT = 3.2; spawnEnemy('sloop', b.side, 0, b.x - b.dir * 20 * u); }
+    if (b.spawnT <= 0) { b.spawnT = 5; spawnEnemy('sloop', b.side, 0, b.x - b.dir * 20 * u); }
   } else if (b.type === 'leviatan') {
-    b.stT -= dt;
-    if (b.st === 'dive') {
+    if (b.st === 'swim') {
       b.invuln = true;
-      b.x += (b.tx - b.x) * Math.min(1, dt * 1.5);
-      b.y = levelY(Math.max(0, levelAt(b.x) - 0.25));
-      if (b.stT <= 0) { b.st = 'lunge'; b.stT = 4; b.invuln = false; b.dir = b.x < W / 2 ? 1 : -1; splash(b.x, waveY(b.x), 30); sfx('splash'); }
+      b.x += (b.tx - b.x) * Math.min(1, dt * (b.ph === 'enter' ? 0.9 : 1.5));
+      if (Math.abs(b.tx - b.x) > 6 * u) b.dir = b.tx > b.x ? 1 : -1;
+      b.y += (levelY(Math.max(0, levelAt(b.x) - 0.25)) - b.y) * Math.min(1, dt * 4);
+      if (b.ph === 'enter' && Math.abs(b.tx - b.x) < 8 * u) { b.ph = 'fight'; b.abT = 0.6; }
+      // bubbles give away where it is, and a burst of them warns of a charge
+      const charging = b.cast && b.cast.ab.id === 'embestida';
+      if (Math.random() < dt * (charging ? 40 : 6)) S.parts.push({ x: b.x + rand(-40, 40) * u, y: waveY(b.x) + 2, vx: rand(-20, 20), vy: rand(-80, -30), t: 0, life: 0.4, c: '#e6f8ff', s: rand(2, 3.4), g: 300 });
+    } else if (b.st === 'surface') {
+      b.y += (waveY(b.x) - 6 * u - b.y) * Math.min(1, dt * 6);
     } else {
       b.y = waveY(b.x) - 6 * u;
       b.x += b.dir * 78 * u * S.spdMul * dt;
       b.x -= b.dir * pullAt(b.x) / 0.3 * 40 * u * dt;
       const stop = b.dir > 0 ? I.l - 30 * u : I.r + 30 * u;
-      const reached = b.dir > 0 ? b.x >= stop : b.x <= stop;
-      if (reached || b.stT <= 0) {
-        if (reached) { islandDamage(11 * bossScale(), true); S.shake = Math.max(S.shake, 0.6); sfx('boom'); vib(90); }
-        b.st = 'dive'; b.stT = 2.4; b.tx = W * (Math.random() < 0.5 ? rand(0.08, 0.24) : rand(0.76, 0.92));
-        splash(b.x, waveY(b.x), 30);
-      }
+      if (b.dir > 0 ? b.x >= stop : b.x <= stop) { islandDamage(9 * bs, true); S.shake = Math.max(S.shake, 0.6); sfx('boom'); vib(90); bossEndBusy(b); }
     }
   } else if (b.type === 'eclipse') {
-    const ty = levelY(1.85);
-    b.y += (ty - b.y) * Math.min(1, dt * 1.2);
-    b.x = W / 2 + Math.sin(b.t * 0.45) * W * 0.3;
-    b.fireT -= dt;
-    if (b.fireT <= 0) { b.fireT = 1.9; S.proj.push({ type: 'orb', x: b.x, y: b.y, tx: W / 2 + rand(-30, 30) * u, ty: ISL().top - 10 * u, spd: 230 * u, dmg: 4 * bossScale(), hostile: true }); }
-    b.lockT -= dt;
-    if (b.lockT <= 0) {
-      b.lockT = 13; S.moonLock = 3;
-      banner('¡El eclipse atrapa a la luna!', 'No podrás moverla durante 3 s', 1.8, true);
-      for (let i = 0; i < 4; i++) spawnEnemy('gull', i % 2 ? 1 : -1, i);
-      sfx('roar');
+    // high in the sky it is shielded; when it sets into the sea it can be hurt by everything
+    const oc = b.busy && b.busy.id === 'ocaso', trip = b.busy && b.busy.id === 'tropiezo', left = b.busy ? b.busy.t : 0;
+    const down = (oc && left > 1.4) || (trip && left > 1.1), sx = trip ? b.trX : b.setX;
+    const tx = down ? sx : W / 2 + Math.sin(b.t * 0.4) * W * 0.16, ty = down ? waveY(sx) + 4 * u : levelY(1.58);
+    const k = trip ? (down ? 3.4 : 1.7) : down ? 1.8 : b.ph === 'enter' ? 0.8 : 1.4;
+    b.x += (tx - b.x) * Math.min(1, dt * k); b.y += (ty - b.y) * Math.min(1, dt * k);
+    const open = (oc && left <= 8.4 && left > 1.4) || (trip && left <= 3.5 && left > 1.1);
+    b.scared = trip;
+    if (b.ph === 'fight') { b.invuln = !open; b.sea = open; }
+    if (open && !b.open) {
+      if (trip) { banner('¡Ups! ¡Ha perdido su escudo!', 'El sol oscuro cayó al mar por error', 1.4); sfx('splash'); }
+      else tip('ocaso', 'El sol oscuro se pone', '¡Mientras toca el mar es vulnerable!');
+      splash(b.x, waveY(b.x), 40); S.shake = Math.max(S.shake, 0.4);
     }
+    if (!open && b.open) sfx('roar');
+    b.open = open;
+    if (b.ph === 'enter' && b.t > 2.6) { b.ph = 'fight'; b.abT = 1.5; sfx('roar'); }
+    if (b.ph === 'fight' && !oc && !trip) { b.fireT -= dt; if (b.fireT <= 0) { b.fireT = 2.4; fireOrb(b, 4 * bs); } }
+    // the dark ray chases the moon, then holds still just before it strikes
+    if (b.beam && b.cast && b.cast.ab.id === 'rayo' && b.cast.t > 0.45) b.beam.x += (moonPos().x - b.beam.x) * Math.min(1, dt * 5);
   }
 }
 function killBoss(b) {
   if (b.dead) return;
   b.dead = true; S.bossKills++; save.stats.bosses++;
+  b.cast = null; b.wave = null; b.beam = null; b.volley = 0; S.night = Math.min(S.night, 0.6);
   S.slowmo = 1.4; S.shake = 1.2; S.flash = 0.5;
   for (let i = 0; i < 6; i++) setTimeout(() => { if (S) { boomFx(b.x + rand(-50, 50) * u, b.y + rand(-40, 20) * u, 50 * u); } }, i * 120);
   sfx('bigboom'); vib([100, 50, 100, 50, 250]);
@@ -1149,44 +1521,74 @@ function killBoss(b) {
   missionProgress('boss', 1);
   banner('¡Jefe derrotado!', 'La onda expansiva hunde a toda la flota', 2.2);
   MUS.boss = false;
-  for (const e of S.enemies) if (!e.dead) { e.hp = 0; kill(e, true); }
+  for (const e of S.enemies) if (!e.dead && !e.def.ghost) { e.hp = 0; kill(e, true); }
 }
-
 // =====================================================================
 // COMBAT CORE
 // =====================================================================
 function hit(e, base, o) {
-  if (e.dead || e.invuln) return 0;
+  if (e.dead || e.invuln || e.shield || e.phased) return 0;
   let d = base * S.st.dmg * (S.furia > 0 ? 2 : 1) * (S.eclipse > 0 ? 1.6 : 1);
   let crit = false;
-  if (!o || !o.dot) { if (Math.random() < S.st.crit) { d *= 2; crit = true; } }
+  const dot = o && o.dot;
+  if (!dot) { if (Math.random() < S.st.crit) { d *= 2; crit = true; } }
+  // armoured enemies take half of every hit until the armour breaks
+  const armored = e.armor > 0;
+  if (armored) { d *= 0.5; e.armor -= d; if (e.armor <= 0) armorBreak(e); }
   e.hp -= d; e.flash = 0.07;
-  if (o && o.dot) {
+  if (!dot && S.st.poison && !e.def?.ghost) { e.psn = 3; e.psnD = Math.max(e.psnD || 0, base * S.st.poison); }
+  // the iron chain makes every blow push the enemy back a little
+  if (!dot && S.st.kb > 1 && !e.isBoss) shove(e, Math.min(16, 3 + base * 0.12) * u * (S.st.kb - 1));
+  if (dot) {
     e.dotAcc += d;
-    if (e.dotT <= 0) { if (e.dotAcc >= 1) num(e.x, e.y - e.r * u, e.dotAcc, false, o.col); e.dotAcc = 0; e.dotT = 0.4; }
-  } else num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit);
-  if (e.hp <= 0) { if (e.isBoss) killBoss(e); else kill(e); }
+    if (e.dotT <= 0) { if (e.dotAcc >= 1) num(e.x, e.y - e.r * u, e.dotAcc, false, armored ? '#c3d2e6' : o.col); e.dotAcc = 0; e.dotT = 0.4; }
+  } else num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit, armored ? '#c3d2e6' : undefined);
+  if (e.hp <= 0) { if (e.isBoss) killBoss(e); else if (e.def.ghost) repel(e); else kill(e); }
   return d;
+}
+function armorBreak(e) {
+  e.armor = 0; sparks(e.x, e.y - e.r * u * 0.5); burst(e.x, e.y - e.r * u * 0.5, 12, '#c3d2e6', 170); sfx('crash');
+  S.nums.push({ x: e.x, y: e.y - e.r * u * 1.6, v: '¡Coraza rota!', txt: true, col: '#c3d2e6', t: 0 });
+}
+// the Flying Dutchman can't sink: emptying its health throws it back out to sea, tougher each time
+function repel(e) {
+  e.repels++; e.maxHp *= 1.35; e.hp = e.maxHp; e.back = 1.8; e.atIsland = false;
+  burst(e.x, e.y - 20 * u, 26, '#9dffd8', 240); S.shake = Math.max(S.shake, 0.4); sfx('roar'); vib([40, 30, 60]);
+  S.nums.push({ x: e.x, y: e.y - 60 * u, v: '¡Retrocede!', txt: true, col: '#9dffd8', t: 0 });
+  missionProgress('ghost', 1);
+}
+// a fire ship blows up: against the island it hurts a lot; sunk at sea it only scorches the ships around it
+function bruloteBoom(e, atIsland) {
+  boomFx(e.x, e.y - 8 * u, (atIsland ? 70 : 52) * u, '#ff8a3d'); sfx('bigboom'); vib(atIsland ? [80, 40, 160] : 40);
+  S.shake = Math.max(S.shake, atIsland ? 0.9 : 0.35);
+  if (atIsland) {
+    islandDamage(S.maxHp * 0.12 + 8 * scaleW(), false, 'brulote');
+    S.face = 'hurt'; S.faceT = 1.2; S.flash = Math.min(0.6, S.flash + 0.35);
+    if (!S.seen.brulBoom) { S.seen.brulBoom = 1; banner('¡Un brulote ha estallado!', 'Húndelos antes de que lleguen a la isla', 1.8, true); }
+  } else for (const o of S.threat) if (o !== e && !o.isBoss && Math.hypot(o.x - e.x, o.y - e.y) < 52 * u + o.r * u) hit(o, 30 * scaleW());
 }
 function kill(e, silent) {
   if (e.dead) return;
   e.dead = true; S.kills++; save.stats.kills++;
   S.killsBy[e.type] = (S.killsBy[e.type] || 0) + 1;
-  missionProgress(e.type, 1);
+  missionProgress(e.type, 1); missionProgress('kill', 1);
+  if (e.tr) missionProgress('trait', 1);
+  if (e.elite) missionProgress('elite', 1);
+  if (e.def.fuse) bruloteBoom(e, false);
   S.combo++; S.comboT = 1.9; if (S.combo > S.maxCombo) { S.maxCombo = S.combo; missionProgress('combo', S.combo, true); }
-  addXp(e.def.xp * (e.elite ? 5 : 1));
+  addXp(e.def.xp * (e.elite ? 5 : 1) * (e.xpK || 1));
   S.charge = Math.min(1, S.charge + 0.011 * S.chargeMul * (e.elite ? 4 : 1));
   const def = e.def;
   if (e.type === 'gold') {
     S.golds++; save.stats.golds++; missionProgress('gold', 1);
     dropCoins(e.x, e.y - 10 * u, Math.round(18 * S.isl.coin * (1 + 0.3 * S.danger)), true);
     if (Math.random() < 0.35) dropChest(e.x, e.y - 20 * u);
-    banner('¡Tesoro!', 'Recoge las monedas con la luna', 1.4); S.shake = Math.max(S.shake, 0.3); S.face = 'happy'; S.faceT = 1.5;
+    banner('¡Tesoro!', 'Recoge las perlas con la luna', 1.4); S.shake = Math.max(S.shake, 0.3); S.face = 'happy'; S.faceT = 1.5;
   } else if (e.elite) {
     dropCoins(e.x, e.y, 5, true);
     if (Math.random() < 0.05) dropChest(e.x, e.y - 14 * u);
     burst(e.x, e.y, 18, '#ffd36b', 200); S.shake = Math.max(S.shake, 0.18); vib(20);
-  } else if (Math.random() < def.coin * (1 + 0.1 * metaLv('codicia')) || S.fiebre > 0) dropCoins(e.x, e.y, def.cv || 1);
+  } else if (Math.random() < def.coin * 1.25 * (1 + 0.1 * metaLv('codicia')) * (e.tr ? 1.5 : 1) || S.fiebre > 0) dropCoins(e.x, e.y, (def.cv || 1) * (e.tr && e.tr.gigante ? 3 : 1));
   e.dyT = 0; S.dying.push(e);
   const k = def.kind;
   if (k === 'ship') { splash(e.x, e.y, 14); debris(e.x, e.y); }
@@ -1197,8 +1599,28 @@ function kill(e, silent) {
   comboCheck();
 }
 function addXp(v) { S.xp += v * S.st.xp; }
+// ice: every freeze on the same enemy lasts less, a thawed enemy can't be frozen again for a moment,
+// burning ones never freeze, and later waves shrug the cold off faster
+const frostRes = () => clamp((S.wave - 6) * 0.025, 0, 0.5);
+function freeze(e, dur, shatter, force) {
+  if (e.dead) return false;
+  if (e.isBoss) { e.frozen = Math.max(e.frozen, Math.min(dur, 0.8)); return true; }
+  if (e.tr && e.tr.igneo || e.def.ghost) return false;
+  if (e.thaw > 0 && !force) return false;
+  const d = dur * Math.pow(0.6, e.frz || 0) * (1 - frostRes());
+  if (d < 0.3) return false;
+  e.frz = (e.frz || 0) + 1; e.frzT = 4; e.frozen = Math.max(e.frozen, d);
+  if (shatter) e.shatter = Math.max(e.shatter || 0, shatter);
+  S.frozenN = (S.frozenN || 0) + 1; missionProgress('freeze', 1);
+  return true;
+}
+function slowE(e, dur, amt) {
+  if (e.isBoss || e.tr && e.tr.igneo || e.def.ghost) return;
+  if (e.thaw > 0) amt = Math.min(amt, 0.3);
+  e.slow = Math.max(e.slow, dur); e.slowAmt = Math.max(e.slowAmt, amt);
+}
 
-// ---- coins and chests: they float up out of the sea and the moon collects them
+// ---- pearls (S.coins) and chests: they float up out of the sea and the moon collects them
 function dropCoins(x, y, n, burstOut) {
   const val = S.isl.coin * (1 + 0.3 * S.danger) * S.coinMul;
   for (let i = 0; i < n; i++) {
@@ -1215,7 +1637,7 @@ function updPickups(dt) {
     if (c.home || d < R) {
       const sp = (c.home ? 520 : 300 + (R - d) * 4) * u;
       c.x += dx / d * sp * dt; c.y += dy / d * sp * dt;
-      if (d < MOON_R() * 0.8) { c.done = true; S.coinsRun += c.v; sfx('coin'); missionProgress('coins', c.v); if (Math.random() < 0.4) S.nums.push({ x: m.x + rand(-10, 10) * u, y: m.y - MOON_R(), v: Math.round(c.v), col: '#ffd36b', t: 0, coin: true }); }
+      if (d < MOON_R() * 0.8) { c.done = true; S.pearls += c.v; S.pearlsGot += c.v; sfx('coin'); missionProgress('coins', c.v); if (Math.random() < 0.4) S.nums.push({ x: m.x + rand(-10, 10) * u, y: m.y - MOON_R(), v: Math.round(c.v), col: '#f4e6ff', t: 0, coin: true }); }
     } else {
       c.vx *= Math.exp(-2 * dt);
       c.vy += ((c.hy - c.y) * 7 - c.vy * 3.2) * dt;
@@ -1241,7 +1663,7 @@ function openChest() {
   const wl = S.weapons.filter(w => !w.evo && !w.union && w.lv < 3), pl = Object.keys(S.passives).filter(p => S.passives[p] < 3);
   if (wl.length && (Math.random() < 0.7 || !pl.length)) { const w = pick(wl); w.lv++; syncEnts(); banner('¡Cofre!', `${WEAPONS[w.id].name} sube a nivel ${w.lv}`, 1.6); }
   else if (pl.length) { const p = pick(pl); S.passives[p]++; recompute(); banner('¡Cofre!', `${PASSIVES[p].name} sube a nivel ${S.passives[p]}`, 1.6); }
-  else { const n = Math.round(15 * S.isl.coin); S.coinsRun += n; banner('¡Cofre!', `+${n} monedas`, 1.4); }
+  else { const n = Math.round(15 * S.isl.coin); S.pearls += n; S.pearlsGot += n; banner('¡Cofre!', `+${n} perlas`, 1.4); }
 }
 
 function moonSwat(dt) {
@@ -1253,16 +1675,16 @@ function moonSwat(dt) {
     if (!S.seen.swatTip) { S.seen.swatTip = 1; tip('swat', '¡Golpe lunar!', 'La luna aplasta a las gaviotas que toca'); }
   }
   const b = S.boss;
-  if (b && !b.dead && b.type === 'eclipse' && Math.hypot(b.x - m.x, b.y - m.y) < mr + b.r * u * 0.7) {
+  if (b && !b.dead && b.type === 'eclipse' && !b.invuln && Math.hypot(b.x - m.x, b.y - m.y) < mr + b.r * u) {
     hit(b, 90 * tideW() * dt, { dot: true, col: '#f4ecd0' });
-    if (!S.seen.eclTip) { S.seen.eclTip = 1; tip('ecl', '¡Eclipse!', 'Tapa al demonio con la luna para quemarlo'); }
+    if (!S.seen.eclTip) { S.seen.eclTip = 1; tip('ecl', '¡Quémalo!', 'Tapar al sol oscuro con la luna le hace aún más daño'); }
   }
 }
 function islandDamage(d, ignoreEclipse, src = 'boss') {
   if (S.eclipse > 0 && !ignoreEclipse) return;
   if (S.eclipse > 0) d *= 0.3;
   d *= (S.mods.dmgTaken || 1) * S.st.taken * (1 + 0.12 * S.danger);
-  S.hp -= d; S.hurtAcc += d; S.dmgBy[src] = (S.dmgBy[src] || 0) + d;
+  S.hp -= d; S.hurtAcc += d; S.dmgBy[src] = (S.dmgBy[src] || 0) + d; S.waveHurt += d;
   if (S.hurtT <= 0) {
     S.hurtT = 0.35;
     if (S.hurtAcc >= 1) { num(W / 2 + rand(-20, 20) * u, ISL().top - 40 * u, S.hurtAcc, false, '#ff5f6d'); sfx('hurt'); vib(30); S.flash = Math.min(0.45, S.flash + 0.12); if (S.hurtAcc >= 4) { S.face = 'hurt'; S.faceT = 0.8; } }
@@ -1270,7 +1692,7 @@ function islandDamage(d, ignoreEclipse, src = 'boss') {
   }
 }
 // reef scrape damage per second (tier 1 coral cuts twice as hard)
-const reefDps = () => 16 * (S.reefT >= 1 ? 2 : 1) * S.st.reef * tideW();
+const reefDps = () => 16 * (reefHas(1) ? 2 : 1) * S.st.reef * tideW();
 function comboCheck() {
   for (const [n, txt] of COMBO_TXT) if (S.combo === n) { comboAnnounce(txt); S.face = 'cool'; S.faceT = 1.4; break; }
   if (S.combo > 500 && S.combo % 250 === 0) comboAnnounce('¡Leyenda!');
@@ -1283,6 +1705,7 @@ function comboAnnounce(txt) {
 }
 function num(x, y, v, crit, col) {
   if (S.nums.length > 55) S.nums.shift();
+  if (v < 0.5) return;
   S.nums.push({ x, y, v: Math.round(v), crit, col, t: 0 });
 }
 function explode(x, y, r, dmg, col) {
@@ -1291,8 +1714,8 @@ function explode(x, y, r, dmg, col) {
 }
 function buildThreats() {
   const list = [];
-  for (const e of S.enemies) if (!e.dead) list.push(e);
-  if (S.boss && !S.boss.dead && !S.boss.invuln) list.push(S.boss);
+  for (const e of S.enemies) if (!e.dead && !e.phased) list.push(e);
+  if (S.boss && !S.boss.dead && !S.boss.invuln && !S.boss.shield) list.push(S.boss);
   const cx = W / 2;
   list.sort((a, b) => Math.abs(a.x - cx) - Math.abs(b.x - cx));
   S.threat = list;
@@ -1322,7 +1745,7 @@ function addWeapon(id, union) {
 }
 const hasW = id => S.weapons.find(w => w.id === id);
 function syncEnts() {
-  S.ents = S.ents.filter(e => (e.type === 'whirl' && !e.perm) || e.type === 'tsunami');
+  S.ents = S.ents.filter(e => (e.type === 'whirl' && !e.perm) || e.type === 'tsunami' || e.type === 'jelly');
   for (const w of S.weapons) {
     if (w.id === 'tiburon') {
       if (w.evo) S.ents.push({ type: 'mega', x: W * 0.2, y: levelY(0.3), t: 0, cd: 1, leap: null });
@@ -1345,7 +1768,7 @@ function lighthouseBeams(w, dt, aims, dps, width, chill) {
     for (const e of S.threat) {
       if (segDist(e.x, e.y, lx, ly, ex, ey) >= width + e.r * u) continue;
       hit(e, dps * dt, { dot: true, col: chill ? '#bff3ff' : '#ffd38a' });
-      if (chill && !e.isBoss) { e.slow = Math.max(e.slow, 0.3); e.slowAmt = 0.6; e.chill = (e.chill || 0) + dt; if (e.chill > 0.9) { e.chill = 0; e.frozen = 1.2 * S.st.cc; e.shatter = 40; } }
+      if (chill && !e.isBoss) { slowE(e, 0.3, 0.6); e.chill = (e.chill || 0) + dt; if (e.chill > 0.9) { e.chill = 0; freeze(e, 1.2 * S.st.cc, 40); } }
     }
   }
 }
@@ -1370,6 +1793,40 @@ function fireBall(e, dmg, r, extra) {
   S.proj.push(Object.assign({ type: 'ball', x0: sx, y0: sy, x: sx, y: sy, vx: (tx - sx) / Tf, vy: (ty - sy) / Tf - 0.5 * g * Tf, g, t: 0, T: Tf, dmg, r }, extra));
   S.fx.push({ type: 'muzzle', x: sx, y: sy, t: 0, life: 0.15 });
   S.cannonKick = 0.15;
+}
+
+// knock an enemy back out to sea (bosses don't budge; the Dutchman and giants only half as far)
+function shove(e, px) {
+  if (e.isBoss || e.dead || px <= 0) return;
+  e.x = clamp(e.x - e.dir * px * (e.def.ghost ? 0.5 : 1) * (e.tr && e.tr.gigante ? 0.5 : 1), -60 * u, W + 60 * u);
+  e.atIsland = false;
+}
+// anchors hang from the moon on a chain long enough to dip into the water right beneath it
+const anchorLen = extra => { const m = moonPos(); return clamp(waveY(m.x) - m.y + extra * u, 80 * u, 340 * u); };
+function swingAnchors(w, angs, s, sprN) {
+  const m = moonPos(), L = anchorLen(10 * s);
+  w.anchors = angs.map(a => ({ a, s, spr: sprN, L, x: m.x + Math.sin(a) * L, y: m.y + Math.cos(a) * L }));
+  return w.anchors;
+}
+// every enemy the anchor's head touches takes a blow and is shoved away (each one at most every `cd` seconds)
+function anchorHits(A, r, cd, push, strike) {
+  let n = 0;
+  for (const e of S.threat) {
+    const cy = e.y - (e.isBoss ? 0 : e.r * u * 0.4);
+    if (Math.hypot(e.x - A.x, cy - A.y) > r + (e.r || 30) * u * 0.7) continue;
+    if (S.t - (e.ancT || -9) < cd) continue;
+    e.ancT = S.t;
+    if (strike(e)) { shove(e, push * S.st.kb); sparks(e.x, cy); n++; }
+  }
+  if (n) sfx('crash');
+  return n;
+}
+// a jellyfish drops from the moon into the sea (never onto the island) and stings whatever floats past
+function dropJelly(x, o) {
+  if (Math.abs(x - W / 2) < 62 * u) x = W / 2 + (x < W / 2 ? -1 : 1) * 62 * u;
+  x = clamp(x, 14 * u, W - 14 * u);
+  const m = moonPos();
+  S.ents.push(Object.assign({ type: 'jelly', x, y: m.y, y0: m.y, drop: 0.4, t: 0, cd: 0.2, life: 8, zaps: 3, dmg: 40, r: 34 * u * S.st.area, s: 0.8, k: 'jelly', zap: 0 }, o));
 }
 const WUP = {
   rayo(w, dt) {
@@ -1412,12 +1869,12 @@ const WUP = {
     const m = moonPos();
     if (w.evo) {
       w.t = 4.5 * cdm();
-      for (const e of S.threat) { if (e.isBoss) { e.frozen = Math.max(e.frozen, 0.8); hit(e, 60); } else { e.frozen = 2 * S.st.cc; e.shatter = 90; hit(e, 20); } }
+      for (const e of S.threat) { if (e.isBoss) { freeze(e, 0.8); hit(e, 60); } else { freeze(e, 2 * S.st.cc, 90); hit(e, 20); } }
       S.fx.push({ type: 'ring', x: m.x, y: m.y, t: 0, life: 0.7, r1: W * 1.1, c: '#9fe3ff' });
     } else {
       w.t = L3(w, [7, 6, 4.5]) * cdm();
       const dmg = L3(w, [14, 20, 28]), dur = L3(w, [2, 3, 3.2]) * S.st.cc, R = 190 * u * S.st.area;
-      for (const e of S.threat) { if (Math.hypot(e.x - m.x, e.y - m.y) > R + e.r * u) continue; hit(e, dmg); if (!e.isBoss) { e.slow = dur; e.slowAmt = 0.5; } }
+      for (const e of S.threat) { if (Math.hypot(e.x - m.x, e.y - m.y) > R + e.r * u) continue; hit(e, dmg); slowE(e, dur, 0.5); }
       S.fx.push({ type: 'ring', x: m.x, y: m.y, t: 0, life: 0.6, r1: R, c: '#9fe3ff' });
     }
     sfx('freeze');
@@ -1454,6 +1911,36 @@ const WUP = {
     const e = near.length ? pick(near) : randomTarget(false); if (!e) return;
     chain(e, dmg, jumps);
     S.flash = Math.max(S.flash, 0.04); sfx('thunder');
+  },
+  ancla(w, dt) {
+    const evo = w.evo, sw = Math.sin(w.phase += dt * (evo ? 2.1 : 2.6) / Math.max(0.5, cdm()));
+    if (evo) {
+      const [A] = swingAnchors(w, [sw * 1.25], 1.55, 'anchorA');
+      anchorHits(A, 30 * u * S.st.area, 0.45, 34 * u, e => hit(e, 90));
+      w.t -= dt;
+      // every few seconds the giant anchor slams into the sea and sends out a shockwave
+      if (w.t <= 0 && A.y > waveY(A.x) - 30 * u) {
+        w.t = 2.5 * cdm();
+        const y = waveY(A.x), R = 70 * u * S.st.area;
+        for (const e of S.threat) if (Math.hypot(e.x - A.x, e.y - y) < R + e.r * u) { if (hit(e, 120)) shove(e, 30 * u * S.st.kb); }
+        S.fx.push({ type: 'ring', x: A.x, y, t: 0, life: 0.5, r1: R, c: '#7dffe0' });
+        splash(A.x, y, 20); S.shake = Math.max(S.shake, 0.3); sfx('boom');
+      }
+      return;
+    }
+    const s = 0.8 + 0.1 * w.lv, dmg = L3(w, [30, 42, 52]), r = (14 + 3 * w.lv) * u * S.st.area;
+    for (const A of swingAnchors(w, w.lv >= 3 ? [sw * 1.05, -sw * 1.05] : [sw * 1.05], s, 'anchorW')) anchorHits(A, r, 0.5, 26 * u, e => hit(e, dmg));
+  },
+  medusa(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    const m = moonPos();
+    if (w.evo) {
+      w.t = 0.9 * cdm();
+      if (S.ents.filter(n => n.type === 'jelly').length < 12) dropJelly(m.x + rand(-90, 90) * u, { life: 8, zaps: 6, dmg: 70, chain: 2 });
+      return;
+    }
+    w.t = L3(w, [4, 3.5, 3]) * cdm();
+    for (let i = 0; i < (w.lv >= 3 ? 2 : 1); i++) dropJelly(m.x + (i ? 1 : -1) * rand(5, 55) * u, { life: L3(w, [8, 10, 10]), zaps: L3(w, [3, 4, 5]), dmg: L3(w, [40, 55, 70]) });
   },
   // ---- unions
   tiburonado(w, dt) {
@@ -1495,6 +1982,43 @@ const WUP = {
     }
     if (ts.length) { sfx('zap'); S.moonKick = 0.12; }
   },
+  galvana(w, dt) {
+    const sw = Math.sin(w.phase += dt * 2.6 / Math.max(0.5, cdm()));
+    for (const A of swingAnchors(w, [sw * 1.1, -sw * 1.1], 1.15, 'anchorG')) anchorHits(A, 24 * u * S.st.area, 0.45, 28 * u, e => { chain(e, 60, 2, [A.x, A.y]); return true; });
+    w.t -= dt;
+    if (w.t <= 0) { w.t = 2.6 * cdm(); const A = w.anchors[Math.random() < 0.5 ? 0 : 1]; dropJelly(A.x, { y: A.y, y0: A.y, drop: 0.25, life: 9, zaps: 4, dmg: 60 }); }
+  },
+  tempestad(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    w.t = 2.2 * cdm();
+    const m = moonPos();
+    for (let i = 0; i < 2; i++) dropJelly(m.x + (i ? 1 : -1) * rand(20, 80) * u, { life: 10, zaps: 6, dmg: 80, chain: 3, s: 1.15, k: 'jellyT', r: 46 * u * S.st.area });
+    S.flash = Math.max(S.flash, 0.03); sfx('thunder');
+  },
+  encadenadas(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    w.t = 1.1 * cdm();
+    const I = ISL();
+    // every other volley flies high if there are birds to hit
+    w.phase = w.phase ? 0 : 1;
+    const high = w.phase === 1 && S.threat.some(e => !e.isBoss && e.def.kind === 'fly');
+    for (const sd of [-1, 1]) {
+      const sx = sd < 0 ? I.l + 22 * u : I.r - 22 * u, sy = I.top - 14 * u;
+      S.proj.push({ type: 'chainshot', x: sx, y: sy, vx: sd * 560 * u, high, t: 0, dmg: 95, r: 20 * u * S.st.area * S.st.boom, hits: new Set() });
+      S.fx.push({ type: 'muzzle', x: sx, y: sy, t: 0, life: 0.15 });
+    }
+    S.cannonKick = 0.15; sfx('boom');
+  },
+  torbellino(w, dt) {
+    w.t -= dt; if (w.t > 0) return;
+    w.t = 3.2 * cdm();
+    for (const R of REEFS()) S.ents.push({ type: 'whirl', ice: true, x: R.c + rand(-10, 10) * u, r: 72 * u * S.st.area, life: 4.2, t: 0, dps: 60 });
+    // and a frost pulse around the moon for whatever flies
+    const m = moonPos(), R = 190 * u * S.st.area;
+    for (const e of S.threat) { if (Math.hypot(e.x - m.x, e.y - m.y) > R + e.r * u) continue; hit(e, 30); if (!e.isBoss) slowE(e, 3 * S.st.cc, 0.5); }
+    S.fx.push({ type: 'ring', x: m.x, y: m.y, t: 0, life: 0.6, r1: R, c: '#9fe3ff' });
+    sfx('freeze'); sfx('splash');
+  },
 };
 function segDist(px, py, x1, y1, x2, y2) {
   const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy;
@@ -1525,10 +2049,10 @@ function reefTopAt(top, px) {
 }
 const reefScaleY = () => (floorY() - levelY(REEF) + 4 * u) / 118;
 function reefPowers(dt) {
-  const t = S.reefT; if (t < 2) return;
+  const zap = reefHas(2), clam = reefHas(3), vent = reefHas(4); if (!zap && !clam && !vent) return;
   const cd = S.reefCd, pw = tideW() * S.st.reef;
-  cd.zap -= dt; if (t >= 3) cd.clam -= dt; if (t >= 4) cd.vent -= dt;
-  if (cd.zap <= 0) {
+  if (zap) cd.zap -= dt; if (clam) cd.clam -= dt; if (vent) cd.vent -= dt;
+  if (zap && cd.zap <= 0) {
     cd.zap = 2.2;
     let any = false;
     for (const p of reefPts('zap')) {
@@ -1542,7 +2066,7 @@ function reefPowers(dt) {
     }
     if (any) sfx('zap');
   }
-  if (t >= 3 && cd.clam <= 0) {
+  if (clam && cd.clam <= 0) {
     cd.clam = 4;
     const pts = reefPts('clam');
     pts.forEach((p, i) => {
@@ -1552,7 +2076,7 @@ function reefPowers(dt) {
       if (best) { hit(best, 60 * pw); best.frozen = Math.max(best.frozen, 1.2); best.grab = p; burst(best.x, best.y, 10, '#f3ead2', 120); sfx('crash'); }
     });
   }
-  if (t >= 4 && cd.vent <= 0) {
+  if (vent && cd.vent <= 0) {
     cd.vent = 5;
     for (const p of reefPts('vent')) {
       S.fx.push({ type: 'geyser', x: p.x, y: p.y, t: 0, life: 1.1 });
@@ -1573,9 +2097,36 @@ function updEnts(dt) {
       for (const e of S.seaT) {
         if (Math.abs(e.x - n.x) < n.r + e.r * u * 0.5) {
           hit(e, n.dps * dt, { dot: true, col: '#9fd8ff' });
-          if (!e.isBoss) { e.x += Math.sign(n.x - e.x) * 45 * u * dt; e.slow = Math.max(e.slow, 0.2); e.slowAmt = Math.max(e.slowAmt, 0.5); }
+          if (!e.isBoss && !e.def.ghost) {
+            e.x += Math.sign(n.x - e.x) * 45 * u * dt; slowE(e, 0.2, 0.5);
+            if (n.ice && (e.chill = (e.chill || 0) + dt) > 1.0) { e.chill = 0; freeze(e, 1.6 * S.st.cc, 50); }
+          }
         }
       }
+    } else if (n.type === 'jelly') {
+      if (n.drop > 0) {
+        n.drop -= dt; const f = 1 - Math.max(0, n.drop) / 0.4, wy = waveY(n.x);
+        n.y = n.y0 + (wy - n.y0) * f * f;
+        if (n.drop <= 0) { n.t = 0; burst(n.x, wy, 6, '#cfe6ff', 100); }
+        continue;
+      }
+      // drifts after the closest ship and stings it
+      let best = null, bd = 130 * u;
+      for (const e of S.seaT) { const d = Math.abs(e.x - n.x); if (d < bd) { bd = d; best = e; } }
+      if (best && bd > 8 * u) { const nx = n.x + Math.sign(best.x - n.x) * 30 * u * dt; if (Math.abs(nx - W / 2) > 60 * u) n.x = nx; }
+      n.y = waveY(n.x) + 2 * u + Math.sin(n.t * 2.4) * 3 * u;
+      if (n.zap > 0) n.zap -= dt;
+      if ((n.cd -= dt) <= 0) {
+        const tg = S.seaT.find(e => Math.abs(e.x - n.x) < n.r + e.r * u * 0.5 && Math.abs(e.y - n.y) < 90 * u);
+        if (tg) {
+          n.cd = 0.45; n.zaps--; n.zap = 0.15;
+          if (n.chain) chain(tg, n.dmg, n.chain, [n.x, n.y]);
+          else { hit(tg, n.dmg); S.fx.push({ type: 'bolt', x1: n.x, y1: n.y, x2: tg.x, y2: tg.y - tg.r * u * 0.4, t: 0, life: 0.18, pts: zig(n.x, n.y, tg.x, tg.y - tg.r * u * 0.4), c: n.k === 'jellyT' ? '#9fd8ff' : '#ffb0f4' }); }
+          if (!tg.isBoss) slowE(tg, 0.6, 0.35);
+          sfx('zap');
+        }
+      }
+      if (n.zaps <= 0 || n.t > n.life) { n.done = true; burst(n.x, n.y - 6 * u, 10, n.k === 'jellyT' ? '#9fb8ff' : '#ffb0f4', 110); }
     } else if (n.type === 'shark') {
       const w = hasW('tiburon'); if (!w) continue;
       const home = n.side < 0 ? W * 0.19 : W * 0.81, range = 80 * u * S.st.area;
@@ -1587,7 +2138,7 @@ function updEnts(dt) {
       const tx = n.tgt ? n.tgt.x : home + Math.sin(n.t * 1.3) * 30 * u;
       n.vx = clamp(tx - n.x, -260 * u * dt, 260 * u * dt); n.x += n.vx;
       if (Math.abs(n.vx) > 0.1) n.face = Math.sign(n.vx);
-      n.y = waveY(n.x) + 12 * u;
+      n.y = waveY(n.x) + 6 * u;   // just under the surface: only the dorsal fin breaks the water
       n.cd -= dt;
       if (n.tgt && Math.abs(n.tgt.x - n.x) < 16 * u + n.tgt.r * u * 0.5 && n.cd <= 0) { hit(n.tgt, dmg); n.cd = bcd; n.bite = 0.2; splash(n.x, waveY(n.x), 6); sfx('bite'); }
       if (n.bite > 0) n.bite -= dt;
@@ -1605,7 +2156,7 @@ function updEnts(dt) {
           n.leap = null; n.cd = 1.1 * cdm();
         }
       } else {
-        n.y = waveY(n.x) + 16 * u;
+        n.y = waveY(n.x) + 4 * u;
         if (n.cd <= 0 && S.seaT.length) { const e = S.seaT[0]; n.leap = { t: 0, x0: n.x, x1: e.x }; }
         else n.x += Math.sin(n.t) * 20 * u * dt;
       }
@@ -1616,7 +2167,7 @@ function updEnts(dt) {
         const d = Math.abs(e.x - W / 2);
         if (d <= n.r && d >= prev - 40 * u) {
           n.hits.add(e); hit(e, n.dmg);
-          if (!e.dead) { e.x += (e.x < W / 2 ? -1 : 1) * W * 0.32; e.atIsland = false; e.slow = 1; e.slowAmt = 0.6; }
+          if (!e.dead) { e.x += (e.x < W / 2 ? -1 : 1) * W * 0.32 * (e.def.ghost ? 0.5 : 1); e.atIsland = false; slowE(e, 1, 0.6); }
         }
       }
       const b = S.boss;
@@ -1633,9 +2184,19 @@ function updEnts(dt) {
 function updEnemy(e, dt) {
   e.t += dt; if (e.flash > 0) e.flash -= dt; if (e.dotT > 0) e.dotT -= dt;
   const def = e.def, I = ISL();
+  if (def.ghost) { updGhost(e, dt, I); return; }
   let sp = e.spd * S.spdMul;
-  if (e.frozen > 0) { e.frozen -= dt; sp = 0; if (e.frozen <= 0) { e.grab = null; if (e.shatter) { const s = e.shatter; e.shatter = 0; hit(e, s); shards(e.x, e.y); } } }
-  if (e.slow > 0) { e.slow -= dt; sp *= (1 - e.slowAmt); }
+  if (e.psn > 0) { e.psn -= dt; hit(e, e.psnD * dt, { dot: true, col: '#9be15d' }); if (e.dead) return; if (e.psn <= 0) e.psnD = 0; }
+  if (e.tr) {
+    // spectral: every few seconds it fades out of reach for a moment
+    if (e.tr.espectral && (e.phaseT -= dt) <= 0) { e.phased = !e.phased; e.phaseT = e.phased ? 1.2 : rand(2.6, 3.6); }
+    if (e.tr.igneo && Math.random() < dt * 9) S.parts.push({ x: e.x + rand(-0.6, 0.6) * e.r * u, y: e.y - e.r * u * rand(0.4, 1.4), vx: rand(-10, 10), vy: -rand(30, 70), t: 0, life: 0.45, c: Math.random() < 0.5 ? '#ffb347' : '#ff6a3d', s: rand(1.8, 3), g: -40 });
+    if (e.tr.veloz && !e.atIsland && e.frozen <= 0 && Math.random() < dt * 14) S.parts.push({ x: e.x - e.dir * e.r * u, y: e.y - e.r * u * rand(0.2, 1.2), vx: -e.dir * rand(60, 120), vy: 0, t: 0, life: 0.25, c: '#fff6c2', s: 1.6, g: 0 });
+  }
+  if (e.frozen > 0) { e.frozen -= dt; sp = 0; if (e.frozen <= 0) { e.grab = null; e.thaw = 1.8; if (e.shatter) { const s = e.shatter; e.shatter = 0; hit(e, s); shards(e.x, e.y); } } }
+  else if (e.thaw > 0) { e.thaw -= dt; if (Math.random() < dt * 10) S.parts.push({ x: e.x + rand(-1, 1) * e.r * u, y: e.y - e.r * u * 0.6, vx: 0, vy: 20, t: 0, life: 0.4, c: '#bff0ff', s: 2, g: 300 }); }
+  if (e.frz && (e.frzT -= dt) <= 0) { e.frz--; e.frzT = 4; }
+  if (e.slow > 0) { e.slow -= dt; sp *= (1 - e.slowAmt); if (e.slow <= 0) e.slowAmt = 0; }
   if (e.bleed > 0) { e.bleed -= dt; hit(e, 0.35 * reefDps() * dt, { dot: true, col: '#ff8a8a' }); }
   // thrown into the air by a geyser
   if (e.air) {
@@ -1652,7 +2213,7 @@ function updEnemy(e, dt) {
     if (over && lvl - REEF < def.draft) {
       sp *= 0.35;
       hit(e, reefDps() * dt, { dot: true, col: '#9fd8ff' });
-      if (S.reefT >= 1) e.bleed = 2.5;
+      if (reefHas(1)) e.bleed = 2.5;
       if (Math.random() < dt * 6) { sparks(e.x, e.y + 6 * u); sfx('crash'); }
       if (!S.seen.crashTip) { S.seen.crashTip = 1; tip('crash', '¡Encallan!', 'Con marea baja los barcos se destrozan contra el arrecife'); }
     }
@@ -1680,7 +2241,7 @@ function updEnemy(e, dt) {
   }
   // the moon's pull drags sea enemies back out to sea and wears them down
   if ((def.kind === 'ship' || def.kind === 'swim') && pull > 0.05) {
-    e.x -= e.dir * pull * 26 * u * dt;
+    e.x -= e.dir * pull * 26 * u * S.st.kb * dt;
     hit(e, 9 * pull * S.st.reef * tideW() * dt, { dot: true, col: '#cfe6ff' });
     if (e.atIsland) e.atIsland = false;
   }
@@ -1696,15 +2257,27 @@ function updEnemy(e, dt) {
   else if (def.kind === 'fly') stop = W / 2 - e.dir * (16 + (e.wob * 4) % 20) * u;
   else stop = e.dir > 0 ? I.l - 16 * u - e.r * u * 0.6 : I.r + 16 * u + e.r * u * 0.6;
   const past = e.dir > 0 ? e.x >= stop : e.x <= stop;
+  if (def.fuse && !past && Math.abs(stop - e.x) < W * 0.22) { e.fuse = (e.fuse || 0) - dt; if (e.fuse <= 0) { e.fuse = 0.5; sfx('warn'); } }
   if (!past) { e.x += e.dir * sp * u * dt; e.atIsland = false; }
   else {
     e.x = stop; e.atIsland = true;
     if (e.frozen <= 0) {
       if (def.ranged) {
         e.fireT -= dt;
-        if (e.fireT <= 0) { e.fireT = 3; const g = 700 * u, Tf = 1.1, tx = W / 2 + rand(-30, 30) * u, ty = I.top - 6 * u; S.proj.push({ type: 'bomb', x0: e.x, y0: e.y - 10 * u, x: e.x, y: e.y, vx: (tx - e.x) / Tf, vy: (ty - e.y + 10 * u) / Tf - 0.5 * g * Tf, g, t: 0, T: Tf, dmg: 5 * scaleW() * 0.8, hostile: true }); S.fx.push({ type: 'muzzle', x: e.x, y: e.y - 12 * u, t: 0, life: 0.15 }); e.recoil = 0.3; }
+        if (e.fireT <= 0) {
+          // from wave 9 every third shot is a huge incendiary shell (every other one during a bombardment)
+          e.fireT = 3; e.shots++;
+          const big = (S.wave >= 9 || (S.theme && S.theme.id === 'bombardeo')) && e.shots % (S.theme && S.theme.id === 'bombardeo' ? 2 : 3) === 0;
+          const g = 700 * u, Tf = big ? 2.1 : 1.1, tx = W / 2 + rand(-30, 30) * u, ty = I.top - 6 * u;
+          S.proj.push({ type: 'bomb', big, x0: e.x, y0: e.y - 10 * u, x: e.x, y: e.y, vx: (tx - e.x) / Tf, vy: (ty - e.y + 10 * u) / Tf - 0.5 * g * Tf, g, t: 0, T: Tf, tx, ty,
+            dmg: big ? S.maxHp * 0.07 + 6 * scaleW() : 6 * scaleW() * e.dpsK, hostile: true });
+          S.fx.push({ type: 'muzzle', x: e.x, y: e.y - 12 * u, t: 0, life: big ? 0.3 : 0.15 }); e.recoil = 0.3;
+          if (big) { sfx('boom'); if (!S.seen.bigShell) { S.seen.bigShell = 1; tip('bigShell', '¡Bala incendiaria!', 'Pon la luna en su camino para detenerla'); } }
+        }
+      } else if (def.fuse) {
+        bruloteBoom(e, true); e.dead = true; e.dyT = 0; S.dying.push(e); return;
       } else {
-        islandDamage(def.dps * dt * (1 + 0.04 * S.wave), false, e.type);
+        islandDamage(def.dps * e.dpsK * dt * (1 + 0.06 * S.wave + 0.002 * S.wave * S.wave), false, e.type);
         if (def.kind === 'fly' && (e.peck = (e.peck || 0) + dt) > 2.6) { e.leave = true; e.lift = 0; e.dir = -e.dir; e.atIsland = false; }
       }
     }
@@ -1712,20 +2285,80 @@ function updEnemy(e, dt) {
   if (e.x < -200 * u || e.x > W + 200 * u) e.dead = true;
 }
 
+// the Flying Dutchman: drifts in through reefs and ice alike; the moon's pull only slows it.
+// Damage throws it back (see repel); at the island it tears the island apart until it is pushed off
+function updGhost(e, dt, I) {
+  e.life -= dt;
+  const base = waveY(e.x) - 4 * u + Math.sin(e.t * 1.6) * 3 * u;
+  if (e.life <= 0) { e.fade = (e.fade || 0) + dt; e.y = base + e.fade * 30 * u; if (e.fade > 1.4) e.dead = true; return; }
+  e.y = base;
+  if (Math.random() < dt * 8) S.parts.push({ x: e.x + rand(-40, 40) * u, y: e.y - rand(0, 50) * u, vx: rand(-15, 15), vy: -rand(10, 30), t: 0, life: 1, c: '#9dffd8', s: rand(1.5, 3), g: -10 });
+  const stop = e.dir > 0 ? I.l - 30 * u : I.r + 30 * u;
+  if (e.back > 0) { e.back -= dt; e.x -= e.dir * 150 * u * dt * Math.min(1, e.back); e.atIsland = false; return; }
+  const sp = (e.spd + 0.4 * Math.max(0, S.wave - 25)) * u * (1 - 0.45 * pullAt(e.x) / 0.3);
+  const past = e.dir > 0 ? e.x >= stop : e.x <= stop;
+  if (!past) { e.x += e.dir * sp * dt; e.atIsland = false; }
+  else {
+    e.x = stop;
+    if (!e.atIsland) { e.atIsland = true; banner('¡El Holandés aborda la isla!', '¡Quítale la vida para echarlo!', 1.4, true); }
+    islandDamage(S.maxHp * 0.3 * dt, true, 'ghost');
+    if (Math.random() < dt * 4) S.shake = Math.max(S.shake, 0.3);
+  }
+}
 // =====================================================================
 // PROJECTILES
 // =====================================================================
+const SPIT_COL = { ink: ['#2a1640', '#4a2a6e'], lava: ['#ff8a3d', '#ffcf6b'], ice: ['#bff0ff', '#e8fbff'] };
+function moonSplat(k) {
+  const m = moonPos();
+  S.moonSlow = k === 'ice' ? 2.5 : 3; S.moonSlowK = k;
+  burst(m.x, m.y, 18, SPIT_COL[k][0], 190); sfx(k === 'ice' ? 'freeze' : 'hurt'); vib([40, 30, 60]);
+  S.face = 'hurt'; S.faceT = 1;
+  if (!S.seen.splat) { S.seen.splat = 1; banner(k === 'ice' ? '¡Luna congelada!' : k === 'lava' ? '¡Luna quemada!' : '¡Luna entintada!', 'Se mueve más lenta unos segundos', 1.4); }
+}
 function updProj(dt) {
   for (const p of S.proj) {
+    if (p.type === 'chainshot') {   // two balls on a chain skim the sea (or fly at bird height) and plough through everything
+      p.t += dt; p.x += p.vx * dt;
+      const ty = p.high ? levelY(1.15) : waveY(p.x) - 12 * u;
+      p.y += (ty - p.y) * Math.min(1, dt * 10);
+      for (const e of S.threat) {
+        const cy = e.y - (e.isBoss ? 0 : e.r * u * 0.4);
+        if (p.hits.has(e) || Math.abs(e.x - p.x) > p.r + e.r * u * 0.6 || Math.abs(cy - p.y) > p.r + e.r * u) continue;
+        p.hits.add(e); if (hit(e, p.dmg)) { shove(e, 22 * u * S.st.kb); sparks(e.x, cy); }
+      }
+      if (p.x < -50 * u || p.x > W + 50 * u) p.done = true;
+      continue;
+    }
+    if (p.type === 'spit') {   // boss spit aimed at the moon: ink, lava or ice
+      p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt;
+      const m = moonPos();
+      if (Math.hypot(p.x - m.x, p.y - m.y) < MOON_R() + p.r) { p.done = true; moonSplat(p.k); }
+      else if (p.t > p.life || p.x < -40 * u || p.x > W + 40 * u || p.y < -40 * u || p.y > H) p.done = true;
+      if (Math.random() < 0.5) S.parts.push({ x: p.x, y: p.y, vx: rand(-20, 20), vy: rand(-10, 30), t: 0, life: 0.4, c: SPIT_COL[p.k][1], s: 3, g: 120 });
+      continue;
+    }
     if (p.type === 'ball' || p.type === 'bomb' || p.type === 'sharkp') {
       p.t += dt; p.x = p.x0 + p.vx * p.t; p.y = p.y0 + p.vy * p.t + 0.5 * p.g * p.t * p.t;
+      // the moon can stop enemy shells in mid-air
+      if (p.hostile) {
+        const m = moonPos();
+        if (Math.hypot(p.x - m.x, p.y - m.y) < MOON_R() + (p.big ? 12 : 6) * u) {
+          p.done = true; S.intercepts++; missionProgress('intercept', 1);
+          burst(p.x, p.y, p.big ? 22 : 12, p.big ? '#ff8a3d' : '#cfd6e6', p.big ? 220 : 150); sfx(p.big ? 'boom' : 'pop'); vib(15);
+          S.nums.push({ x: p.x, y: p.y - 14 * u, v: '¡Bloqueada!', txt: true, col: '#9fe3ff', t: 0 }); S.moonKick = 0.15;
+          if (!S.seen.blockTip) { S.seen.blockTip = 1; tip('block', '¡Bala detenida!', 'La luna para las balas enemigas que toca'); }
+          continue;
+        }
+        if (p.big && Math.random() < 0.7) S.parts.push({ x: p.x, y: p.y, vx: rand(-20, 20), vy: rand(-20, 10), t: 0, life: 0.45, c: Math.random() < 0.5 ? '#ffb347' : '#ff6a3d', s: rand(2, 3.5), g: -30 });
+      }
       if (p.t >= p.T) {
         p.done = true;
         if (p.type === 'ball') {
           explode(p.x, p.y, p.r, p.dmg, p.thunder ? '#bfe3ff' : '#ffb36b'); sfx('boom');
           if (p.thunder) { const near = S.threat.filter(o => Math.hypot(o.x - p.x, o.y - p.y) < 110 * u).slice(0, 3); for (const o of near) chain(o, 55, 0, [p.x, p.y]); if (near.length) sfx('thunder'); }
         } else if (p.type === 'sharkp') { explode(p.x, p.y, p.r, p.dmg, '#cfe6ff'); splash(p.x, p.y, 16); sfx('bite'); }
-        else { islandDamage(p.dmg, false, 'mortar'); boomFx(p.x, p.y, 22 * u, '#ff7a3d'); sfx('boom'); }
+        else { islandDamage(p.dmg, false, 'mortar'); boomFx(p.x, p.y, (p.big ? 46 : 22) * u, '#ff7a3d'); sfx(p.big ? 'bigboom' : 'boom'); if (p.big) { S.shake = Math.max(S.shake, 0.6); vib([60, 30, 90]); S.face = 'hurt'; S.faceT = 1; } }
       }
     } else {
       const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy), step = p.spd * dt;
@@ -1767,18 +2400,18 @@ function hazards(dt) {
 // =====================================================================
 function useActive() {
   if (mode !== 'play' || S.charge < 1 || S.mods.noActive) return;
-  S.charge = 0;
+  S.charge = 0; missionProgress('active', 1);
   const id = S.moon.id;
   if (id === 'llena') tsunami(1);
   else if (id === 'roja') { S.furia = 8; banner('¡Furia!', 'Doble daño durante 8 s', 1.4); }
   else if (id === 'hielo') {
-    for (const e of S.enemies) { e.frozen = 4 * S.st.cc; hit(e, 40); }
+    for (const e of S.enemies) { freeze(e, 4 * S.st.cc, 0, true); hit(e, 40); }
     if (S.boss && !S.boss.dead) { S.boss.frozen = 1.6; hit(S.boss, 80); }
     S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.8, r1: W * 1.1, c: '#e6fbff' });
     banner('¡Ventisca!', '', 1.2); sfx('freeze');
   } else if (id === 'nueva') { S.eclipse = 6; banner('¡Eclipse!', 'La isla es invulnerable', 1.4); }
   else if (id === 'tormenta') { S.diluvio = 6; S.diluvioT = 0; banner('¡Diluvio!', 'Rayos por todo el mar', 1.4); }
-  else if (id === 'dorada') { S.fiebre = 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una moneda', 1.4); }
+  else if (id === 'dorada') { S.fiebre = 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
   S.face = 'angry'; S.faceT = 1.6;
   sfx('tsunami'); vib([60, 40, 140]);
   S.shake = Math.max(S.shake, 0.6);
@@ -1790,7 +2423,8 @@ function tsunami(mult) { S.ents.push({ type: 'tsunami', r: 0, t: 0, hits: new Se
 // =====================================================================
 function evoReady(w) { return w.lv >= 3 && !w.evo && !w.union && (WEAPONS[w.id].pair in S.passives); }
 function unionsReady() { return Object.keys(UNIONS).filter(k => { const U = UNIONS[k], a = hasW(U.a), b = hasW(U.b); return a && b && a.lv >= 3 && b.lv >= 3; }); }
-const unionOf = id => Object.keys(UNIONS).find(k => UNIONS[k].a === id || UNIONS[k].b === id);
+// a weapon can join more than one union: these are the partners it can merge with
+const unionMates = id => Object.values(UNIONS).filter(U => U.a === id || U.b === id).map(U => U.a === id ? U.b : U.a);
 function rollCards() {
   const opts = [];
   const top = S.weapons.filter(evoReady).map(w => ({ k: 'evo', id: w.id })).concat(unionsReady().map(id => ({ k: 'union', id })));
@@ -1814,13 +2448,13 @@ function cardInfo(c) {
   if (c.k === 'union') { const U = UNIONS[c.id]; return { ico: U.ico, name: U.name, d: `${U.desc} Une ${WEAPONS[U.a].name} y ${WEAPONS[U.b].name}.`, tag: 'UNIÓN', cls: 'union' }; }
   if (c.k === 'wup') { const w = hasW(c.id), D = WEAPONS[c.id]; return { ico: D.ico, name: D.name, d: D.lv[w.lv], tag: `NIVEL ${w.lv + 1}`, cls: '', lv: w.lv + 1 }; }
   if (c.k === 'wnew') {
-    const D = WEAPONS[c.id], uk = unionOf(c.id), U = uk && UNIONS[uk], mate = U && (U.a === c.id ? U.b : U.a);
-    return { ico: D.ico, name: D.name, d: `${D.desc}${mate && hasW(mate) ? ` A nivel 3 se une con ${WEAPONS[mate].name}.` : ''}`, tag: 'NUEVA', cls: 'new', lv: 1 };
+    const D = WEAPONS[c.id], mates = unionMates(c.id).filter(m => hasW(m)).map(m => WEAPONS[m].name);
+    return { ico: D.ico, name: D.name, d: `${D.desc}${mates.length ? ` A nivel 3 se une con ${mates.join(' o ')}.` : ''}`, tag: 'NUEVA', cls: 'new', lv: 1 };
   }
   if (c.k === 'pup') { const D = PASSIVES[c.id]; return { ico: D.ico, name: D.name, d: `${D.desc}.`, tag: `NIVEL ${S.passives[c.id] + 1}`, cls: '', lv: S.passives[c.id] + 1 }; }
-  if (c.k === 'pnew') { const D = PASSIVES[c.id], pair = Object.keys(WEAPONS).find(k => WEAPONS[k].pair === c.id); return { ico: D.ico, name: D.name, d: `${D.desc}. Fusiona con ${WEAPONS[pair].name} a nivel 3.`, tag: 'NUEVA', cls: 'new', lv: 1 }; }
+  if (c.k === 'pnew') { const D = PASSIVES[c.id], pair = Object.keys(WEAPONS).find(k => WEAPONS[k].pair === c.id); return { ico: D.ico, name: D.name, d: `${D.desc}.${pair ? ` Fusiona con ${WEAPONS[pair].name} a nivel 3.` : ''}`, tag: 'NUEVA', cls: 'new', lv: 1 }; }
   if (c.k === 'heal') return { ico: 'i_vida', name: 'Reparar la isla', d: 'Recupera el 35% de la vida.', tag: '', cls: '' };
-  return { ico: 'i_monedas', name: 'Bolsa de monedas', d: `+${Math.round(15 * S.isl.coin * S.coinMul)} monedas.`, tag: '', cls: '' };
+  return { ico: 'i_perla', name: 'Bolsa de perlas', d: `+${Math.round(15 * S.isl.coin * S.coinMul)} perlas para el mercader.`, tag: '', cls: '' };
 }
 function applyCard(c) {
   if (c.k === 'evo') {
@@ -1839,10 +2473,10 @@ function applyCard(c) {
     sfx('evo'); vib([40, 30, 40, 30, 160]); S.flash = 0.35; S.face = 'happy'; S.faceT = 1.6;
   } else if (c.k === 'wup') { hasW(c.id).lv++; syncEnts(); }
   else if (c.k === 'wnew') addWeapon(c.id);
-  else if (c.k === 'pup') S.passives[c.id]++;
-  else if (c.k === 'pnew') S.passives[c.id] = 1;
+  else if (c.k === 'pup') { S.passives[c.id]++; passiveGained(c.id); }
+  else if (c.k === 'pnew') { S.passives[c.id] = 1; passiveGained(c.id); }
   else if (c.k === 'heal') S.hp = Math.min(S.maxHp, S.hp + S.maxHp * 0.35);
-  else S.coinsRun += Math.round(15 * S.isl.coin * S.coinMul);
+  else { const n = Math.round(15 * S.isl.coin * S.coinMul); S.pearls += n; S.pearlsGot += n; }
   recompute();
   if (c.k === 'pnew' || c.k === 'pup') syncEnts();
 }
@@ -1882,22 +2516,29 @@ function chooseCard(i) {
 $('rerollBtn').addEventListener('click', () => { if (S.rerolls > 0) { S.rerolls--; currentCards = rollCards(); renderCards(); sfx('card'); } });
 
 // =====================================================================
-// MERCHANT (docks after each boss; coins buy boosts for this run only)
+// MERCHANT (docks every 5 waves; pearls buy boosts for this run only)
 // =====================================================================
-let wares = [];
-const wareCost = w => Math.round(w.cost * S.isl.coin * (1 + 0.2 * S.danger) * (1 + 0.25 * Math.floor((S.wave - 1) / 10)));
-function openMerchant() {
-  mode = 'merchant';
+let wares = [], mRerolls = 0;
+const wareCost = w => Math.round(w.cost * S.isl.coin * (1 + 0.3 * S.danger) * (1 + 0.35 * Math.floor((S.wave - 1) / 5)));
+// spare pearls can buy a fresh set of wares; each change this visit costs more
+const rerollCost = () => Math.round(12 * S.isl.coin * (1 + 0.3 * S.danger) * (1 + mRerolls));
+function rollWares() {
   const pool = WARES.filter(w => !(w.id === 'wnew' && S.weapons.length >= S.slots));
   wares = [];
-  while (wares.length < 3 && pool.length) wares.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  while (wares.length < 4 && pool.length) wares.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+}
+function rerollWares() { const c = rerollCost(); if (purse() < c) return; spend(c); mRerolls++; rollWares(); renderMerchant(); }
+function openMerchant() {
+  mode = 'merchant'; mRerolls = 0;
+  rollWares();
   renderMerchant();
   show('scrMerchant'); setAudioGains(); sfx('coin');
 }
-const purse = () => Math.floor(save.coins + S.coinsRun);
-function spend(n) { const fromRun = Math.min(S.coinsRun, n); S.coinsRun -= fromRun; save.coins -= n - fromRun; persist(); }
+const purse = () => Math.floor(S.pearls);
+function spend(n) { S.pearls -= n; }
 function renderMerchant() {
   $('mPurse').textContent = purse().toLocaleString('es');
+  $('mRerollCost').textContent = rerollCost(); $('mReroll').disabled = purse() < rerollCost();
   $('mShip').innerHTML = pic('merchant0', 120);
   const box = $('wares'); box.innerHTML = '';
   wares.forEach((w, i) => {
@@ -1905,21 +2546,35 @@ function renderMerchant() {
     el.innerHTML = `<span class="ico" aria-hidden="true">${ico(w.ico, 40)}</span><span><b>${w.name}</b><span class="d">${w.desc}</span></span>`;
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy';
     if (w.sold) { btn.textContent = 'Comprado'; btn.disabled = true; }
-    else { btn.innerHTML = `<i class="coin"></i>${cost}`; btn.disabled = purse() < cost; btn.onclick = () => { spend(cost); buyWare(w); w.sold = true; sfx('coin'); vib(15); renderMerchant(); }; }
+    else { btn.innerHTML = `<i class="pearl"></i>${cost}`; btn.disabled = purse() < cost; btn.onclick = () => { spend(cost); buyWare(w, cost); w.sold = true; sfx('coin'); vib(15); renderMerchant(); }; }
     el.appendChild(btn); box.appendChild(el);
   });
 }
-function buyWare(w) {
+function buyWare(w, paid) {
+  S.bought++; missionProgress('merchant', 1);
   if (w.id === 'heal') S.hp = S.maxHp;
-  else if (w.id === 'wup') { const l = S.weapons.filter(x => !x.evo && !x.union && x.lv < 3); if (l.length) { pick(l).lv++; syncEnts(); } else S.coinsRun += wareCost(w); }
+  else if (w.id === 'wup') { const l = S.weapons.filter(x => !x.evo && !x.union && x.lv < 3); if (l.length) { pick(l).lv++; syncEnts(); } else S.pearls += wareCost(w); }
   else if (w.id === 'wnew') { const l = Object.keys(WEAPONS).filter(id => !hasW(id) && !S.weapons.find(x => x.union && (UNIONS[x.id].a === id || UNIONS[x.id].b === id))); if (l.length && S.weapons.length < S.slots) addWeapon(pick(l)); }
-  else if (w.id === 'pnew') { const own = Object.keys(S.passives).filter(p => S.passives[p] < 3), fresh = Object.keys(PASSIVES).filter(p => !(p in S.passives)); if (fresh.length && Object.keys(S.passives).length < 5) S.passives[pick(fresh)] = 1; else if (own.length) S.passives[pick(own)]++; }
+  else if (w.id === 'pnew') { const own = Object.keys(S.passives).filter(p => S.passives[p] < 3), fresh = Object.keys(PASSIVES).filter(p => !(p in S.passives)); const id = fresh.length && Object.keys(S.passives).length < 5 ? pick(fresh) : own.length ? pick(own) : null; if (id) { S.passives[id] = (S.passives[id] || 0) + 1; passiveGained(id); } }
   else if (w.id === 'dmg') S.runDmg *= 1.2;
   else if (w.id === 'maxhp') { S.maxHp *= 1.3; S.hp *= 1.3; }
   else if (w.id === 'revive') S.revives++;
   else if (w.id === 'magnet') S.magnetMul *= 2;
+  else if (w.id === 'card') S.xp = Math.max(S.xp, S.need);
+  else if (w.id === 'reroll') S.rerolls += 2;
+  else if (w.id === 'charge') S.charge = 1;
+  else if (w.id === 'reef') S.runReef *= 1.3;
+  else if (w.id === 'crit') S.runCrit += 0.08;
+  else if (w.id === 'cd') S.runCd *= 0.9;
+  else if (w.id === 'xp') S.runXp *= 1.25;
+  else if (w.id === 'coins') S.bonusCoins += Math.round((paid || wareCost(w)) * 1.6);
+  else if (w.id === 'chest') openChest();
+  else if (w.id === 'armor') S.runTaken *= 0.85;
+  else if (w.id === 'regen') S.regen += 1;
   recompute();
 }
+// passives that change the island itself apply on the spot
+function passiveGained(id) { if (id === 'nacar') { S.maxHp *= 1.15; S.hp = Math.min(S.maxHp, S.hp * 1.15 + S.maxHp * 0.1); S.regen += 0.5; } }
 
 // =====================================================================
 // MAIN UPDATE
@@ -1944,6 +2599,10 @@ function update(dt) {
   S.t += dt;
   keyMove(dt);
   if (S.moonLock > 0) S.moonLock -= dt;
+  if (S.moonSlow > 0) S.moonSlow -= dt;
+  if (S.night > 0) S.night -= dt;
+  for (const w of S.warn) w.t += dt;
+  S.warn = S.warn.filter(w => w.t < w.life);
   updTide(dt);
   S.hp = Math.min(S.maxHp, S.hp + S.regen * dt);
   if (S.hurtT > 0) S.hurtT -= dt;
@@ -1980,7 +2639,7 @@ function update(dt) {
   S.parts = S.parts.filter(p => p.t < p.life);
   if (S.parts.length > 700) S.parts.splice(0, S.parts.length - 700);
   for (const n of S.nums) n.t += dt;
-  S.nums = S.nums.filter(n => n.t < 0.8);
+  S.nums = S.nums.filter(n => n.t < (n.txt ? 1.2 : 0.8));
   if (S.moonKick > 0) S.moonKick -= dt;
   if (S.cannonKick > 0) S.cannonKick -= dt;
   S.shake = Math.max(0, S.shake - dt * 1.6);
@@ -2008,7 +2667,9 @@ function boomFx(x, y, r, c = '#ffb36b') { S.fx.push({ type: 'boom', x, y, r, t: 
 const OUTLINE = '#1c1430';
 function pal() { return (S ? ISLANDS[S.palIdx] : ISLANDS[0]).pal; }
 const biome = () => (S ? ISLANDS[S.palIdx] : ISLANDS[0]).id;
-const reefTier = () => S ? S.reefT : save.reef;
+// the reef sprite is the highest design switched on; each power is checked on its own
+const reefTier = () => S ? S.reefT : Math.max(0, ...reefActive());
+const reefHas = k => (S ? S.reefOn : reefActive()).includes(k);
 function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; }
 function rr(x, y, w, h, r) { ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); }
 function softGlow(x, y, r, col, a) {
@@ -2023,10 +2684,12 @@ function drawSky() {
   g.addColorStop(0, P.sky[0]); g.addColorStop(0.6, P.sky[1]); g.addColorStop(1, P.sky[2]);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   for (const s of stars) { ctx.fillStyle = `rgba(${P.star},${0.45 + 0.4 * Math.sin(T * 1.3 + s.p)})`; ctx.fillRect(s.x, s.y, s.r * 1.4, s.r * 1.4); }
-  const hz = levelY(1) + 4 * u;
-  ctx.globalAlpha = 0.85;
-  if (!spr('farA', W * 0.14, hz, 0.9 * u) || !spr('farB', W * 0.86, hz, 0.8 * u)) {
-    ctx.fillStyle = P.far; ctx.beginPath(); ctx.moveTo(0, hz); ctx.quadraticCurveTo(W * 0.1, hz - 22, W * 0.24, hz); ctx.moveTo(W * 0.72, hz); ctx.quadraticCurveTo(W * 0.86, hz - 28, W, hz); ctx.fill();
+  // distant sea stacks rise from the sea floor, so the tide always laps at them; their tops sit just above high water
+  const fy = floorY(), sy = (fy - levelY(0.98)) / 192;
+  ctx.globalAlpha = 0.65;
+  if (!spr('stackA', W * 0.09, fy, 0.75 * u, false, 0, sy) || !spr('stackB', W * 0.91, fy, 0.75 * u, false, 0, sy)) {
+    const hz = levelY(0.95);
+    ctx.fillStyle = P.far; ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(0, hz); ctx.quadraticCurveTo(W * 0.1, hz - 22, W * 0.2, fy); ctx.moveTo(W * 0.8, fy); ctx.quadraticCurveTo(W * 0.9, hz - 28, W, hz); ctx.lineTo(W, fy); ctx.fill();
   }
   ctx.globalAlpha = 0.42;
   for (const c of clouds) { c.x += c.v / 60; if (c.x > W + 90 * u) c.x = -90 * u; spr(`cloud${c.k}`, c.x, c.y, c.s * u); }
@@ -2072,13 +2735,13 @@ function drawReefs() {
   }
   drawCoralSpikes();
   if (!S && tier < 2) return;
-  if (tier >= 2) {
+  if (reefHas(2)) {
     const zap = S ? S.reefCd.zap : 1;
     for (const p of (S ? reefPts('zap') : [])) softGlow(p.x, p.y, (9 + (zap < 0.3 ? 10 : 3 * Math.sin(T * 5 + p.x))) * u, '#8ff7ff', 0.55);
   }
   const cs = (FR[name]?.pts?.clamS || 0.8) * u;
-  if (tier >= 3 && S) reefPts('clam').forEach((p, i) => spr((S.clamSnap?.[i % 2] || 0) > 0 ? 'clam1' : 'clam0', p.x, p.y, cs, p.x > W / 2));
-  if (tier >= 4 && S) for (const p of reefPts('vent')) softGlow(p.x, p.y, (8 + 3 * Math.sin(T * 4 + p.x)) * u, '#ff8a3d', 0.6);
+  if (reefHas(3) && S) reefPts('clam').forEach((p, i) => spr((S.clamSnap?.[i % 2] || 0) > 0 ? 'clam1' : 'clam0', p.x, p.y, cs, p.x > W / 2));
+  if (reefHas(4) && S) for (const p of reefPts('vent')) softGlow(p.x, p.y, (8 + 3 * Math.sin(T * 4 + p.x)) * u, '#ff8a3d', 0.6);
 }
 function drawLand() {
   const P = pal(), I = ISL(), fy = floorY(), b = biome();
@@ -2161,8 +2824,22 @@ function drawWater(back) {
 }
 
 // ---- enemies
-const SHIP_K = { sloop: 0.6, galleon: 0.6, mortar: 0.6, gold: 0.62 };
-const SHIP_SPR = { sloop: 'sloop', galleon: 'galleon', mortar: 'mortar', gold: 'goldship' };
+const SHIP_K = { sloop: 0.6, galleon: 0.6, mortar: 0.6, gold: 0.62, brulote: 0.62, ghost: 0.78 };
+const SHIP_SPR = { sloop: 'sloop', galleon: 'galleon', mortar: 'mortar', gold: 'goldship', brulote: 'brulote', ghost: 'ghost' };
+// little round badges over an enemy, one per trait
+function traitGlyph(id, x, y, r) {
+  const T0 = TRAITS[id];
+  ctx.fillStyle = 'rgba(16,10,30,0.85)'; ctx.beginPath(); ctx.arc(x, y, r + 1.5, 0, TAU); ctx.fill();
+  ctx.fillStyle = T0.col; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#1a0e26'; ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = Math.max(1, r * 0.22); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const k = r / 6;
+  ctx.beginPath();
+  if (id === 'acorazado') { ctx.moveTo(x, y - 4 * k); ctx.lineTo(x + 3.6 * k, y - 2.6 * k); ctx.quadraticCurveTo(x + 3.4 * k, y + 2.6 * k, x, y + 4.4 * k); ctx.quadraticCurveTo(x - 3.4 * k, y + 2.6 * k, x - 3.6 * k, y - 2.6 * k); ctx.closePath(); ctx.fill(); }
+  else if (id === 'veloz') { for (const dx of [-2.2, 1]) { ctx.moveTo(x + dx * k - 1 * k, y - 3.2 * k); ctx.lineTo(x + dx * k + 2 * k, y); ctx.lineTo(x + dx * k - 1 * k, y + 3.2 * k); } ctx.stroke(); }
+  else if (id === 'igneo') { ctx.moveTo(x, y + 4 * k); ctx.bezierCurveTo(x - 4.2 * k, y + 3 * k, x - 3 * k, y - 1.6 * k, x - 0.4 * k, y - 4.4 * k); ctx.bezierCurveTo(x, y - 1.8 * k, x + 1.8 * k, y - 2.2 * k, x + 1.6 * k, y - 3.4 * k); ctx.bezierCurveTo(x + 4.4 * k, y - 1 * k, x + 3.4 * k, y + 3.4 * k, x, y + 4 * k); ctx.fill(); }
+  else if (id === 'gigante') { ctx.moveTo(x, y - 4 * k); ctx.lineTo(x + 3.8 * k, y + 0.4 * k); ctx.lineTo(x + 1.5 * k, y + 0.4 * k); ctx.lineTo(x + 1.5 * k, y + 3.8 * k); ctx.lineTo(x - 1.5 * k, y + 3.8 * k); ctx.lineTo(x - 1.5 * k, y + 0.4 * k); ctx.lineTo(x - 3.8 * k, y + 0.4 * k); ctx.closePath(); ctx.fill(); }
+  else { ctx.moveTo(x - 3.2 * k, y + 3.8 * k); ctx.lineTo(x - 3.2 * k, y - 0.6 * k); ctx.arc(x, y - 0.6 * k, 3.2 * k, Math.PI, 0); ctx.lineTo(x + 3.2 * k, y + 3.8 * k); ctx.lineTo(x + 1.6 * k, y + 2.6 * k); ctx.lineTo(x, y + 3.8 * k); ctx.lineTo(x - 1.6 * k, y + 2.6 * k); ctx.closePath(); ctx.fill(); ctx.fillStyle = T0.col; ctx.fillRect(x - 1.8 * k, y - 1.4 * k, 1.2 * k, 1.6 * k); ctx.fillRect(x + 0.6 * k, y - 1.4 * k, 1.2 * k, 1.6 * k); }
+}
 function flashOver(fn, e) {
   fn();
   if (e.flash > 0 || e.frozen > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= e.flash > 0 ? 0.55 : 0.25; fn(); ctx.restore(); }
@@ -2173,8 +2850,14 @@ function drawEnemy(e, dying) {
   const flip = e.dir < 0;
   if (e.elite && !dying) softGlow(x, y - e.r * u * 0.5, e.r * u * 2.1, '#ffd36b', 0.3 + 0.12 * Math.sin(T * 6 + e.wob));
   if (e.type === 'gold' && !dying) softGlow(x, y - 16 * u, 46 * u, '#ffd36b', 0.35);
+  if (!dying && e.tr && e.tr.igneo) softGlow(x, y - e.r * u * 0.6, e.r * u * 1.9, '#ff8a3d', 0.28 + 0.1 * Math.sin(T * 9 + e.wob));
+  if (!dying && e.armor > 0) softGlow(x, y - e.r * u * 0.6, e.r * u * 1.7, '#c3d2e6', 0.22);
+  if (!dying && e.def.fuse) softGlow(x, y - 16 * u, (34 + 8 * Math.sin(T * 12)) * u, '#ff5f2a', 0.35);
+  if (!dying && e.def.ghost) softGlow(x, y - 30 * u, 90 * u, '#7dffcf', 0.25 + 0.08 * Math.sin(T * 3));
   if (dying) { const f = e.dyT / 0.9; alpha = 1 - f; if (def.kind === 'ship' || def.kind === 'swim') { y += f * 30 * u; rot = -e.dir * f * 0.7; } else if (def.kind === 'fly') { y += f * 60 * u; rot = f * 2; } }
   if (e.air) rot = (e.air.t / e.air.T) * TAU * 0.6 * -e.dir;
+  if (e.phased) alpha *= 0.28 + 0.1 * Math.sin(T * 20);
+  if (e.def.ghost) alpha *= 0.82 * (e.fade ? Math.max(0, 1 - e.fade / 1.4) : 1) * (0.9 + 0.1 * Math.sin(T * 5));
   ctx.globalAlpha = alpha;
   if (def.kind === 'ship') {
     if (!dying && !e.air) rot = Math.sin(T * 2 + e.wob) * 0.05;
@@ -2192,12 +2875,25 @@ function drawEnemy(e, dying) {
   }
   if (!dying && e.frozen > 0) { ctx.fillStyle = 'rgba(190,240,255,0.32)'; ctx.strokeStyle = 'rgba(230,250,255,0.8)'; ctx.lineWidth = 1.5; rr(x - e.r * u * 1.3, y - e.r * u * 1.6, e.r * u * 2.6, e.r * u * 2, 6 * u); ctx.fill(); ctx.stroke(); }
   ctx.globalAlpha = 1;
-  if (!dying && e.hp < e.maxHp && e.hp > 0) {
+  if (!dying && (e.hp < e.maxHp || e.def.ghost) && e.hp > 0) {
     const w = Math.max(18, e.r * 1.6) * u, bx = x - w / 2, by = y - (def.kind === 'ship' ? 2.9 : def.kind === 'walk' ? 2.3 : 1.6) * e.r * u - 4;
     ctx.fillStyle = 'rgba(0,0,0,0.6)'; rr(bx - 1, by - 1, w + 2, 5, 2.5); ctx.fill();
-    ctx.fillStyle = e.elite || e.type === 'gold' ? '#ffd36b' : '#ff5f6d'; rr(bx, by, w * (e.hp / e.maxHp), 3, 1.5); ctx.fill();
+    ctx.fillStyle = e.def.ghost ? '#7dffcf' : e.elite || e.type === 'gold' ? '#ffd36b' : '#ff5f6d'; rr(bx, by, w * (e.hp / e.maxHp), 3, 1.5); ctx.fill();
+    if (e.armor > 0) { ctx.fillStyle = '#c3d2e6'; rr(bx, by - 2.5, w * Math.min(1, e.armor / (e.maxHp * 0.45)), 2, 1); ctx.fill(); }
   }
   if (!dying && e.slow > 0 && e.frozen <= 0) softGlow(x, y - e.r * u * 0.4, e.r * u * 1.4, '#9fe3ff', 0.3);
+  if (dying) return;
+  const top = y - (def.kind === 'ship' ? 2.9 : def.kind === 'walk' ? 2.3 : 1.6) * e.r * u - 4;
+  if (e.tr) { const ids = Object.keys(e.tr).filter(id => !(e.def.fuse && id === 'igneo')), r = 5.2 * u; ids.forEach((id, i) => traitGlyph(id, x + (i - (ids.length - 1) / 2) * (r * 2 + 3), top - 9 * u, r)); }
+  // fire ships carry a blinking warning so you know to sink them first
+  if (e.def.fuse) {
+    const p = 1 + 0.15 * Math.sin(T * 14), bx = x, by = top - (e.tr && Object.keys(e.tr).length > 1 ? 22 : 10) * u;
+    ctx.save(); ctx.translate(bx, by); ctx.scale(p, p);
+    ctx.fillStyle = '#ff5f2a'; ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, -8 * u); ctx.lineTo(7.5 * u, 5 * u); ctx.lineTo(-7.5 * u, 5 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#1a0e26'; ctx.fillRect(-1 * u, -4 * u, 2 * u, 5 * u); ctx.beginPath(); ctx.arc(0, 3 * u, 1.1 * u, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
 }
 function fallbackDot(x, y, e) { ctx.fillStyle = '#c66'; ctx.beginPath(); ctx.arc(x, y - e.r * u * 0.5, e.r * u * 0.7, 0, TAU); ctx.fill(); return true; }
 // serpent / leviathan: head, body segments and tail placed along a swimming wave
@@ -2207,7 +2903,7 @@ function chainBody(x, y, s, dir, t, n, gap, amp, names, rot = 0, headName) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.translate(-x, -y);
   for (let i = n + 1; i >= 0; i--) {
     const [px, py] = pts[i], nx = pts[Math.max(0, i - 1)], ang = Math.atan2(nx[1] - py, (nx[0] - px) * dir) * dir;
-    const name = i === 0 ? headName : i === n + 1 ? names.tail : names.body;
+    const name = i === 0 ? headName : i === n + 1 ? names.tail : names.alt && i % 3 === 1 ? names.alt : names.body;
     const sc = i === 0 ? s : s * (1 - i * 0.05);
     spr(name, px, py, sc, dir < 0, i === 0 ? Math.sin(t * 6) * 0.08 * dir : ang);
   }
@@ -2226,37 +2922,160 @@ function tentacle(bx, by, cx, cy, ex, ey, s, magma, raised) {
     spr(i === n ? tip : seg, px, py, sc, false, ang);
   }
 }
+const bossCenter = b => b.type === 'kraken' ? [b.x, b.y - 30 * u] : b.type === 'armada' ? [b.x, b.y - 40 * u] : b.type === 'leviatan' ? [b.x - b.dir * 40 * u, b.y - 4 * u] : [b.x, b.y];
 function drawBoss(b) {
+  const I = ISL();
+  if (b.enraged) { const [cx, cy] = bossCenter(b); softGlow(cx, cy, b.r * u * 2.4, '#ff3a3a', 0.28 + 0.12 * Math.sin(T * 8)); }
   if (b.flash > 0) ctx.globalAlpha = 0.85;
   if (b.type === 'kraken') {
-    const magma = b.name === 'Kraken de magma', s = 0.75 * u;
-    const y = b.y + (1 - b.emerge) * 90 * u, dirTo = b.side < 0 ? 1 : -1;
+    const magma = magmaBoss(b), y = b.y, dirTo = b.dir, edge = b.side < 0 ? I.l + 12 * u : I.r - 12 * u;
+    const grip = b.busy && b.busy.id === 'abrazo', near = dirTo > 0 ? 2 : 1;
+    const inking = b.cast && b.cast.ab.id === 'tinta', s = 0.75 * u * (inking ? 1 + 0.05 * Math.sin(T * 30) : 1);
     for (let i = 0; i < 4; i++) {
-      const raise = b.raised && i === 1, bx = b.x + (i - 1.5) * 26 * u, by = y + 8 * u;
-      if (raise) tentacle(bx, by, bx + dirTo * 30 * u, y - 170 * u, bx + dirTo * 100 * u, y - 120 * u + Math.sin(T * 10) * 6, 0.9 * u, magma, true);
+      const bx = b.x + (i - 1.5) * 26 * u, by = y + 8 * u;
+      if (b.ph === 'enter') tentacle(bx, by, bx - dirTo * 60 * u, by + 14 * u + Math.sin(T * 5 + i) * 10 * u, bx - dirTo * 130 * u, by + Math.sin(T * 4 + i * 1.7) * 22 * u, 0.85 * u, magma, false);
+      else if (grip && (i === near || i === near + dirTo)) {
+        const k = i === near ? 0 : 1, ex = edge + dirTo * k * 20 * u, ey = I.top - 2 * u + Math.sin(T * 14 + i) * 2 * u;
+        tentacle(bx, by, (bx + ex) / 2, Math.min(by, I.top) - 120 * u, ex, ey, 0.9 * u, magma, true);
+      }
+      else if (b.slamFx > 0 && i === near) tentacle(bx, by, (bx + edge) / 2, I.top - 150 * u, edge, I.top + 4 * u, 0.9 * u, magma, true);
+      else if (b.raised && i === near) tentacle(bx, by, bx + dirTo * 30 * u, y - 170 * u, bx + dirTo * 100 * u, y - 120 * u + Math.sin(T * 10) * 6, 0.9 * u, magma, true);
       else tentacle(bx, by, bx + Math.sin(T * 2 + i) * 34 * u, y - 60 * u, bx + Math.sin(T * 1.5 + i * 2) * 46 * u, y - 96 * u, 0.85 * u, magma, false);
     }
-    spr(`kraken${magma ? 'M' : 'A'}${b.raised ? '_slam' : ''}`, b.x, y, s, b.side > 0);
+    if (inking) softGlow(b.x, y - 15 * u, 30 * u, magma ? '#ff7a3d' : '#3a1a5e', 0.6);
+    spr(`kraken${magma ? 'M' : 'A'}${b.raised || grip ? '_slam' : ''}`, b.x, y, s, b.side > 0);
   } else if (b.type === 'armada') {
     spr(`flag${Math.floor(T * 2.5) % 2}`, b.x, b.y + 4 * u, 0.62 * u, b.dir < 0, Math.sin(T * 1.2) * 0.03);
+    if (b.cast && b.cast.ab.id === 'andanada') for (let i = 0; i < 3; i++) softGlow(b.x + b.dir * (12 + i * 20) * u, b.y - 22 * u, 14 * u, '#ffb36b', 0.5 + 0.4 * Math.sin(T * 20 + i * 2));
   } else if (b.type === 'leviatan') {
-    if (b.st === 'dive') { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(b.x, b.y, 70 * u, 13 * u, 0, 0, TAU); ctx.fill(); }
-    else chainBody(b.x, b.y, 0.72 * u, b.dir, b.t, 7, 22, 7, { body: 'levBody', tail: 'levTail' }, 0, b.stT > 3 ? 'levHead_open' : 'levHead');
+    const open = b.mouth > 0 || b.st === 'lunge' || (b.cast && b.st === 'surface');
+    if (b.st === 'swim') ctx.globalAlpha *= 0.85;
+    chainBody(b.x, b.y, 0.72 * u, b.dir, b.t, 7, 22, 7, { body: 'levBody', alt: 'levFlip', tail: 'levTail' }, b.st === 'surface' ? -b.dir * 0.22 : 0, open ? 'levHead_open' : 'levHead');
   } else if (b.type === 'eclipse') {
-    softGlow(b.x, b.y, b.r * u * 2.6, '#b450ff', 0.35);
-    spr(`eclipse${Math.floor(T * 6) % 2}`, b.x, b.y, 0.75 * u);
-    const ex = clamp((W / 2 - b.x) * 0.04, -8 * u, 8 * u), ey = clamp((ISL().top - b.y) * 0.02, -4 * u, 6 * u);
-    spr('eclEye', b.x + ex, b.y + ey, 0.75 * u);
+    const s = 1.35 * u, jx = b.scared ? Math.sin(T * 47) * 2.4 * u : 0;
+    drawDarkSun(b, s, b.ph === 'fight' && !b.invuln);
+    if (b.scared) {
+      // it slipped into the sea: shaking, sweating and wide-eyed
+      spr('eclipse_scared', b.x + jx, b.y, s);
+      spr('eclEyeScared', b.x + jx + Math.sin(T * 9) * 3 * u, b.y - 8 * s + Math.sin(T * 13) * 1.5 * u, s * 0.95);
+    } else {
+      spr(`eclipse${Math.floor(T * 6) % 2}`, b.x, b.y, s);
+      const ex = clamp((W / 2 - b.x) * 0.04, -8 * u, 8 * u) * 1.8, ey = clamp((ISL().top - b.y) * 0.02, -4 * u, 6 * u) * 1.8;
+      spr('eclEye', b.x + ex, b.y + ey, s);
+    }
   }
   ctx.globalAlpha = 1;
   if (b.flash > 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.3; softGlow(b.x, b.y - 30 * u, 80 * u, '#ffffff', 0.6); ctx.restore(); }
 }
+// the eclipse demon as a black sun: long dark rays and a corona ring that blazes gold while it is
+// shielded high up, and turns dim violet when it has set into the sea and can be hurt
+function drawDarkSun(b, s, open) {
+  const R = 35 * s, rot = T * (open ? 0.1 : 0.28), pulse = 0.75 + 0.25 * Math.sin(T * 6);
+  softGlow(b.x, b.y, R * 4.4, open ? '#8a3cff' : '#ff9a4a', open ? 0.28 : 0.38 + (b.cast ? 0.12 * Math.sin(T * 16) : 0));
+  ctx.save(); ctx.translate(b.x, b.y);
+  // corona: blinding light around a black disc
+  const cg = ctx.createRadialGradient(0, 0, R * 0.95, 0, 0, R * 2.6);
+  if (open) { cg.addColorStop(0, 'rgba(200,150,255,0.55)'); cg.addColorStop(0.35, 'rgba(140,70,240,0.3)'); cg.addColorStop(1, 'rgba(90,30,180,0)'); }
+  else { cg.addColorStop(0, `rgba(255,244,210,${0.95 * pulse + 0.05})`); cg.addColorStop(0.3, 'rgba(255,190,100,0.7)'); cg.addColorStop(0.65, 'rgba(255,120,60,0.25)'); cg.addColorStop(1, 'rgba(255,90,40,0)'); }
+  ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(0, 0, R * 2.6, 0, TAU); ctx.fill();
+  for (let i = 0; i < 18; i++) {
+    const long = i % 2 === 0, l = R * (long ? 3.3 : 2.5) * (open ? 0.72 : 1) * (0.9 + 0.1 * Math.sin(T * 2.5 + i * 1.3)), w = R * (long ? 0.27 : 0.19);
+    ctx.save(); ctx.rotate(rot * (long ? 1 : -0.7) + i * TAU / 18);
+    const g = ctx.createLinearGradient(R * 0.9, 0, l, 0);
+    g.addColorStop(0, '#14062a'); g.addColorStop(0.55, 'rgba(70,20,130,0.85)'); g.addColorStop(1, 'rgba(120,50,220,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(R * 0.9, -w); ctx.quadraticCurveTo(l * 0.65, -w * 0.4, l, 0); ctx.quadraticCurveTo(l * 0.65, w * 0.4, R * 0.9, w); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(0, 0, R * 1.85, 0, TAU);
+  if (open) { ctx.lineWidth = 2.5 * u; ctx.strokeStyle = `rgba(190,140,255,${0.5 * pulse})`; ctx.stroke(); }
+  else { ctx.lineWidth = 12 * u; ctx.strokeStyle = `rgba(255,170,80,${0.35 * pulse})`; ctx.stroke(); ctx.lineWidth = 4 * u; ctx.strokeStyle = `rgba(255,240,200,${0.9 * pulse + 0.1})`; ctx.stroke(); }
+  if (!open) {   // shield: a dashed ring turning around it
+    ctx.lineWidth = 2 * u; ctx.strokeStyle = `rgba(255,224,170,${0.45 * pulse})`; ctx.setLineDash([10 * u, 8 * u]); ctx.lineDashOffset = -T * 40 * u;
+    ctx.beginPath(); ctx.arc(0, 0, R * 2.15, 0, TAU); ctx.stroke(); ctx.setLineDash([]); ctx.lineDashOffset = 0;
+  }
+  ctx.restore();
+}
+// sea bosses are drawn twice: whole under the water's surface (the water tints what is below)
+// and clipped above it, so they really sit in the sea instead of floating on it
+function clipWater(above) { ctx.beginPath(); ctx.moveTo(-40, above ? -H : 2 * H); for (let x = -40; x <= W + 40; x += 8) ctx.lineTo(x, waveY(x) + 1); ctx.lineTo(W + 40, above ? -H : 2 * H); ctx.closePath(); ctx.clip(); }
+const eclipseHigh = b => b.type === 'eclipse' && b.y < levelY(seaLevel()) - 160 * u;
+function drawBossPass(b, under) {
+  if (eclipseHigh(b)) return;   // drawn by drawBossTop, above the abyss's darkness
+  if (b.type === 'armada') { if (!under) drawBoss(b); }
+  else if (b.type === 'leviatan' && b.st === 'swim') { if (under) drawBoss(b); }
+  else { ctx.save(); clipWater(!under); drawBoss(b); ctx.restore(); }
+  if (!under) drawBossFx(b);
+}
+function drawBossTop() { const b = S && S.boss; if (b && !b.dead && eclipseHigh(b)) { drawBoss(b); drawBossFx(b); return true; } return false; }
+// warnings and the effects that live outside the boss: cast marker, entry arrow, dark ray, wave
+function drawBossFx(b) {
+  if (b.wave) drawCrest(b.wave.x, b.wave.dir);
+  if (b.shield) {
+    const [cx, cy] = bossCenter(b), R = b.r * u * 1.75, p = 0.75 + 0.25 * Math.sin(T * 5);
+    ctx.save();
+    ctx.setLineDash([3 * u, 5 * u]); ctx.lineDashOffset = -T * 30 * u; ctx.lineWidth = 1.5 * u; ctx.strokeStyle = 'rgba(160,235,255,0.55)';
+    for (const e of S.enemies) if (e.guard === b && !e.dead) { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(e.x, e.y - e.r * u); ctx.stroke(); }
+    ctx.setLineDash([]);
+    const g = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R);
+    g.addColorStop(0, 'rgba(150,230,255,0)'); g.addColorStop(0.8, `rgba(150,230,255,${0.16 * p})`); g.addColorStop(1, `rgba(220,250,255,${0.45 * p})`);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fill();
+    ctx.lineWidth = 2.5 * u; ctx.strokeStyle = `rgba(220,250,255,${0.8 * p})`; ctx.stroke();
+    ctx.lineWidth = 1.5 * u; ctx.strokeStyle = 'rgba(180,240,255,0.5)';
+    for (let i = 0; i < 6; i++) { const a = T * 0.8 + i * TAU / 6; ctx.beginPath(); ctx.arc(cx, cy, R * 0.86, a, a + 0.5); ctx.stroke(); }
+    ctx.restore();
+  }
+  if (b.beam) {
+    const w = MOON_R() + 16 * u, x = b.beam.x;
+    if (b.beam.fire > 0) {
+      const a = b.beam.fire / 0.4, g = ctx.createLinearGradient(x - w, 0, x + w, 0);
+      g.addColorStop(0, 'rgba(120,40,220,0)'); g.addColorStop(0.5, `rgba(235,210,255,${0.9 * a})`); g.addColorStop(1, 'rgba(120,40,220,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - w, 0, w * 2, H);
+    } else {
+      ctx.fillStyle = `rgba(150,80,255,${0.12 + 0.08 * Math.sin(T * 14)})`; ctx.fillRect(x - w, 0, w * 2, H);
+      ctx.strokeStyle = 'rgba(200,150,255,0.8)'; ctx.lineWidth = 2; ctx.setLineDash([8, 6]);
+      ctx.beginPath(); ctx.moveTo(x - w, 0); ctx.lineTo(x - w, H); ctx.moveTo(x + w, 0); ctx.lineTo(x + w, H); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  if (b.ph === 'enter' && (b.x < 10 * u || b.x > W - 10 * u)) {
+    const x = b.side < 0 ? 16 * u : W - 16 * u, y = b.type === 'eclipse' ? levelY(1.9) : waveY(x) - 26 * u, d = -b.side, a = 0.55 + 0.45 * Math.sin(T * 10);
+    ctx.fillStyle = `rgba(255,95,109,${a})`; ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - d * 9 * u, y - 11 * u); ctx.lineTo(x + d * 6 * u, y); ctx.lineTo(x - d * 9 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  if (b.cast) {
+    const p = b.type === 'kraken' ? [b.x, b.y - 104 * u] : b.type === 'armada' ? [b.x, b.y - 124 * u] : b.type === 'leviatan' ? (b.st === 'swim' ? [b.x, waveY(b.x) - 28 * u] : [b.x + b.dir * 30 * u, b.y - 46 * u]) : [b.x + 74 * u, b.y - 74 * u];
+    const r = 12 * u, f = 1 - b.cast.t / b.cast.T, pop = 1 + 0.12 * Math.sin(T * 18);
+    ctx.save(); ctx.translate(p[0], p[1]); ctx.scale(pop, pop);
+    ctx.fillStyle = '#ffd36b'; ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = '#ff5f6d'; ctx.lineWidth = 3.5 * u; ctx.beginPath(); ctx.arc(0, 0, r + 5 * u, -Math.PI / 2, -Math.PI / 2 + f * TAU); ctx.stroke();
+    ctx.fillStyle = '#1a0e26'; ctx.fillRect(-1.7 * u, -7.5 * u, 3.4 * u, 9 * u); ctx.beginPath(); ctx.arc(0, 5 * u, 2 * u, 0, TAU); ctx.fill();
+    ctx.restore();
+  }
+}
+// the leviathan's tail wave rolling toward the island
+function drawCrest(x, dir) {
+  const P = pal(), base = waveY(x) + 8 * u, crest = base - 52 * u;
+  const g = ctx.createLinearGradient(0, crest, 0, base); g.addColorStop(0, 'rgba(230,248,255,0.95)'); g.addColorStop(0.35, P.sea[0]); g.addColorStop(1, 'rgba(10,40,70,0.5)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(x - dir * 80 * u, base); ctx.quadraticCurveTo(x - dir * 34 * u, crest + 30 * u, x + dir * 4 * u, crest);
+  ctx.quadraticCurveTo(x + dir * 26 * u, crest + 6 * u, x + dir * 18 * u, crest + 24 * u); ctx.quadraticCurveTo(x + dir * 12 * u, base - 22 * u, x + dir * 26 * u, base); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 2.5 * u; ctx.stroke();
+}
 
+function drawWarn() {
+  for (const w of S.warn) {
+    const x = w.side < 0 ? 16 * u : W - 16 * u, y = waveY(x) - 40 * u, d = -w.side, a = (0.55 + 0.45 * Math.sin(T * 14)) * Math.min(1, (w.life - w.t) * 3);
+    ctx.fillStyle = hexA(w.c, a); ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x - d * 9 * u, y - 11 * u); ctx.lineTo(x + d * 6 * u, y); ctx.lineTo(x - d * 9 * u, y + 11 * u); ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+}
 function drawWhirl(n) {
   const y = waveY(n.x), f = n.perm ? 1 : Math.min(1, n.t * 3, (n.life - n.t) * 2);
   ctx.save(); ctx.globalAlpha = 0.8 * f; ctx.translate(n.x, y + 4 * u); ctx.scale(1, 0.3);
-  for (let k = 0; k < 5; k++) { ctx.strokeStyle = k % 2 ? 'rgba(225,248,255,0.85)' : 'rgba(110,190,235,0.75)'; ctx.lineWidth = 3.2 - k * 0.3; ctx.beginPath(); ctx.arc(0, 0, n.r * (1 - k * 0.18), T * (5 + k) + k, T * (5 + k) + k + 4.2); ctx.stroke(); }
+  if (n.ice) { const g = ctx.createRadialGradient(0, 0, 0, 0, 0, n.r); g.addColorStop(0, 'rgba(235,252,255,0.55)'); g.addColorStop(1, 'rgba(160,225,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, n.r, 0, TAU); ctx.fill(); }
+  for (let k = 0; k < 5; k++) { ctx.strokeStyle = n.ice ? (k % 2 ? 'rgba(255,255,255,0.95)' : 'rgba(150,228,255,0.85)') : k % 2 ? 'rgba(225,248,255,0.85)' : 'rgba(110,190,235,0.75)'; ctx.lineWidth = 3.2 - k * 0.3; ctx.beginPath(); ctx.arc(0, 0, n.r * (1 - k * 0.18), T * (5 + k) + k, T * (5 + k) + k + 4.2); ctx.stroke(); }
   ctx.restore();
+  if (n.ice && Math.random() < 0.5) S.parts.push({ x: n.x + rand(-1, 1) * n.r, y: y + rand(-4, 4) * u, vx: 0, vy: -rand(20, 50), t: 0, life: 0.6, c: '#e8fbff', s: rand(1.4, 2.4), g: -10 });
   if (n.spout) {
     const h = 110 * u * f, g = ctx.createLinearGradient(0, y - h, 0, y);
     g.addColorStop(0, 'rgba(220,245,255,0)'); g.addColorStop(0.3, 'rgba(200,235,255,0.55)'); g.addColorStop(1, 'rgba(150,210,240,0.7)');
@@ -2275,25 +3094,97 @@ function drawTsunami(n) {
     if (Math.random() < 0.8) S.parts.push({ x: x + sgn * rand(0, 20) * u, y: crest + rand(0, 20) * u, vx: sgn * rand(40, 160), vy: rand(-120, -20), t: 0, life: 0.5, c: '#f2fbff', s: 3, g: 400 });
   }
 }
+function drawJelly(n, under) {
+  const k = (n.k || 'jelly') + (Math.sin(n.t * 5) > 0 ? 0 : 1), s = n.s * u * (n.zap > 0 ? 1.15 : 1);
+  if (n.drop > 0) { if (!under) spr(k, n.x, n.y, s); return; }
+  const fade = Math.min(1, (n.life - n.t) * 2);
+  if (n.zap > 0 && !under) softGlow(n.x, n.y, 26 * u * n.s, n.k === 'jellyT' ? '#9fd8ff' : '#ff9ef0', 0.6);
+  ctx.save(); ctx.globalAlpha = (under ? 0.55 : 1) * fade;
+  if (!under) clipWater(true);
+  spr(k, n.x, n.y - 4 * u, s);
+  ctx.restore();
+}
+// the anchors hang from the moon on a chain of links
+function drawAnchors() {
+  const m = moonPos();
+  for (const w of S.weapons) {
+    if (!w.anchors) continue;
+    const elec = w.id === 'galvana', abyss = w.evo && w.id === 'ancla';
+    for (const A of w.anchors) {
+      const dx = Math.sin(A.a), dy = Math.cos(A.a), ringD = A.L - 36 * A.s * u, step = 7 * u * Math.max(1, A.s * 0.8);
+      const rx = m.x + dx * ringD, ry = m.y + dy * ringD;
+      if (elec) softGlow((m.x + rx) / 2, (m.y + ry) / 2, ringD * 0.4, '#8ff7ff', 0.12 + 0.08 * Math.sin(T * 30));
+      ctx.lineWidth = 1.8 * u * A.s; ctx.strokeStyle = OUTLINE;
+      for (let d = MOON_R() * 0.6, i = 0; d < ringD; d += step, i++) {
+        const x = m.x + dx * d, y = m.y + dy * d;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(-A.a + Math.PI / 2);
+        ctx.fillStyle = abyss ? '#3a4466' : elec ? '#bfeeff' : '#aab2c8';
+        ctx.beginPath();
+        if (i % 2) ctx.rect(-step * 0.55, -1.2 * u * A.s, step * 1.1, 2.4 * u * A.s);
+        else ctx.ellipse(0, 0, step * 0.62, 2.6 * u * A.s, 0, 0, TAU);
+        ctx.fill(); ctx.stroke(); ctx.restore();
+      }
+      if (abyss) softGlow(A.x, A.y, 34 * u * A.s, '#5ff2d0', 0.35);
+      spr(A.spr, rx, ry, 0.9 * A.s * u, false, -A.a);
+    }
+  }
+}
+function drawChainshot(p) {
+  const a = p.t * 16 * Math.sign(p.vx), c = Math.cos(a) * 11 * u, sn = Math.sin(a) * 11 * u;
+  ctx.strokeStyle = OUTLINE; ctx.lineWidth = 3.4 * u; ctx.beginPath(); ctx.moveTo(p.x - c, p.y - sn); ctx.lineTo(p.x + c, p.y + sn); ctx.stroke();
+  ctx.strokeStyle = '#c3cadc'; ctx.lineWidth = 1.6 * u; ctx.setLineDash([3 * u, 2 * u]); ctx.stroke(); ctx.setLineDash([]);
+  spr('ball', p.x - c, p.y - sn, 0.9 * u); spr('ball', p.x + c, p.y + sn, 0.9 * u);
+}
+// sharks swim just under the surface: the whole body shows faintly through the water, and the same sprite
+// clipped to above the waterline is drawn again so its dorsal fin cuts through the waves
+const sharkSpr = n => spr('shark', n.x, n.y, 0.55 * u, (n.face || 1) < 0, n.bite > 0 ? -0.2 * (n.face || 1) : 0);
+const megaSpr = n => spr('mega', n.x, n.y + 6 * u, 0.5 * u, Math.sin(n.t) < 0);
+function finPass(n, fn) {
+  ctx.save(); clipWater(true); fn(n); ctx.restore();
+  if (Math.random() < 0.25) S.parts.push({ x: n.x + rand(-6, 6) * u, y: waveY(n.x), vx: rand(-30, 30), vy: -rand(20, 60), t: 0, life: 0.35, c: '#e6f6ff', s: rand(1.2, 2), g: 300 });
+}
 function drawSharkUnder(n) {
-  if (n.type === 'shark') { ctx.globalAlpha = 0.8; spr('shark', n.x, n.y + 4 * u, 0.55 * u, (n.face || 1) < 0, n.bite > 0 ? -0.2 * (n.face || 1) : 0); ctx.globalAlpha = 1; }
-  else if (n.type === 'mega' && !n.leap) { ctx.globalAlpha = 0.55; spr('mega', n.x, n.y + 6 * u, 0.5 * u, Math.sin(n.t) < 0); ctx.globalAlpha = 1; }
+  if (n.type === 'shark') { ctx.globalAlpha = 0.8; sharkSpr(n); ctx.globalAlpha = 1; }
+  else if (n.type === 'mega' && !n.leap) { ctx.globalAlpha = 0.6; megaSpr(n); ctx.globalAlpha = 1; }
+  else if (n.type === 'jelly') drawJelly(n, true);
 }
 function drawSurfaceEnts() {
   for (const n of S.ents) {
     if (n.type === 'whirl') drawWhirl(n);
     else if (n.type === 'tsunami') drawTsunami(n);
-    else if (n.type === 'shark') spr('sharkFin', n.x + (n.face || 1) * 4 * u, waveY(n.x) + 2 * u, 0.6 * u, (n.face || 1) < 0);
+    else if (n.type === 'jelly') drawJelly(n, false);
+    else if (n.type === 'shark') finPass(n, sharkSpr);
+    else if (n.type === 'mega' && !n.leap) finPass(n, megaSpr);
     else if (n.type === 'mega' && n.leap) { const dir = n.leap.x1 > n.leap.x0 ? 1 : -1; spr('mega', n.x, n.y, 0.6 * u, dir < 0, dir * -0.45 * (1 - 2 * (n.leap.t / 0.55))); }
   }
 }
 function drawProj() {
   for (const p of S.proj) {
     if (p.type === 'ball') { if (p.thunder) softGlow(p.x, p.y, 12 * u, '#9fd8ff', 0.6); spr('ball', p.x, p.y, 0.8 * u) || (ctx.fillStyle = '#1c1c22', ctx.beginPath(), ctx.arc(p.x, p.y, 4.5 * u, 0, TAU), ctx.fill()); }
-    else if (p.type === 'bomb') spr('bomb', p.x, p.y, 0.8 * u, false, p.t * 8);
+    else if (p.type === 'bomb') {
+      if (p.big) {
+        // incendiary shell: a target ring on the island shows where it will land
+        const f = p.t / p.T, rr0 = (30 - 14 * f) * u;
+        ctx.strokeStyle = `rgba(255,95,42,${0.5 + 0.4 * Math.sin(T * 16)})`; ctx.lineWidth = 2.5 * u;
+        ctx.beginPath(); ctx.ellipse(p.tx, p.ty, rr0, rr0 * 0.35, 0, 0, TAU); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(p.tx - rr0 * 1.2, p.ty); ctx.lineTo(p.tx - rr0 * 0.6, p.ty); ctx.moveTo(p.tx + rr0 * 0.6, p.ty); ctx.lineTo(p.tx + rr0 * 1.2, p.ty); ctx.stroke();
+        softGlow(p.x, p.y, 20 * u, '#ff8a3d', 0.6);
+        spr('bomb', p.x, p.y, 1.35 * u, false, p.t * 6);
+      } else spr('bomb', p.x, p.y, 0.8 * u, false, p.t * 8);
+    }
     else if (p.type === 'star') { softGlow(p.x, p.y, 14 * u, '#fff3b0', 0.6); spr('star', p.x, p.y, 0.75 * u, false, T * 9); }
+    else if (p.type === 'spit') {
+      const [c0, c1] = SPIT_COL[p.k], r = p.r * (1 + 0.12 * Math.sin(T * 22 + p.x));
+      softGlow(p.x, p.y, r * 2.2, c1, p.k === 'ink' ? 0.25 : 0.55);
+      const g = ctx.createRadialGradient(p.x - r * 0.3, p.y - r * 0.35, r * 0.1, p.x, p.y, r);
+      g.addColorStop(0, c1); g.addColorStop(1, c0);
+      ctx.fillStyle = g; ctx.strokeStyle = '#1a0e26'; ctx.lineWidth = 1.6 * u;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = c0; ctx.beginPath(); ctx.arc(p.x - p.vx * 0.03, p.y - p.vy * 0.03, r * 0.55, 0, TAU); ctx.arc(p.x - p.vx * 0.055, p.y - p.vy * 0.055, r * 0.32, 0, TAU); ctx.fill();
+    }
     else if (p.type === 'orb') { softGlow(p.x, p.y, 16 * u, '#b49cff', 0.5); spr('orb', p.x, p.y, 0.8 * u); }
     else if (p.type === 'lava') { softGlow(p.x, p.y, 14 * u, '#ff7a3d', 0.55); spr('lava', p.x, p.y, 0.8 * u, false, T * 6); }
+    else if (p.type === 'chainshot') drawChainshot(p);
     else if (p.type === 'sharkp') { const vy = p.vy + p.g * p.t; spr('shark', p.x, p.y, 0.5 * u, p.vx < 0, Math.atan2(vy, Math.abs(p.vx)) * (p.vx < 0 ? -1 : 1)); }
   }
 }
@@ -2381,10 +3272,30 @@ function drawGeyser(f) {
   }
   if (h > 24 * u && Math.random() < 0.7) S.parts.push({ x: x + rand(-1, 1) * w1, y: top, vx: rand(-90, 90), vy: rand(-110, -10), t: 0, life: rand(0.5, 0.9), c: '#e6f8ff', s: rand(2, 3.4), g: 420 });
 }
+// pearl pickup, pre-rendered once per scale: lilac pearl with an outline and a soft halo
+let pearlCv = null, pearlU = 0;
+function pearlSprite() {
+  if (pearlCv && pearlU === u * 8 + DPR) return pearlCv;
+  const r = 6 * u, pad = 5 * u, n = Math.ceil((r + pad) * 2 * DPR), c = document.createElement('canvas');
+  c.width = c.height = n; const g = c.getContext('2d'), m = n / 2;
+  g.scale(DPR, DPR); const h = m / DPR;
+  const halo = g.createRadialGradient(h, h, r * 0.6, h, h, r + pad);
+  halo.addColorStop(0, 'rgba(244,226,255,0.55)'); halo.addColorStop(1, 'rgba(244,226,255,0)');
+  g.fillStyle = halo; g.beginPath(); g.arc(h, h, r + pad, 0, TAU); g.fill();
+  const body = g.createRadialGradient(h - r * 0.35, h - r * 0.4, r * 0.1, h, h, r);
+  body.addColorStop(0, '#ffffff'); body.addColorStop(0.4, '#f1e4ff'); body.addColorStop(0.8, '#c4a9e8'); body.addColorStop(1, '#8a6cc2');
+  g.fillStyle = body; g.beginPath(); g.arc(h, h, r, 0, TAU); g.fill();
+  g.lineWidth = Math.max(1, 1.3 * u); g.strokeStyle = '#2b1a40'; g.stroke();
+  g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.ellipse(h - r * 0.35, h - r * 0.38, r * 0.32, r * 0.2, -0.6, 0, TAU); g.fill();
+  pearlCv = c; pearlU = u * 8 + DPR; return c;
+}
 function drawPickups() {
+  const pc = pearlSprite(), ps = pc.width / DPR;
   for (const c of S.coins) {
     if (c.life - c.t < 2 && Math.sin(T * 24) > 0 && !c.home) continue;
-    spr(`coin${Math.floor(T * 12 + c.ph * 2) % 6}`, c.x, c.y, 0.85 * u) || (ctx.fillStyle = '#ffd36b', ctx.beginPath(), ctx.arc(c.x, c.y, 5 * u, 0, TAU), ctx.fill());
+    const k = 1 + 0.08 * Math.sin(T * 5 + c.ph), s = ps * k;
+    ctx.drawImage(pc, c.x - s / 2, c.y - s / 2, s, s);
+    if ((Math.floor(T * 1.5 + c.ph) % 4) === 0) { const f = (T * 1.5 + c.ph) % 1, a = Math.sin(f * Math.PI); ctx.globalAlpha = a; ctx.fillStyle = '#fff'; const sx = c.x + 3 * u, sy = c.y - 3.5 * u, l = 3.5 * u * a; ctx.beginPath(); ctx.moveTo(sx, sy - l); ctx.lineTo(sx + l * 0.25, sy); ctx.lineTo(sx, sy + l); ctx.lineTo(sx - l * 0.25, sy); ctx.closePath(); ctx.moveTo(sx - l, sy); ctx.lineTo(sx, sy + l * 0.25); ctx.lineTo(sx + l, sy); ctx.lineTo(sx, sy - l * 0.25); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1; }
   }
   for (const c of S.chests) { softGlow(c.x, c.y, 26 * u, '#ffd36b', 0.45 + 0.15 * Math.sin(T * 6)); spr('chest', c.x, c.y + Math.sin(T * 3) * 3 * u, 0.85 * u); }
 }
@@ -2405,6 +3316,20 @@ function drawMoon() {
   if (!spr(`moon_${id}`, m.x, m.y + bob, s)) { ctx.fillStyle = moonColor(); ctx.beginPath(); ctx.arc(m.x, m.y + bob, r, 0, TAU); ctx.fill(); }
   const face = !S ? 'calm' : S.faceT > 0 ? S.face : (S.furia > 0 || (S.boss && !S.boss.dead)) ? 'angry' : 'calm';
   spr(`face_${face}`, m.x, m.y + bob, s);
+  if (S && S.moonSlow > 0) {
+    const a = Math.min(1, S.moonSlow * 2), k = S.moonSlowK, cy = m.y + bob;
+    if (k === 'ice') {
+      ctx.fillStyle = `rgba(190,240,255,${0.42 * a})`; ctx.beginPath(); ctx.arc(m.x, cy, r, 0, TAU); ctx.fill();
+      ctx.strokeStyle = `rgba(235,252,255,${0.95 * a})`; ctx.lineWidth = 3; ctx.stroke();
+      ctx.lineWidth = 1.6; for (let i = 0; i < 6; i++) { const an = i * TAU / 6 + 0.3; ctx.beginPath(); ctx.moveTo(m.x + Math.cos(an) * r * 0.55, cy + Math.sin(an) * r * 0.55); ctx.lineTo(m.x + Math.cos(an) * r * 1.12, cy + Math.sin(an) * r * 1.12); ctx.stroke(); }
+    } else {
+      ctx.fillStyle = k === 'lava' ? `rgba(255,120,40,${0.8 * a})` : `rgba(30,16,46,${0.85 * a})`;
+      ctx.beginPath();
+      for (const [dx, dy, rr] of [[-0.35, -0.2, 0.36], [0.3, 0.22, 0.3], [0.08, -0.48, 0.22], [0.44, -0.18, 0.17], [-0.15, 0.42, 0.2]]) { ctx.moveTo(m.x + dx * r + rr * r, cy + dy * r); ctx.arc(m.x + dx * r, cy + dy * r, rr * r, 0, TAU); }
+      for (const dx of [-0.35, 0.3]) { const dl = (1 - a) * 0.3 + 0.25; ctx.moveTo(m.x + dx * r + 0.07 * r, cy + 0.2 * r); ctx.ellipse(m.x + dx * r, cy + (0.3 + dl) * r, 0.07 * r, dl * r * 0.6, 0, 0, TAU); }
+      ctx.fill();
+    }
+  }
   if (S && S.moonLock > 0) { ctx.strokeStyle = `rgba(255,60,90,${0.6 + 0.4 * Math.sin(T * 14)})`; ctx.lineWidth = 3; ctx.setLineDash([5, 4]); ctx.beginPath(); ctx.arc(m.x, m.y + bob, r + 7, 0, TAU); ctx.stroke(); ctx.setLineDash([]); }
   if (S && S.furia > 0) { ctx.strokeStyle = `rgba(255,107,90,${0.5 + 0.5 * Math.sin(T * 12)})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(m.x, m.y + bob, r + 6, 0, TAU); ctx.stroke(); }
   if (S && S.fiebre > 0) { ctx.strokeStyle = `rgba(255,211,107,${0.5 + 0.5 * Math.sin(T * 10)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(m.x, m.y + bob, r + 10 + Math.sin(T * 6) * 3, 0, TAU); ctx.stroke(); }
@@ -2412,11 +3337,12 @@ function drawMoon() {
 function drawNums() {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (const n of S.nums) {
-    const k = n.t / 0.8, sz = (n.crit ? 19 : n.coin ? 12 : 13) * Math.max(0.9, u) * (n.t < 0.08 ? 1.3 : 1);
+    const k = n.t / (n.txt ? 1.2 : 0.8), sz = (n.crit ? 19 : n.coin ? 12 : 13) * Math.max(0.9, u) * (n.t < 0.08 ? 1.3 : 1);
     ctx.globalAlpha = 1 - k * k;
     ctx.font = `900 ${sz}px Figtree, system-ui, sans-serif`;
     ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-    const y = n.y - k * 26 * u, txt = n.coin ? `+${n.v}` : n.crit ? `${n.v}!` : String(n.v);
+    if (n.txt) ctx.font = `900 ${13 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`;
+    const y = n.y - k * 26 * u, txt = n.txt ? n.v : n.coin ? `+${n.v}` : n.crit ? `${n.v}!` : String(n.v);
     ctx.strokeText(txt, n.x, y); ctx.fillStyle = n.col || (n.crit ? '#ffd34a' : '#ffffff'); ctx.fillText(txt, n.x, y);
   }
   ctx.globalAlpha = 1;
@@ -2435,10 +3361,11 @@ function drawGauge() {
 }
 function drawDark() {
   const hz = S ? (S.mode === 'island' ? S.isl.hazard : ISLANDS[S.palIdx].hazard) : null;
-  if (hz !== 'dark') return;
-  const m = moonPos(), cy = (m.y + levelY(0.45)) / 2;
-  const g = ctx.createRadialGradient(m.x, cy, W * 0.18, m.x, cy, W * 0.8);
-  g.addColorStop(0, 'rgba(2,0,10,0)'); g.addColorStop(1, 'rgba(2,0,10,0.82)');
+  const night = S && S.night > 0 ? Math.min(1, S.night * 1.5, (5 - S.night) * 3) : 0;
+  if (hz !== 'dark' && !night) return;
+  const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, k = hz === 'dark' ? Math.max(0.82, 0.93 * night) : 0.93 * night;
+  const g = ctx.createRadialGradient(m.x, cy, W * (0.18 - 0.06 * night), m.x, cy, W * (0.8 - 0.35 * night));
+  g.addColorStop(0, 'rgba(2,0,10,0)'); g.addColorStop(1, `rgba(2,0,10,${k})`);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 }
 function draw() {
@@ -2452,25 +3379,37 @@ function draw() {
     for (const e of S.dying) if (e.def.kind === 'walk') drawEnemy(e, true);
     for (const n of S.ents) drawSharkUnder(n);
     drawGeysersUnder();
-    if (S.boss && !S.boss.dead && S.boss.type === 'leviatan' && S.boss.st === 'dive') drawBoss(S.boss);
+    if (S.boss && !S.boss.dead) drawBossPass(S.boss, true);
   }
   drawWater(false);
   if (S) {
     drawSurfaceEnts();
     for (const e of S.dying) if (e.def.kind !== 'walk') drawEnemy(e, true);
     for (const e of S.enemies) if (e.def.kind !== 'walk' && e.def.kind !== 'fly') drawEnemy(e, false);
-    if (S.boss && !S.boss.dead && !(S.boss.type === 'leviatan' && S.boss.st === 'dive')) drawBoss(S.boss);
+    if (S.boss && !S.boss.dead) drawBossPass(S.boss, false);
     for (const e of S.enemies) if (e.def.kind === 'fly') drawEnemy(e, false);
-    drawPickups(); drawProj(); drawFx(); drawParts();
+    drawAnchors();
+    drawPickups(); drawProj(); drawFx(); drawParts(); drawWarn();
   }
   drawMoon();
   if (S) drawNums();
   drawDark();
+  if (drawBossTop()) drawMoon();   // the moon stays in front of the dark sun
   ctx.restore();
   if (S && (mode === 'play' || mode === 'levelup' || mode === 'paused' || mode === 'merchant')) drawGauge();
   if (S && S.flash > 0) { ctx.fillStyle = `rgba(255,95,109,${S.flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
   if (S && S.eclipse > 0) { ctx.fillStyle = 'rgba(60,20,120,0.18)'; ctx.fillRect(0, 0, W, H); }
   if (S && S.furia > 0) { ctx.fillStyle = 'rgba(255,60,40,0.08)'; ctx.fillRect(0, 0, W, H); }
+  if (S && S.intro > 0) drawIris();
+  if (S && mode === 'result' && S.endT > 0) { ctx.fillStyle = `rgba(11,8,32,${0.45 * (1 - Math.min(1, S.endT))})`; ctx.fillRect(0, 0, W, H); }
+}
+// a run opens with an iris that widens from the island
+function drawIris() {
+  const k = 1 - S.intro, cx = W / 2, cy = levelY(0.75), r = 20 * u + Math.hypot(W, H) * k * k;
+  ctx.save(); ctx.fillStyle = '#0b0820';
+  ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(cx, cy, r, 0, TAU, true); ctx.fill();
+  ctx.strokeStyle = `rgba(244,236,208,${0.6 * S.intro})`; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+  ctx.restore();
 }
 
 // =====================================================================
@@ -2487,7 +3426,12 @@ function updateHUD() {
   setStyle('xpFill', 'width', `${clamp(S.xp / S.need, 0, 1) * 100}%`);
   const b = S.boss && !S.boss.dead ? S.boss : null;
   if (!!b !== hudCache.boss) { hudCache.boss = !!b; $('bossBar').hidden = !b; }
-  if (b) { setText('bossName', b.name); setStyle('bossFill', 'width', `${clamp(b.hp / b.maxHp, 0, 1) * 100}%`); }
+  if (b) {
+    setText('bossName', b.name); setStyle('bossFill', 'width', `${clamp(b.hp / b.maxHp, 0, 1) * 100}%`);
+    const open = !b.cast && b.ph === 'fight' && !b.invuln && (b.type === 'eclipse' || b.type === 'leviatan');
+    const c = b.cast ? `¡${bossAbName(b, b.cast.ab)}!` : b.shield ? 'Escudo: hunde a su escolta' : b.frozen > 0 && b.gIdx ? '¡Aturdido!' : open ? '¡Vulnerable!' : '';
+    if (c !== hudCache.cast) { hudCache.cast = c; $('bossCast').textContent = c; $('bossCast').hidden = !c; $('bossCast').classList.toggle('ok', open); }
+  }
   const c = S.combo >= 5 ? `×${S.combo}` : '';
   if (c !== hudCache.combo) { hudCache.combo = c; const el = $('comboNum'); el.textContent = c; if (c && S.combo % 5 === 0) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); } }
   $('comboNum').style.opacity = S.comboT > 0.6 ? 1 : Math.max(0, S.comboT / 0.6);
@@ -2495,7 +3439,7 @@ function updateHUD() {
   setStyle('activeBtn', '--p', String(Math.round(p * 100) / 100));
   const ready = p >= 1;
   if (ready !== hudCache.ready) { hudCache.ready = ready; $('activeBtn').classList.toggle('ready', ready); }
-  setText('coinText', Math.floor(S.coinsRun).toLocaleString('es'));
+  setText('coinText', Math.floor(S.pearls).toLocaleString('es'));
   const kw = S.weapons.map(w => `<span class="${w.evo || w.union ? 'evo' : ''}">${ico(wIco(w), 24)}<i>${w.evo || w.union ? '★' : w.lv}</i></span>`).join('');
   if (kw !== hudCache.kw) { hudCache.kw = kw; $('kitW').innerHTML = kw; }
   const kp = Object.keys(S.passives).map(id => `<span>${ico(PASSIVES[id].ico, 24)}<i>${S.passives[id]}</i></span>`).join('');
@@ -2516,36 +3460,47 @@ function tipFor(type) {
     crab: ['Cangrejos gigantes', 'Solo se ahogan con la pleamar y la luna encima'],
     mortar: ['Morteros', 'Disparan desde lejos: aléjalos con la luna'],
     serpent: ['Serpientes marinas', 'En bajamar se quedan varadas sin agua'],
-    gold: ['Barco del tesoro', 'Cruza el mar sin parar: húndelo y recoge sus monedas'],
+    gold: ['Barco del tesoro', 'Cruza el mar sin parar: húndelo y recoge sus perlas'],
+    brulote: ['¡Brulote!', 'Barco cargado de pólvora: si llega a la isla, estalla'],
   };
   const t = T_[type]; if (t) tip('en_' + type, t[0], t[1]);
 }
 
 // =====================================================================
-// MISSIONS (three a day; progress adds up over that day's runs)
+// MISSIONS (four a day and three a week; progress adds up over all the runs)
 // =====================================================================
+const DAILY_N = 4, WEEKLY_N = 3;
+const missionOpen = m => !m.needs || (m.needs === 'endless' ? !!save.isl.coral?.cleared : save.endlessBest >= 25);
+function fillMissions(rec, pool0, n, seed) {
+  const r = seeded(seed), pool = pool0.filter(m => missionOpen(m) && !rec.list.some(x => x.id === m.id));
+  while (rec.list.length < n && pool.length) { const m = pool.splice(Math.floor(r() * pool.length), 1)[0], gi = Math.floor(r() * 3); rec.list.push({ id: m.id, goal: m.goals[gi], prog: 0, claimed: false, reward: Math.round(m.reward * (1 + gi * 0.5)) }); }
+}
 function ensureMissions() {
-  if (save.missions.date === today() && save.missions.list.length) return;
-  const r = seeded(Number(today().replace(/-/g, '')) * 104729), pool = MISSIONS.slice(), list = [];
-  while (list.length < 3) { const m = pool.splice(Math.floor(r() * pool.length), 1)[0], gi = Math.floor(r() * 3); list.push({ id: m.id, goal: m.goals[gi], prog: 0, claimed: false, reward: Math.round(m.reward * (1 + gi * 0.5)) }); }
-  save.missions = { date: today(), list }; persist();
+  let ch = false;
+  if (save.missions.date !== today()) { save.missions = { date: today(), list: [] }; ch = true; }
+  if (save.missions.list.length < DAILY_N) { fillMissions(save.missions, MISSIONS, DAILY_N, Number(today().replace(/-/g, '')) * 104729 + save.missions.list.length); ch = true; }
+  if (!save.weekly || save.weekly.week !== weekKey()) { save.weekly = { week: weekKey(), list: [] }; ch = true; }
+  if (save.weekly.list.length < WEEKLY_N) { fillMissions(save.weekly, WEEKLY, WEEKLY_N, Number(weekKey().replace(/-/g, '')) * 7349); ch = true; }
+  if (ch) persist();
 }
 function missionProgress(id, v, isMax) {
   if (!S || S.mode === 'daily' && id === 'wave') return;
   ensureMissions();
-  for (const m of save.missions.list) {
+  for (const [list, pool] of [[save.missions.list, MISSIONS], [save.weekly.list, WEEKLY]]) for (const m of list) {
     if (m.id !== id || m.prog >= m.goal) continue;
     m.prog = Math.min(m.goal, isMax ? Math.max(m.prog, v) : m.prog + v);
-    if (m.prog >= m.goal) banner('¡Misión cumplida!', MISSIONS.find(x => x.id === id).txt(m.goal), 1.6);
+    if (m.prog >= m.goal) banner(pool === WEEKLY ? '¡Misión semanal cumplida!' : '¡Misión cumplida!', pool.find(x => x.id === id).txt(m.goal), 1.6);
   }
 }
-const missionsReady = () => { ensureMissions(); return save.missions.list.filter(m => m.prog >= m.goal && !m.claimed).length; };
+const missionsReady = () => { ensureMissions(); return save.missions.list.concat(save.weekly.list).filter(m => m.prog >= m.goal && !m.claimed).length; };
 
 // =====================================================================
 // SCREENS
 // =====================================================================
 const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
-function show(id) { SCREENS.forEach(s => $(s).hidden = s !== id); $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant'); }
+function show(id) {
+  SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
+  $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant'); }
 function refreshCoins() { document.querySelectorAll('.coinCount').forEach(el => el.textContent = Math.floor(save.coins).toLocaleString('es')); }
 function statVal(s) {
   if (s === 'evos') return save.stats.evos.length;
@@ -2681,14 +3636,19 @@ function openShop(from) {
   if (from) shopReturn = from;
   refreshCoins();
   const biome = ISLANDS[0].id;
-  // reef designs: one card per tier, the next one can be bought
+  // reef designs: one card per tier, bought in order; each one bought can be switched on or off
   const reef = $('reefList'); reef.innerHTML = '';
+  const on = reefActive();
   REEF_TIERS.forEach((R, t) => {
-    const own = t <= save.reef, next = t === save.reef + 1;
-    const el = document.createElement('div'); el.className = 'reefc' + (own ? ' own' : '') + (t === save.reef ? ' sel' : '') + (!own && !next ? ' locked' : '');
+    const own = t <= save.reef, next = t === save.reef + 1, act = t === 0 || on.includes(t);
+    const el = document.createElement('div'); el.className = 'reefc' + (own ? ' own' : '') + (own && act && t ? ' sel' : '') + (!own && !next ? ' locked' : '');
     el.innerHTML = `<span class="rpic">${pic(`reef${t}_${biome}`, 92)}</span><b>${R.name}</b><span class="d">${R.desc}</span>`;
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy';
-    if (own) { btn.textContent = t === save.reef ? 'Activo' : 'Incluido'; btn.disabled = true; }
+    if (own && t === 0) { btn.textContent = 'Siempre'; btn.disabled = true; }
+    else if (own) {
+      btn.className = 'buy sw' + (act ? ' on' : ''); btn.textContent = act ? 'Encendido' : 'Apagado'; btn.setAttribute('aria-pressed', act);
+      btn.onclick = () => { save.reefOff = act ? [...(save.reefOff || []), t] : (save.reefOff || []).filter(x => x !== t); persist(); sfx(act ? 'pop' : 'card'); vib(12); openShop(); };
+    }
     else if (next) { btn.innerHTML = coinBtn(R.cost); btn.disabled = save.coins < R.cost; btn.onclick = () => { save.coins -= R.cost; save.reef = t; persist(); sfx('evo'); vib([30, 30, 80]); openShop(); }; }
     else { btn.innerHTML = `${ico('i_candado', 16)} ${R.cost.toLocaleString('es')}`; btn.disabled = true; }
     el.appendChild(btn); reef.appendChild(el);
@@ -2724,8 +3684,10 @@ function openAch() {
 function openMissions() {
   refreshCoins(); ensureMissions();
   const list = $('misList'); list.innerHTML = '';
-  save.missions.list.forEach(m => {
-    const M = MISSIONS.find(x => x.id === m.id), done = m.prog >= m.goal;
+  const daysLeft = 7 - (new Date().getDay() + 6) % 7;
+  const rows = [['Hoy', save.missions.list, MISSIONS], [`Esta semana · quedan ${daysLeft} día${daysLeft > 1 ? 's' : ''}`, save.weekly.list, WEEKLY]];
+  for (const [title, ms, pool] of rows) { const h = document.createElement('h3'); h.className = 'sect'; h.textContent = title; list.appendChild(h); ms.forEach(m => {
+    const M = pool.find(x => x.id === m.id), done = m.prog >= m.goal;
     const el = document.createElement('div'); el.className = 'lc' + (m.claimed ? ' locked' : '');
     el.innerHTML = `<span class="ico" aria-hidden="true">${ico(m.claimed ? 'i_check' : 'i_mision', 36)}</span><span><b>${M.txt(m.goal)}</b><span class="prog-mini"><i style="width:${m.prog / m.goal * 100}%"></i></span><span class="meta">${m.prog.toLocaleString('es')} / ${m.goal.toLocaleString('es')}</span></span>`;
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy' + (done && !m.claimed ? ' claim' : '');
@@ -2733,7 +3695,7 @@ function openMissions() {
     btn.disabled = !done || m.claimed;
     btn.onclick = () => { m.claimed = true; save.coins += m.reward; persist(); sfx('evo'); vib(40); openMissions(); };
     el.appendChild(btn); list.appendChild(el);
-  });
+  }); }
   show('scrMissions');
 }
 function openDaily() {
@@ -2746,9 +3708,18 @@ function openDaily() {
   show('scrDaily');
 }
 
-function startRun(runMode, islIdx) {
-  audioInit();
+// fade to dark, swap scenes underneath, fade back in
+let curtainBusy = false;
+function curtain(fn) {
+  if (reduceMotion) { fn(); return; }
+  if (curtainBusy) return;
+  curtainBusy = true; $('curtain').classList.add('on');
+  setTimeout(() => { fn(); curtainBusy = false; requestAnimationFrame(() => $('curtain').classList.remove('on')); }, 290);
+}
+function startRun(runMode, islIdx) { audioInit(); curtain(() => beginRun(runMode, islIdx)); }
+function beginRun(runMode, islIdx) {
   newRun(runMode, islIdx);
+  S.intro = 1;
   hudCache = {};
   mode = 'play'; show(null); setAudioGains();
   const m = S.moon;
@@ -2757,14 +3728,84 @@ function startRun(runMode, islIdx) {
   if (runMode === 'island') banner(S.isl.name, S.danger ? DANGER_TXT[S.danger] : ISLANDS[islIdx].sub, 2);
   else if (runMode === 'daily') banner('Reto diario', S.dailyList.map(x => x.name).join(' + '), 2.4);
   else banner('Marea sin fin', 'Aguanta todo lo que puedas', 2);
-  if (!save.tips.move) setTimeout(() => tip('move', 'Arrastra para mover la luna', 'Dispara a lo que tiene cerca, recoge monedas y levanta el agua'), 2100);
+  if (!save.tips.move) setTimeout(() => tip('move', 'Arrastra para mover la luna', 'Dispara a lo que tiene cerca, recoge perlas y levanta el agua'), 2100);
   updateHUD();
 }
 function pause() {
   if (mode !== 'play') return;
   mode = 'paused'; dragId = null;
-  $('pauseBuild').innerHTML = buildHtml();
+  renderPause(); pauseTab(pauseOn);
   show('scrPause'); setAudioGains();
+}
+let pauseOn = 'gear';
+function pauseTab(t) {
+  pauseOn = t;
+  $('pTabGear').setAttribute('aria-selected', t === 'gear'); $('pTabCombo').setAttribute('aria-selected', t === 'combo');
+  $('pGear').hidden = t !== 'gear'; $('pCombo').hidden = t !== 'combo';
+}
+$('pTabGear').onclick = () => pauseTab('gear');
+$('pTabCombo').onclick = () => pauseTab('combo');
+const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+// weapons and passives as slots (empty ones too), tap one to read what it does
+function renderPause() {
+  const info = [];
+  const slot = (icon, name, lv, tag, txt) => { info.push(txt); return `<button type="button" class="slot${tag ? ' gold' : ''}" data-i="${info.length - 1}">${tag ? `<span class="tag">${tag}</span>` : ''}${ico(icon, 34)}<span class="nm">${name}</span>${lv ? lvStars(lv) : ''}</button>`; };
+  const empty = n => '<span class="slot empty" aria-hidden="true">+</span>'.repeat(Math.max(0, n));
+  const ws = S.weapons.map(w => {
+    if (w.union) { const U = UNIONS[w.id]; return slot(U.ico, U.name, 0, 'UNIÓN', `<b>${U.name}</b> · unión de ${WEAPONS[U.a].name} y ${WEAPONS[U.b].name}. ${U.desc}`); }
+    const W0 = WEAPONS[w.id];
+    if (w.evo) { const E = EVOS[W0.evo]; return slot(E.ico, E.name, 0, 'FUSIÓN', `<b>${E.name}</b> · fusión de ${W0.name} y ${PASSIVES[W0.pair].name}. ${E.desc}`); }
+    const next = w.lv < 3 ? ` Siguiente nivel: ${W0.lv[w.lv].toLowerCase()}.` : ` Al máximo: con ${PASSIVES[W0.pair].name} se fusiona.`;
+    return slot(W0.ico, W0.name, w.lv, '', `<b>${W0.name}</b> · nivel ${w.lv} de 3. ${W0.desc}${next}`);
+  });
+  const ps = Object.keys(S.passives).map(p => {
+    const P0 = PASSIVES[p], wid = Object.keys(WEAPONS).find(id => WEAPONS[id].pair === p);
+    return slot(P0.ico, P0.name, S.passives[p], '', `<b>${P0.name}</b> · nivel ${S.passives[p]} de 3. ${capFirst(P0.desc)}.${wid ? ` Fusiona con ${WEAPONS[wid].name} a nivel 3.` : ''}`);
+  });
+  $('pWeapons').style.setProperty('--n', S.slots); $('pPassives').style.setProperty('--n', 5);
+  $('pWeapons').innerHTML = ws.join('') + empty(S.slots - S.weapons.length);
+  $('pPassives').innerHTML = ps.join('') + empty(5 - ps.length);
+  $('pWCount').textContent = `${S.weapons.length} de ${S.slots}`;
+  $('pPCount').textContent = `${ps.length} de 5`;
+  $('pInfo').innerHTML = 'Toca un arma o una pasiva para ver qué hace.';
+  document.querySelectorAll('#pGear .slot[data-i]').forEach(b => b.onclick = () => {
+    document.querySelectorAll('#pGear .slot.sel').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel'); $('pInfo').innerHTML = info[+b.dataset.i];
+  });
+  const rows = comboRows();
+  $('pComboBadge').hidden = !rows.some(r => r.state === 'ready');
+  $('pCombos').innerHTML = rows.map(r => `<div class="combo ${r.state}"><span class="rec"><span class="${r.a[1] ? '' : 'miss'}">${ico(r.a[0], 30)}</span>+<span class="${r.b[1] ? '' : 'miss'}">${ico(r.b[0], 30)}</span>→${ico(r.r, 34)}</span><span><span class="kind">${r.kind}</span><b>${r.name}</b><span class="cs">${r.txt}</span></span></div>`).join('');
+}
+// every fusion and union with what is still missing, the ones you can get soonest first
+function comboRows() {
+  const rows = [], inUnion = id => S.weapons.some(x => x.union && (UNIONS[x.id].a === id || UNIONS[x.id].b === id));
+  const needW = (id, w) => !w ? `consigue ${WEAPONS[id].name}` : w.lv < 3 ? `sube ${WEAPONS[id].name} a nivel 3 (va en ${w.lv})` : null;
+  for (const id in WEAPONS) {
+    const W0 = WEAPONS[id], E = EVOS[W0.evo], P0 = PASSIVES[W0.pair], w = hasW(id), hp = W0.pair in S.passives;
+    let state, txt;
+    if (w && w.evo) { state = 'done'; txt = 'Ya la tienes'; }
+    else if (!w && inUnion(id)) { state = 'gone'; txt = `${W0.name} ya forma parte de una unión`; }
+    else {
+      const need = [needW(id, w), hp ? null : `consigue ${P0.name}`].filter(Boolean);
+      state = need.length ? (w || hp ? 'near' : 'far') : 'ready';
+      txt = need.length ? capFirst(need.join(' y ')) : '¡Lista! Te saldrá al subir de nivel o en un cofre';
+    }
+    rows.push({ kind: 'Fusión', a: [W0.ico, !!w], b: [P0.ico, hp], r: E.ico, name: E.name, state, txt });
+  }
+  for (const k in UNIONS) {
+    const U = UNIONS[k], a = hasW(U.a), b = hasW(U.b);
+    let state, txt;
+    if (S.weapons.some(x => x.union && x.id === k)) { state = 'done'; txt = 'Ya la tienes'; }
+    else if ((!a && inUnion(U.a)) || (!b && inUnion(U.b))) { state = 'gone'; txt = 'Una de sus armas ya forma parte de otra unión'; }
+    else {
+      const need = [needW(U.a, a), needW(U.b, b)].filter(Boolean);
+      state = need.length ? (a || b ? 'near' : 'far') : 'ready';
+      txt = need.length ? capFirst(need.join(' y ')) : '¡Lista! Te saldrá al subir de nivel';
+    }
+    rows.push({ kind: 'Unión', a: [WEAPONS[U.a].ico, !!a], b: [WEAPONS[U.b].ico, !!b], r: U.ico, name: U.name, state, txt });
+  }
+  const order = { ready: 0, near: 1, done: 2, far: 3, gone: 4 };
+  return rows.sort((x, y) => order[x.state] - order[y.state]);
 }
 function buildHtml() {
   return S.weapons.map(w => `<span class="${w.evo || w.union ? 'evo' : ''}">${ico(wIco(w), 20)} ${wName(w)}${w.evo || w.union ? '' : ` ${lvStars(w.lv)}`}</span>`).join('')
@@ -2780,7 +3821,7 @@ function revive() {
   for (const p of S.proj) if (p.hostile) p.done = true;
 }
 function victory() { endRun(true); }
-function endRun(won) {
+function endRun(won, quit) {
   if (S.ended) return; S.ended = true;
   const unlocks = [];
   let bonus = 0;
@@ -2791,7 +3832,7 @@ function endRun(won) {
     if (won) {
       if (!rec.cleared) { bonus += 100 * (S.islIdx + 1); const nx = ISLANDS[S.islIdx + 1]; unlocks.push(nx ? `Nueva isla desbloqueada: ${nx.name}` : '¡Has salvado todos los mares!'); if (S.islIdx === 0) unlocks.push('Nuevo modo: Marea sin fin'); }
       else bonus += 30 * (S.islIdx + 1);
-      rec.cleared = true;
+      rec.cleared = true; missionProgress('clear', 1);
       if (S.danger >= (rec.danger || 0) && S.danger < DANGER_MAX) { rec.danger = S.danger + 1; unlocks.push(`Nuevo: ${DANGER_TXT[rec.danger]} en ${S.isl.name}`); }
       save.stats.dangerBest = Math.max(save.stats.dangerBest || 0, S.danger);
     }
@@ -2800,29 +3841,36 @@ function endRun(won) {
   } else {
     const first = save.daily.date !== today() || !save.daily.played;
     if (save.daily.date !== today()) save.daily = { date: today(), best: 0, played: false };
-    if (first) { bonus += 80; save.stats.dailies++; }
+    if (first) { bonus += 80; save.stats.dailies++; missionProgress('daily', 1); }
     save.daily.played = true;
     if (S.wave > save.daily.best) save.daily.best = S.wave;
   }
   if (S.maxCombo > save.stats.maxCombo) save.stats.maxCombo = S.maxCombo;
+  // workshop coins are paid at the end of the run (pearls stay in the run)
+  const cm = ic * S.coinMul * (1 + 0.1 * metaLv('codicia')) * (1 + 0.3 * S.danger);
+  const fromKills = Math.round(S.kills * 0.35 * cm), fromBoss = Math.round(S.bossKills * 40 * cm);
   const waveBonus = Math.round((S.wave - 1) * 2 * ic * (1 + 0.3 * S.danger));
-  const collected = Math.floor(S.coinsRun);
-  const total = collected + waveBonus + bonus;
+  // pearls left over are exchanged at 1 coin per 4, plus whatever the money changer promised
+  const fromPearls = Math.floor(S.pearls / 4) + S.bonusCoins;
+  const total = fromKills + fromBoss + waveBonus + bonus + fromPearls;
   save.coins += total;
   const cl = achClaimable(); if (cl) unlocks.push(`${cl} logro${cl > 1 ? 's' : ''} listo${cl > 1 ? 's' : ''} para cobrar`);
   const mr = missionsReady(); if (mr) unlocks.push(`${mr} misi${mr > 1 ? 'ones' : 'ón'} cumplida${mr > 1 ? 's' : ''}: cóbrala${mr > 1 ? 's' : ''} en Misiones`);
   if (canBuySomething()) unlocks.push('Tienes monedas para mejorar el taller');
   persist();
   musicStop();
-  const delay = won ? 1600 : 900;
+  const delay = won ? 1600 : quit ? 250 : 900;
+  S.endT = quit ? 0 : delay / 1000;
   if (won) { banner('¡Victoria!', `${S.isl.name} está a salvo`, 1.6); sfx('evo'); }
   mode = 'result';
   setTimeout(() => {
     $('rEyebrow').textContent = S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
-    $('rTitle').textContent = won ? 'Isla salvada' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
+    $('rTitle').textContent = won ? 'Isla salvada' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
     const mm = Math.floor(S.t / 60), ss = String(Math.floor(S.t % 60)).padStart(2, '0');
     const rows = [['Oleada', S.mode === 'island' ? `${won ? 20 : S.wave} / 20` : S.wave], ['Enemigos hundidos', S.kills.toLocaleString('es')], ['Racha máxima', S.maxCombo], ['Jefes derrotados', S.bossKills], ['Nivel alcanzado', S.lv], ['Tiempo', `${mm}:${ss}`],
-      ['Monedas recogidas', `+${collected.toLocaleString('es')}`], ['Bonus de oleadas', `+${(waveBonus + bonus).toLocaleString('es')}`]];
+      ['Perlas recogidas', `<i class="pearl"></i>${Math.floor(S.pearlsGot).toLocaleString('es')}`],
+      ['Monedas por hundidos', `+${fromKills.toLocaleString('es')}`], ['Monedas por jefes', `+${fromBoss.toLocaleString('es')}`], ['Bonus de oleadas', `+${(waveBonus + bonus).toLocaleString('es')}`]];
+    if (fromPearls) rows.push(['Perlas cambiadas', `+${fromPearls.toLocaleString('es')}`]);
     $('rTally').innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot">${coinBtn(total)}</dd>`;
     $('rBuild').innerHTML = buildHtml();
     $('rUnlocks').innerHTML = unlocks.map(t => `<div class="unlock">${t}</div>`).join('');
@@ -2830,6 +3878,13 @@ function endRun(won) {
   }, delay);
 }
 
+// test coins: tap the coin counter on the title 7 times (only outside the Android app)
+let coinTaps = 0, coinTapT = 0;
+document.querySelector('#scrTitle .coinPill').addEventListener('click', () => {
+  if (location.href.startsWith('file:///android_asset/')) return;
+  const now = performance.now(); coinTaps = now - coinTapT < 600 ? coinTaps + 1 : 1; coinTapT = now;
+  if (coinTaps >= 7) { coinTaps = 0; save.coins = Math.max(save.coins, 99999); persist(); refreshCoins(); $('shopBadge').hidden = !canBuySomething(); sfx('evo'); vib([30, 30, 80]); }
+});
 // wiring
 $('goPlay').onclick = () => { audioInit(); if (save.intro) openIslands(); else openIntro(openIslands); };
 $('goSettings').onclick = () => { audioInit(); openSettings(); };
@@ -2843,7 +3898,7 @@ $('goAch').onclick = () => openAch();
 $('goMis').onclick = () => openMissions();
 $('moonsBack').onclick = () => moonsReturn === 'islands' ? openIslands() : openTitle();
 $('shopBack').onclick = () => shopReturn === 'result' ? show('scrResult') : openTitle();
-document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'title') openTitle(); else if (g === 'moons') openMoons('islands'); }));
+document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => { const g = b.dataset.go; if (g === 'title') { if (S) curtain(openTitle); else openTitle(); } else if (g === 'moons') openMoons('islands'); }));
 $('setMusic').onclick = () => { save.music = !save.music; persist(); audioInit(); setAudioGains(); openSettings(); };
 $('setSfx').onclick = () => { save.sfx = !save.sfx; persist(); audioInit(); setAudioGains(); openSettings(); sfx('coin'); };
 $('setVib').onclick = () => { save.vib = save.vib === false; persist(); openSettings(); vib(40); };
@@ -2851,13 +3906,14 @@ $('pauseBtn').onclick = pause;
 $('activeBtn').addEventListener('pointerdown', e => { e.preventDefault(); useActive(); });
 $('resumeBtn').onclick = resume;
 $('restartBtn').onclick = () => startRun(lastRun.mode, lastRun.isl);
-$('quitBtn').onclick = () => { S.ended = true; endRunQuiet(); };
-function endRunQuiet() { musicStop(); openTitle(); }
+// ending a run by choice still pays everything earned so far (the only way out of an endless run)
+$('quitBtn').onclick = () => { if (S && !S.ended) endRun(false, true); };
 $('reviveBtn').onclick = revive;
 $('giveUpBtn').onclick = () => endRun(false);
 $('rAgain').onclick = () => startRun(lastRun.mode, lastRun.isl);
 $('rShop').onclick = () => openShop('result');
 $('mDone').onclick = () => { persist(); resume(); };
+$('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
 // app shell hooks: Android back button and backgrounding
 window.lunaPause = () => { if (mode === 'play') pause(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
@@ -2874,9 +3930,10 @@ $('rMenu').onclick = () => openTitle();
 // test hooks for automated play-testing
 window.__luna = { get S() { return S; }, get mode() { return mode; }, pick: i => chooseCard(i), moveTo: (x, y) => { if (S) { const B = moonBounds(); S.mx = clamp(x, B.x0, B.x1); S.my = clamp(y, B.y0, B.y1); } }, active: () => useActive(),
   jump: w => { if (S) { S.wave = w - 1; nextWave(); } }, give: id => { if (S) { if (WEAPONS[id] && !hasW(id)) addWeapon(id); else if (PASSIVES[id]) S.passives[id] = Math.min(3, (S.passives[id] || 0) + 1); recompute(); syncEnts(); } },
-  maxw: () => { if (S) { S.weapons.forEach(w => { if (!w.union) w.lv = 3; }); syncEnts(); } }, start: (m, i) => startRun(m, i || 0), save: () => save, pairOf: id => WEAPONS[id].pair,
-  buyMerchant: i => { const w = wares[i]; if (w && !w.sold && purse() >= wareCost(w)) { spend(wareCost(w)); buyWare(w); w.sold = true; renderMerchant(); } }, leaveMerchant: () => { if (mode === 'merchant') resume(); },
-  bounds: () => moonBounds(), get W() { return W; }, get H() { return H; }, levelY: l => levelY(l), art: () => artReady };
+  maxw: () => { if (S) { S.weapons.forEach(w => { if (!w.union) w.lv = 3; }); syncEnts(); } }, start: (m, i) => { audioInit(); beginRun(m, i || 0); }, save: () => save, pairOf: id => WEAPONS[id].pair,
+  buyMerchant: i => { const w = wares[i]; if (w && !w.sold && purse() >= wareCost(w)) { spend(wareCost(w)); buyWare(w); w.sold = true; renderMerchant(); } }, leaveMerchant: () => { if (mode === 'merchant') resume(); }, rerollMerchant: () => rerollWares(),
+  bossAb: id => { const b = S && S.boss; if (b && !b.dead) { b.abQ = [BOSS_AB[b.type].find(a => a.id === id)]; b.abT = 0; b.busy = null; b.cast = null; } },
+  ev: src => eval(src), bounds: () => moonBounds(), get W() { return W; }, get H() { return H; }, levelY: l => levelY(l), art: () => artReady };
 
 // =====================================================================
 // LOOP
@@ -2891,12 +3948,16 @@ function loop(now) {
     if (S.slowmo > 0) { S.slowmo -= dt; g *= 0.3; }
     if (g > 0) update(g);
     if (S) updateHUD();
+  } else if (S && mode === 'result' && S.endT > 0) {
+    // the last moments of a run play out in slow motion before the results come up
+    S.endT -= dt; update(dt * 0.25);
   } else if (!S) {
     // title screen: the moon drifts over the sea while the tide breathes
     const B = moonBounds();
     demo.x = W / 2 + Math.sin(T * 0.35) * W * 0.32; demo.y = B.y0 + (B.y1 - B.y0) * (0.55 + 0.35 * Math.sin(T * 0.6));
     demo.level = (TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * Math.sin(T * 0.4);
   }
+  if (S && S.intro > 0) S.intro = Math.max(0, S.intro - dt / 0.9);
   draw();
   requestAnimationFrame(loop);
 }

@@ -148,14 +148,14 @@ for (const k of Object.keys(FACES)) S['face_' + k] = { w: 72, h: 72, ax: 36, ay:
 
 
 // ---------------------------------------------------------------- allies: shark
-const SHARK_BODY = 'M69.5,15.6 C69.6,12.2 66.6,9.6 61.6,8.6 C55.6,7.5 48.6,7.2 42.6,7.6 C40,5.4 36.4,3.3 31.6,3.1 C33.2,5.1 33.8,7.2 33.2,9.3 C26.4,10.2 19.8,11.6 15,13.2 C12.4,10.4 8.8,6.4 4.2,3.6 C5.6,7.8 7,11.6 8.8,15.2 C7.2,18.6 6,22 4.6,26 C9,23.6 12.4,20.6 15,18 C21.6,20.8 29,22.4 36,22.9 C34.4,24.6 33,26 31.6,27 C36.6,26.8 41.4,25.4 44.4,22.6 C50.4,22.6 57.2,21.6 62.2,20.1 C66.6,19 69.4,17.6 69.5,15.6 Z';
+const SHARK_BODY = 'M69.5,15.6 C69.6,12.2 66.6,9.6 61.6,8.6 C55.6,7.5 48.6,7.2 42.6,7.6 C41.4,1.4 37.6,-7.4 28.4,-11.6 C31,-5.6 32.6,1.6 33.2,9.3 C26.4,10.2 19.8,11.6 15,13.2 C12.4,10.4 8.8,6.4 4.2,3.6 C5.6,7.8 7,11.6 8.8,15.2 C7.2,18.6 6,22 4.6,26 C9,23.6 12.4,20.6 15,18 C21.6,20.8 29,22.4 36,22.9 C34.4,24.6 33,26 31.6,27 C36.6,26.8 41.4,25.4 44.4,22.6 C50.4,22.6 57.2,21.6 62.2,20.1 C66.6,19 69.4,17.6 69.5,15.6 Z';
 S.shark = {
-  w: 72, h: 30, ax: 36, ay: 15, draw: (I) => `<defs>
+  w: 72, h: 44, ax: 36, ay: 29, draw: (I) => `<defs>
     ${lin(I('b'), [[0, '#a9c3dc'], [0.38, '#6f90b3'], [1, '#3e5878']])}
     ${lin(I('w'), [[0, '#ffffff'], [1, '#c9d3e0']])}
     <clipPath id="${I('c')}"><path d="${SHARK_BODY}"/></clipPath>
     <clipPath id="${I('m')}"><path d="M68.4,16.4 C64.6,17 59.6,16.8 54.6,15.4 C55.4,18.4 59.4,20.4 63.6,19.6 C66.4,19 68.2,17.8 68.4,16.4 Z"/></clipPath>
-  </defs>
+  </defs><g transform="translate(0 14)">
   <path d="${SHARK_BODY}" fill="url(#${I('b')})"/>
   <g clip-path="url(#${I('c')})">
     <path d="M72,15.4 C66,17.6 58,18.4 50,18.2 C40,18 29,17.6 22,17.4 C19,17.4 16.6,18 14,19.4 L14,32 L72,32 Z" fill="url(#${I('w')})"/>
@@ -163,7 +163,7 @@ S.shark = {
     <path d="M31.6,27 C35,25 37.6,23.4 40,21.6" fill="none" stroke="#3e5878" stroke-width="1" opacity="0.6"/>
     <path d="M36,23 C38,24.4 40,24.6 44.4,22.6 L44.4,30 L30,30 Z" fill="#3e5878" opacity="0.35"/>
     <path d="M4,4 C9,8 12,11 15.4,13.6 L15,18 C11,19 8,17 7,15 Z" fill="#2c4262" opacity="0.25"/>
-    <path d="M63,8.9 C56,7.9 48,7.8 43,8.3 M40.6,6.2 C38,4.4 35.6,3.6 33.4,3.4" fill="none" stroke="#e2efff" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
+    <path d="M63,8.9 C56,7.9 48,7.8 43,8.3 M40.2,3.6 C38.6,-1.6 35.4,-6.4 31,-9.2" fill="none" stroke="#e2efff" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
   </g>
   <path d="M47.6,10.8 Q46.4,13.2 47.6,15.8 M50,10.6 Q48.8,13.2 50,15.8 M52.4,10.8 Q51.3,13.1 52.4,15.4" fill="none" stroke="#2c4262" stroke-width="0.95" stroke-linecap="round"/>
   <path d="M38.6,10.4 L43,14.4" stroke="#e8f1fb" stroke-width="1.3" stroke-linecap="round"/>
@@ -177,7 +177,8 @@ S.shark = {
   <path d="M54.6,15.4 C53.8,15 53.2,14.2 53.1,13.3" ${ol(1.3)} fill="none"/>
   <ellipse cx="59.4" cy="11.6" rx="2.3" ry="2" fill="#fff" ${ol(1)}/><circle cx="60.1" cy="11.9" r="1.2" fill="${OUT}"/><circle cx="60.5" cy="11.4" r="0.4" fill="#fff"/>
   <path d="M56,8.8 L62.4,10.6 L62.6,9.4 C60.4,8.5 58,8.2 56,8.8 Z" fill="${OUT}" ${ol(0.9)}/>
-  <path d="${SHARK_BODY}" fill="none" ${ol(1.8)}/>`,
+  <path d="M36.2,-2 L32.6,5.6" stroke="#2c4262" stroke-width="1" stroke-linecap="round" opacity="0.45"/>
+  <path d="${SHARK_BODY}" fill="none" ${ol(1.8)}/></g>`,
 };
 
 S.sharkFin = {
@@ -618,5 +619,52 @@ function merchant(f) {
 }
 S.merchant0 = { w: 110, h: 90, ax: 55, ay: 74, draw: merchant(0) };
 S.merchant1 = { w: 110, h: 90, ax: 55, ay: 74, draw: merchant(1) };
+
+// ---------------------------------------------------------------- anchors (Ancla weapon) and jellyfish (Medusas)
+// the anchor hangs from its ring: the sprite's anchor point is the ring, so rotating it swings it like a pendulum
+function anchorSpr(pal, glowCol, rune) {
+  return (I) => {
+    const shank = 'M21.2,10 L26.8,10 L26.8,40 L21.2,40 Z', stock = 'M12,10.5 L36,10.5 Q37.5,12.5 36,14.5 L12,14.5 Q10.5,12.5 12,10.5 Z';
+    const arms = 'M7,27 C7.5,39.5 16,44.5 24,44.5 C32,44.5 40.5,39.5 41,27';
+    const fl = 'M2,32.5 L6.5,21.5 L12.5,31 Z M46,32.5 L41.5,21.5 L35.5,31 Z';
+    return `<defs>${lin(I('g'), pal, 0.6, 1)}${glowCol ? glow(I('gl'), glowCol) : ''}</defs>
+    ${glowCol ? `<circle cx="24" cy="28" r="23" fill="url(#${I('gl')})"/>` : ''}
+    <circle cx="24" cy="5.6" r="4.2" fill="none" stroke="${OUT}" stroke-width="6"/><circle cx="24" cy="5.6" r="4.2" fill="none" stroke="url(#${I('g')})" stroke-width="2.8"/>
+    <path d="${arms}" fill="none" stroke="${OUT}" stroke-width="8.4" stroke-linecap="round"/>
+    <path d="${shank} ${stock} ${fl}" fill="${OUT}" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="${arms}" fill="none" stroke="url(#${I('g')})" stroke-width="5" stroke-linecap="round"/>
+    <path d="${shank} ${stock} ${fl}" fill="url(#${I('g')})"/>
+    <path d="M23,12 L23,38 M8.4,28 C9,36 14.5,41.6 21,42.6" stroke="#fff" stroke-width="1.3" fill="none" opacity="0.6" stroke-linecap="round"/>
+    ${rune ? `<path d="M24,18 L24,34 M20,22 L28,22 M20.5,30 L27.5,30" stroke="${rune}" stroke-width="1.6" stroke-linecap="round" opacity="0.95"/>` : ''}
+    <circle cx="24" cy="44.5" r="3" fill="url(#${I('g')})" ${ol(1.5)}/>`;
+  };
+}
+S.anchorW = { w: 48, h: 50, ax: 24, ay: 6, draw: anchorSpr([[0, '#dfe5f2'], [0.45, '#8a90ac'], [1, '#43455e']]) };
+S.anchorG = { w: 48, h: 50, ax: 24, ay: 6, draw: anchorSpr([[0, '#e8fbff'], [0.45, '#7fc4e6'], [1, '#2e4f7e']], '#8ff7ff', '#fff27a') };
+S.anchorA = { w: 48, h: 50, ax: 24, ay: 6, draw: anchorSpr([[0, '#6d7a98'], [0.45, '#2c3352'], [1, '#121426']], '#5ff2d0', '#7dffe0') };
+
+function jelly(fr, pal, tentCol) {
+  return (I) => {
+    const k = fr ? 1 : 0;   // frame 1: bell squeezed, tentacles trailing
+    const bw = k ? 12.5 : 14, bh = k ? 17 : 15.5;
+    const bell = `M${18 - bw},18 C${18 - bw - 1},${18 - bh * 0.75} ${18 - bw * 0.55},${18 - bh} 18,${18 - bh} C${18 + bw * 0.55},${18 - bh} ${18 + bw + 1},${18 - bh * 0.75} ${18 + bw},18 C${18 + bw * 0.8},16 ${18 + bw * 0.55},19.5 ${18 + bw * 0.33},17.5 C20,20 16,20 ${18 - bw * 0.33},17.5 C${18 - bw * 0.55},19.5 ${18 - bw * 0.8},16 ${18 - bw},18 Z`;
+    const sw = k ? -2 : 2;
+    const tent = [9, 14.5, 21, 26.5].map((tx, i) => `M${tx},18.5 C${tx - 3 + sw},24 ${tx + 3 - sw},28 ${tx - 1},${33 + (i % 2) * 3} C${tx - 3 + sw},36 ${tx + 1},39 ${tx + sw * 0.5},${41 + (i % 2) * 2}`).join(' ');
+    return `<defs>${lin(I('b'), pal, 0.3, 1)}${glow(I('gl'), pal[1][1])}</defs><g transform="translate(0 3)">
+    <circle cx="18" cy="14" r="17" fill="url(#${I('gl')})" opacity="0.7"/>
+    <path d="${tent}" fill="none" stroke="${OUT}" stroke-width="4" stroke-linecap="round"/>
+    <path d="${tent}" fill="none" stroke="${tentCol}" stroke-width="1.9" stroke-linecap="round"/>
+    <path d="${bell}" fill="url(#${I('b')})" ${ol(2.2)}/>
+    <path d="M${18 - bw + 4},${18 - bh * 0.4} C${18 - bw + 5},${18 - bh * 0.8} ${18 - 3},${18 - bh + 1.5} 17,${18 - bh + 1.2}" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.8"/>
+    <circle cx="13" cy="12" r="1.5" fill="${OUT}"/><circle cx="23" cy="12" r="1.5" fill="${OUT}"/>
+    <path d="M15.6,15 Q18,17 20.4,15" stroke="${OUT}" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+    <circle cx="10" cy="14.6" r="1.5" fill="#ff6fb8" opacity="0.55"/><circle cx="26" cy="14.6" r="1.5" fill="#ff6fb8" opacity="0.55"/></g>`;
+  };
+}
+const JPAL = [[0, '#ffe2ff'], [0.45, '#ff8ee6'], [1, '#a03cc8']], JPAL_T = [[0, '#eef6ff'], [0.45, '#9fb8ff'], [1, '#4b3cc8']];
+S.jelly0 = { w: 36, h: 49, ax: 18, ay: 17, draw: jelly(0, JPAL, '#f3b6ff') };
+S.jelly1 = { w: 36, h: 49, ax: 18, ay: 17, draw: jelly(1, JPAL, '#f3b6ff') };
+S.jellyT0 = { w: 36, h: 49, ax: 18, ay: 17, draw: jelly(0, JPAL_T, '#cfe4ff') };
+S.jellyT1 = { w: 36, h: 49, ax: 18, ay: 17, draw: jelly(1, JPAL_T, '#cfe4ff') };
 
 module.exports = { S };

@@ -1370,4 +1370,122 @@ S.i_libro = icon((d) => {
     ${hl('M10,15 C17,12 24,13 29,17', 1.4, 0.7)}${spark(57, 7, 0.7)}`;
 });
 
+// ================================================================= v5: anchor, jellyfish and their passives, fusions and unions
+// anchor drawn in local units (ring at the top, crown at the bottom), placed with translate/scale/rotate
+function anchorG(d, x, y, s, rot = 0, pal = IRON, k = 'an') {
+  const g = d.lin(k, pal, 0.6, 1);
+  const shank = 'M-2.8,-14 L2.8,-14 L2.8,17 L-2.8,17 Z', stock = 'M-12,-13.5 L12,-13.5 Q13.5,-11.5 12,-9.5 L-12,-9.5 Q-13.5,-11.5 -12,-13.5 Z';
+  const arms = 'M-17,3 C-16.5,15.5 -8,20.5 0,20.5 C8,20.5 16.5,15.5 17,3';
+  const fl = 'M-22,8.5 L-17.5,-2.5 L-11.5,7 Z M22,8.5 L17.5,-2.5 L11.5,7 Z';
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
+    <circle cx="0" cy="-19" r="4.6" fill="none" stroke="${OUT}" stroke-width="6.4"/><circle cx="0" cy="-19" r="4.6" fill="none" stroke="${g}" stroke-width="3.2"/>
+    <path d="${arms}" fill="none" stroke="${OUT}" stroke-width="8.4" stroke-linecap="round"/>
+    <path d="${shank} ${stock} ${fl}" fill="${OUT}" stroke="${OUT}" stroke-width="3.2" stroke-linejoin="round"/>
+    <path d="${arms}" fill="none" stroke="${g}" stroke-width="5" stroke-linecap="round"/>
+    <path d="${shank} ${stock} ${fl}" fill="${g}"/>
+    <path d="M-1,-12 L-1,15 M-15.6,4 C-15,12 -9.5,17.6 -3,18.6" stroke="#fff" stroke-width="1.3" fill="none" opacity="0.55" stroke-linecap="round"/>
+    <circle cx="0" cy="20.5" r="3.2" fill="${g}" ${ol(1.6)}/>
+  </g>`;
+}
+// jellyfish: bell centred at (x, y), tentacles hanging below
+function jellyG(d, x, y, s, k = 'jl', pal = [[0, '#ffe2ff'], [0.45, '#ff8ee6'], [1, '#a03cc8']]) {
+  const bell = 'M-14,2 C-15,-10 -8,-16 0,-16 C8,-16 15,-10 14,2 C11,0 8,3.5 4.7,1.5 C2,4 -2,4 -4.7,1.5 C-8,3.5 -11,0 -14,2 Z';
+  const tent = [-9, -3.5, 3, 8.5].map((tx, i) => `M${tx},2.5 C${tx - 3},8 ${tx + 3},12 ${tx - 1},${17 + (i % 2) * 3} C${tx - 3},20 ${tx + 1},23 ${tx},${25 + (i % 2) * 2}`).join(' ');
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="${tent}" fill="none" stroke="${OUT}" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="${tent}" fill="none" stroke="#f3b6ff" stroke-width="2" stroke-linecap="round"/>
+    <path d="${bell}" fill="${d.lin(k, pal, 0.3, 1)}" ${ol(2.6)}/>
+    <path d="M-10,-6 C-9,-11 -5,-13.5 -1,-13.8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>
+    <circle cx="-5" cy="-5" r="1.5" fill="${OUT}"/><circle cx="5" cy="-5" r="1.5" fill="${OUT}"/>
+    <path d="M-2.4,-1.8 Q0,0.2 2.4,-1.8" stroke="${OUT}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="-8" cy="-2.6" r="1.6" fill="#ff6fb8" opacity="0.6"/><circle cx="8" cy="-2.6" r="1.6" fill="#ff6fb8" opacity="0.6"/>
+  </g>`;
+}
+const zap = (pts, col = '#fff27a', w = 2.4) => `<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M${pts}" stroke="${OUT}" stroke-width="${w + 2.6}"/><path d="M${pts}" stroke="${col}" stroke-width="${w}"/></g>`;
+const linkO = (x, y, a, d, k) => `<g transform="translate(${x} ${y}) rotate(${a})"><rect x="-8" y="-4.6" width="16" height="9.2" rx="4.6" fill="none" stroke="${OUT}" stroke-width="5.6"/><rect x="-8" y="-4.6" width="16" height="9.2" rx="4.6" fill="none" stroke="${d.lin(k, SILVER, 0.3, 1)}" stroke-width="2.8"/></g>`;
+
+S.i_ancla = icon((d) => {
+  const links = Array.from({ length: 4 }, (_, i) => linkO(13 + i * 5.2, 11 + i * 4.4, 40 + (i % 2) * 90, d, 'ch'));
+  return `<path d="${crescentD(12, 11, 9, 5, 4, 7.5)}" fill="${d.rad('mn', MOON, 0.3, 0.25, 0.85)}" ${ol(2.2)}/>
+    ${links.join('')}
+    ${anchorG(d, 38, 37, 0.98, -24)}
+    ${spark(54, 12, 0.9)}${spark(8, 50, 0.7)}`;
+});
+S.i_medusa = icon((d) => `<circle cx="32" cy="28" r="24" fill="${d.glow('gl', '#ff9ef0', 0.45)}"/>
+    ${jellyG(d, 32, 23, 1.3)}
+    ${zap('8,40 13,36 11,33 17,28', '#fff27a', 2)}${zap('56,36 51,33 53,30 47,26', '#fff27a', 2)}
+    ${spark(52, 10, 0.8)}${spark(10, 14, 0.6)}`);
+S.i_cadena = icon((d) => `${linkO(16, 46, -45, d, 'c1')}${linkO(25, 37, 45, d, 'c2')}${linkO(34, 28, -45, d, 'c3')}${linkO(43, 19, 45, d, 'c4')}
+    <g transform="translate(51 11) rotate(-45)"><path d="M-6,-3 L6,-3 L8,3 L-8,3 Z" fill="${d.lin('hk', IRON, 0.3, 1)}" ${ol(2)}/></g>
+    ${hl('M10,52 L14,48', 1.4, 0.6)}${spark(52, 50, 0.8)}${spark(10, 12, 0.6)}`);
+S.i_veneno = icon((d) => {
+  const drop = 'M32,6 C40,18 50,27 50,39 C50,50 42,58 32,58 C22,58 14,50 14,39 C14,27 24,18 32,6 Z';
+  return `<circle cx="32" cy="38" r="26" fill="${d.glow('gl', '#9be15d', 0.4)}"/>
+    <path d="${drop}" fill="${d.lin('dp', [[0, '#e6ffb0'], [0.45, '#7fd858'], [1, '#2a7a3a']], 0.3, 1)}" ${ol(3)}/>
+    <g transform="translate(32 40) scale(1.25)">
+      <path d="M-6,-1.5 C-6,-8 6,-8 6,-1.5 C6,1.5 4,2.5 4,4.5 L-4,4.5 C-4,2.5 -6,1.5 -6,-1.5 Z" fill="#1d3a22"/>
+      <circle cx="-2.4" cy="-1.6" r="1.8" fill="#bff58a"/><circle cx="2.4" cy="-1.6" r="1.8" fill="#bff58a"/>
+      <path d="M-2,4.5 L-2,6.5 M0,4.5 L0,6.5 M2,4.5 L2,6.5" stroke="#1d3a22" stroke-width="1.2"/>
+    </g>
+    ${hl('M24,24 C21,30 19,35 19.5,41', 2.2, 0.75)}
+    <circle cx="51" cy="18" r="3.4" fill="#bff58a" ${ol(1.6)}/><circle cx="56" cy="28" r="2.2" fill="#bff58a" ${ol(1.3)}/><circle cx="11" cy="24" r="2.6" fill="#bff58a" ${ol(1.4)}/>`;
+});
+S.i_nacar = icon((d) => {
+  const heart = 'M32,56 C20,47 7,38 7,24 C7,14 14,8 22,8 C27,8 30,11 32,15 C34,11 37,8 42,8 C50,8 57,14 57,24 C57,38 44,47 32,56 Z';
+  return `<circle cx="32" cy="32" r="28" fill="${d.glow('gl', '#e6f4ff', 0.5)}"/>
+    <path d="${heart}" fill="${d.linU('ht', [[0, '#ffffff'], [0.3, '#e4f0ff'], [0.55, '#ffd9f0'], [0.8, '#c9e6ff'], [1, '#9fb4e8']], 10, 8, 52, 56)}" ${ol(3)}/>
+    <g clip-path="${d.clip('hc', heart)}" fill="none" stroke-linecap="round">
+      <path d="M2,30 C14,22 28,28 40,20 C48,15 56,16 62,12" stroke="#ffc4ea" stroke-width="3" opacity="0.7"/>
+      <path d="M2,40 C16,34 30,40 42,32 C50,27 58,28 62,25" stroke="#bfe3ff" stroke-width="3" opacity="0.7"/>
+      <path d="M2,50 C16,44 30,50 44,42" stroke="#e7d4ff" stroke-width="3" opacity="0.6"/>
+    </g>
+    ${hl('M13,22 C13,16 17,12.5 22,12.5', 2.4, 0.9)}
+    ${spark(47, 21, 1.1)}${sparkO(54, 50, 0.7, '#ffe6f6')}`;
+});
+// fusions (gold accents)
+S.i_abisal = icon((d) => `<circle cx="32" cy="34" r="29" fill="${d.glow('gl', '#ffd23c', 0.4)}"/>
+    <ellipse cx="32" cy="55" rx="27" ry="6" fill="none" stroke="${OUT}" stroke-width="4.4"/><ellipse cx="32" cy="55" rx="27" ry="6" fill="none" stroke="#8fd8ff" stroke-width="2.2"/>
+    <ellipse cx="32" cy="55" rx="17" ry="3.6" fill="none" stroke="#cfefff" stroke-width="1.6" opacity="0.8"/>
+    ${anchorG(d, 32, 30, 1.18, 0, [[0, '#5a5a82'], [0.5, '#2a2a4a'], [1, '#12101e']], 'ab')}
+    <circle cx="32" cy="7.6" r="5.4" fill="none" stroke="${d.lin('gr', GOLD, 0.3, 1)}" stroke-width="2"/>
+    ${sparkO(55, 14, 0.95)}${sparkO(9, 16, 0.75)}${spark(52, 40, 0.6)}`);
+S.i_plaga = icon((d) => `<circle cx="32" cy="30" r="28" fill="${d.glow('gl', '#ffd23c', 0.35)}"/>
+    ${jellyG(d, 16, 22, 0.78, 'j1')}${jellyG(d, 48, 20, 0.78, 'j2')}${jellyG(d, 32, 30, 1.05, 'j3')}
+    ${zap('20,40 25,44 23,47 29,51', '#ffe27a', 1.8)}${zap('44,40 40,45 43,47 37,52', '#ffe27a', 1.8)}
+    ${sparkO(56, 50, 0.85)}${sparkO(8, 48, 0.7)}`);
+// unions (purple aura + gold)
+S.i_galvana = icon((d) => `${aura(d, 32, 32, 31)}
+    ${anchorG(d, 30, 33, 1.02, 18)}
+    ${zap('46,8 41,16 45,18 38,27', '#bff6ff', 2.4)}${zap('10,42 17,40 15,36 22,33', '#bff6ff', 2)}
+    ${jellyG(d, 50, 44, 0.52, 'jg')}
+    ${sparkO(10, 12, 0.8)}${spark(56, 22, 0.6)}`);
+S.i_tempestad = icon((d) => {
+  const cloud = 'M12,24 C8,24 6,20 8,17 C9,13 14,12 16,14 C17,9 23,6 28,9 C31,5 39,5 42,10 C47,8 53,11 53,16 C57,17 58,22 54,24 Z';
+  return `${aura(d, 32, 32, 31)}
+    <path d="${cloud}" fill="${d.lin('cl', [[0, '#e6e2ff'], [0.5, '#9a94c8'], [1, '#56507e']], 0.3, 1)}" ${ol(2.6)}/>
+    ${hl('M11,19 C12,15 15,14 17,15.5', 1.6, 0.7)}
+    ${zap('22,24 18,30 23,31 19,37', '#ffe27a', 2.4)}${zap('44,24 47,30 42,31 46,36', '#ffe27a', 2.4)}
+    ${jellyG(d, 32, 40, 0.8, 'jt')}
+    ${sparkO(56, 46, 0.8)}${spark(8, 46, 0.6)}`;
+});
+S.i_encadenadas = icon((d) => {
+  const ball = (x, y, k) => `<circle cx="${x}" cy="${y}" r="10" fill="${d.rad(k, [[0, '#7c7a96'], [0.6, '#2c2a3c'], [1, '#14121e']], 0.35, 0.3, 0.8)}" ${ol(2.8)}/><path d="${arcD(x, y, 7, 200, 250)}" stroke="#fff" stroke-width="1.8" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  const links = Array.from({ length: 3 }, (_, i) => linkO(25 + i * 7, 33 - i * 2.4 + (i === 1 ? -1 : 0), (i % 2) * 90 - 18, d, 'l' + i));
+  return `${aura(d, 32, 32, 31)}
+    <path d="M4,46 L18,40 M2,38 L14,34 M48,22 L60,16 M50,30 L62,26" stroke="#e6c6ff" stroke-width="2.2" stroke-linecap="round" opacity="0.8"/>
+    ${links.join('')}${ball(15, 38, 'b1')}${ball(49, 27, 'b2')}
+    ${sparkO(52, 50, 0.85)}${sparkO(12, 14, 0.7, '#e6c6ff')}`;
+});
+S.i_torbellino = icon((d) => {
+  const cx = 32, cy = 35, rx = 26, ry = 19, sy = ry / rx;
+  const arms = [0, 120, 240].map(r => spiralArm(cx, cy, 3, 23, r, 0.95, 7, sy));
+  const flake = Array.from({ length: 3 }, (_, i) => { const a = rd(i * 60); return `M${P([32 - Math.cos(a) * 9, 13 - Math.sin(a) * 9])} L${P([32 + Math.cos(a) * 9, 13 + Math.sin(a) * 9])}`; }).join(' ');
+  return `${aura(d, 32, 32, 31)}
+    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${d.radU('w', [[0, '#16305a'], [0.4, '#3a78c0'], [0.85, '#8fd8ff'], [1, '#e6fbff']], cx, cy, 27)}" ${ol(3)}/>
+    ${arms.map(a => `<path d="${a}" fill="${d.linU('a', ICE, 8, 14, 56, 56)}" stroke="${OUT}" stroke-width="1.4" stroke-linejoin="round"/>`).join('')}
+    <ellipse cx="${cx}" cy="${cy}" rx="4.6" ry="${f2(4.6 * sy)}" fill="#0a1a3a" stroke="${OUT}" stroke-width="1.4"/>
+    <path d="${flake}" stroke="${OUT}" stroke-width="5" stroke-linecap="round"/><path d="${flake}" stroke="#f4feff" stroke-width="2.4" stroke-linecap="round"/>
+    ${sparkO(56, 52, 0.8)}${spark(8, 48, 0.6)}`;
+});
+
 module.exports = { S };

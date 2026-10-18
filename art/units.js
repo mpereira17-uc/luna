@@ -236,4 +236,95 @@ S.serpHead = { w: 42, h: 28, ax: 8, ay: 15, draw: serpentHead(SERP) };
 S.serpBody = { w: 26, h: 26, ax: 13, ay: 14, draw: serpentBody(SERP) };
 S.serpTail = { w: 30, h: 20, ax: 26, ay: 10, draw: serpentTail(SERP) };
 
+// ---------------------------------------------------------------- brulote: a charred little ship packed with powder kegs, sail ablaze
+function brulote(f) {
+  return (I) => {
+    const hull = 'M8,48 L72,48 C78,48 80,51 78,54 C73,64 62,69 50,69 L22,69 C13,69 8,62 8,48 Z';
+    const sail = f ? 'M40,12 C55,18 60,28 57,42 L40,42 Z' : 'M40,12 C52,16 58,27 56,42 L40,42 Z';
+    const fl = (x, y, s, k) => `<path transform="translate(${x} ${y}) scale(${s})" d="${k ? 'M0,0 C-6,-4 -5,-12 -1,-18 C0,-12 4,-12 3,-17 C8,-11 7,-3 0,0 Z' : 'M0,0 C-7,-3 -6,-11 -2,-16 C-1,-11 3,-10 2,-15 C7,-9 6,-2 0,0 Z'}" fill="url(#${I('f')})" ${ol(1.3)}/>`;
+    return `<defs>
+      ${lin(I('h'), [[0, '#6b4a3a'], [0.5, '#4a3128'], [1, '#2a1b17']])}
+      ${lin(I('f'), [[0, '#fff2a8'], [0.45, '#ffb347'], [1, '#ff5a2a']])}
+      ${lin(I('s'), [[0, '#d9c3a0'], [1, '#9a7f62']], 1, 0)}
+      <clipPath id="${I('hc')}"><path d="${hull}"/></clipPath>
+      <clipPath id="${I('sc')}"><path d="${sail}"/></clipPath>
+      ${glow(I('g'), '#ff8a3d')}
+    </defs>
+    <circle cx="44" cy="30" r="30" fill="url(#${I('g')})"/>
+    <path d="M39,8 L72,46 M39,8 L14,42" stroke="#2a1f3a" stroke-width="0.8" fill="none"/>
+    <path d="${sail}" fill="url(#${I('s')})"/>
+    <g clip-path="url(#${I('sc')})">
+      <path d="M44,${f ? 22 : 20} C48,24 50,30 47,34 C52,33 55,38 54,44 L40,44 L40,26 Z" fill="#2a1b17" opacity="0.55"/>
+      <circle cx="50" cy="${f ? 27 : 29}" r="3" fill="#2a1b17" opacity="0.7"/>
+    </g>
+    <path d="${sail}" fill="none" ${ol(1.8)}/>
+    ${fl(50, 30, f ? 1.1 : 1, f)}${fl(44, 20, f ? 0.8 : 0.9, !f)}
+    <rect x="37.5" y="7" width="3.2" height="42" rx="1.2" fill="#3e2a20" ${ol(1.6)}/>
+    ${[[16, 41], [27, 41], [21.5, 33]].map(([x, y]) => `<g transform="translate(${x} ${y})"><rect x="-5.5" y="-6" width="11" height="12" rx="3" fill="#7a4a2a" ${ol(1.4)}/><path d="M-5.5,-2 L5.5,-2 M-5.5,2.5 L5.5,2.5" stroke="#2a1f1a" stroke-width="1.2"/><path d="M-2,-1 L2,2 M2,-1 L-2,2" stroke="#f3ead2" stroke-width="1" stroke-linecap="round"/></g>`).join('')}
+    <path d="M21.5,27 C21,23 24,22 23,${f ? 18 : 19}" fill="none" stroke="#c9b08a" stroke-width="1.2"/>
+    <circle cx="23" cy="${f ? 17.5 : 18.5}" r="${f ? 2.6 : 2}" fill="#fff2a8"/><circle cx="23" cy="${f ? 17.5 : 18.5}" r="${f ? 4.5 : 3.6}" fill="#ffb347" opacity="0.45"/>
+    <path d="${hull}" fill="url(#${I('h')})"/>
+    <g clip-path="url(#${I('hc')})">
+      <path d="M6,55 C30,57 52,57 80,54" stroke="#2a1b17" stroke-width="1.1" fill="none"/>
+      <path d="M6,61 C30,63 52,63 76,60" stroke="#2a1b17" stroke-width="1.1" fill="none"/>
+      <path d="M20,48 C24,54 22,60 28,66 M54,48 C50,55 56,60 52,68" stroke="#1a100c" stroke-width="2.2" fill="none" opacity="0.6"/>
+      <rect x="0" y="64" width="90" height="10" fill="#1d1418"/>
+      <rect x="0" y="48" width="90" height="3" fill="#ff8a3d" opacity="0.75"/>
+    </g>
+    ${fl(66, 49, f ? 0.75 : 0.65, f)}${fl(12, 49, f ? 0.6 : 0.7, !f)}
+    <path d="${hull}" fill="none" ${ol(2.2)}/>`;
+  };
+}
+S.brulote0 = { w: 84, h: 74, ax: 42, ay: 62, draw: brulote(0) };
+S.brulote1 = { w: 84, h: 74, ax: 42, ay: 62, draw: brulote(1) };
+
+// ---------------------------------------------------------------- the Flying Dutchman: a ghostly galleon with torn sails and green lanterns
+function ghostShip(f) {
+  return (I) => {
+    const b = f ? 2.5 : 0;
+    const main = `M42,21 L72,21 C${77 + b},31 ${77 + b},38 74,47 L66,47 L64,40 L60,47 L52,47 L49,38 L46,47 L40,47 C37,38 37,31 42,21 Z`;
+    const fore = `M78,27 L100,27 C${104 + b},35 ${104 + b},40 102,47 L96,47 L94,41 L90,47 L77,47 C75,40 75,35 78,27 Z`;
+    const top = `M48,6 L66,6 C${69 + b * 0.5},10 ${70 + b * 0.5},14 69,17 L62,17 L60,13 L57,17 L45,17 C44,14 45,10 48,6 Z`;
+    const hull = 'M8,34 L34,34 L36,52 L102,52 C110,52 117,50 122,45 C119,58 110,76 94,86 C86,91 74,92 60,92 L28,92 C16,90 9,80 8,64 Z';
+    const rig = 'stroke="#9dffd8" stroke-width="0.8" fill="none" opacity="0.6"';
+    return `<defs>
+      ${lin(I('h'), [[0, '#4f8f86'], [0.5, '#2e5e5a'], [1, '#173533']])}
+      ${lin(I('s'), [[0, '#d8fff2', 0.9], [1, '#7fd1bb', 0.75]], 1, 0)}
+      <clipPath id="${I('hc')}"><path d="${hull}"/></clipPath>
+      ${glow(I('g'), '#7dffcf')}
+    </defs>
+    <circle cx="13" cy="22" r="16" fill="url(#${I('g')})"/>
+    <circle cx="64" cy="50" r="58" fill="url(#${I('g')})" opacity="0.35"/>
+    <path d="M57,1 L10,34 M57,1 L120,46 M89,12 L126,35" ${rig}/>
+    <path d="M110,49 L127,35" ${ol(3)}/><path d="M110,49 L127,35" stroke="#5aa596" stroke-width="1.6" stroke-linecap="round"/>
+    <rect x="55.5" y="0" width="3.6" height="54" rx="1.2" fill="#3c6f68" ${ol(1.6)}/>
+    <rect x="87.5" y="12" width="3.4" height="42" rx="1.2" fill="#3c6f68" ${ol(1.6)}/>
+    <path d="M59,1 L${f ? 72 : 75},${f ? 6 : 3} L68,5 L71,8 L59,7 Z" fill="#a8ffe0" opacity="0.8" ${ol(1.3)}/>
+    <path d="${top}" fill="url(#${I('s')})" ${ol(1.8)}/>
+    <path d="${main}" fill="url(#${I('s')})" ${ol(2)}/>
+    <path d="${fore}" fill="url(#${I('s')})" ${ol(2)}/>
+    <circle cx="66" cy="30" r="3.4" fill="#173533" opacity="0.55"/><circle cx="85" cy="35" r="2.6" fill="#173533" opacity="0.55"/><circle cx="50" cy="12" r="2" fill="#173533" opacity="0.55"/>
+    ${skull(57, 34, 1.15, '#173533', '#a8ffe0')}
+    <rect x="39" y="18.6" width="36" height="3.4" rx="1.2" fill="#3c6f68" ${ol(1.3)}/>
+    <rect x="43" y="4" width="28" height="3" rx="1.2" fill="#3c6f68" ${ol(1.2)}/>
+    <rect x="75" y="25" width="28" height="3" rx="1.2" fill="#3c6f68" ${ol(1.2)}/>
+    <path d="M15,34 L15,25" ${ol(1.6)}/><rect x="12" y="18.5" width="6" height="7" rx="1.6" fill="#b6ffe4" ${ol(1.3)}/>
+    <path d="${hull}" fill="url(#${I('h')})"/>
+    <g clip-path="url(#${I('hc')})">
+      <rect x="0" y="33" width="130" height="3" fill="#9dffd8" opacity="0.6"/>
+      <rect x="0" y="51" width="130" height="3" fill="#9dffd8" opacity="0.6"/>
+      <path d="M0,70 C40,72 80,72 130,64" stroke="#173533" stroke-width="1.3" fill="none"/>
+      <path d="M0,78 C40,80 80,79 130,72" stroke="#173533" stroke-width="1.3" fill="none"/>
+      <path d="M40,60 L46,68 L42,74 M84,58 L80,66 L86,72" stroke="#0e2422" stroke-width="1.6" fill="none"/>
+      <rect x="0" y="84" width="130" height="14" fill="#0e2422" opacity="0.8"/>
+    </g>
+    ${[13, 21, 29].map(x => `<rect x="${x - 3}" y="40" width="6" height="7" rx="1.5" fill="#b6ffe4" ${ol(1.2)}/>`).join('')}
+    ${[48, 62, 76, 90].map(x => `<rect x="${x - 4}" y="58" width="8" height="7" rx="1.2" fill="#7dffcf" opacity="0.85" ${ol(1.3)}/>`).join('')}
+    <path d="${hull}" fill="none" ${ol(2.4)}/>
+    <path d="M28,92 C24,96 26,${f ? 99 : 97} 22,98 M60,92 C58,96 62,98 58,${f ? 100 : 98} M94,86 C96,91 92,94 95,97" stroke="#9dffd8" stroke-width="1.5" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  };
+}
+S.ghost0 = { w: 130, h: 100, ax: 64, ay: 84, draw: ghostShip(0) };
+S.ghost1 = { w: 130, h: 100, ax: 64, ay: 84, draw: ghostShip(1) };
+
 module.exports = { S, serpentHead, serpentBody, serpentTail, galleon, sloop };
