@@ -1,6 +1,7 @@
 // Bot play-test: a bot plays a full run in headless Chromium and prints how far it got.
-// usage: node tools/play-test.js <mode> <isl> <bot:smart|idle> <seconds> [shotPrefix] [danger] [meta preset: none|mid|max] [reefTier]
+// usage: node tools/play-test.js <mode: island|endless|daily|mission> <isl or mission index> <bot:smart|idle> <seconds> [shotPrefix] [danger] [meta preset: none|mid|max] [reefTier]
 // e.g.   node tools/play-test.js island 0 smart 420 "" 0 none    (island 1, no workshop upgrades)
+//        node tools/play-test.js mission 1 smart 300 "" 0 none   (campaign mission 2)
 // The bot drags the moon toward coins, gulls and the ship closest to the island, and picks cards
 // in this order: union > fusion > weapon level > new weapon > passive. Needs: npm i playwright
 let pw;
@@ -56,6 +57,8 @@ const PRESETS = {
         for (const e of S.enemies) { if (e.def.kind === 'fly') continue; const d = Math.abs(e.x - W / 2); if (d < td) { td = d; tgt = e; } }
         if (S.boss && !S.boss.dead && S.boss.type === 'eclipse' && !S.boss.invuln) { tx = S.boss.x; ty = S.boss.y; }
         else if (S.boss && !S.boss.dead && !S.boss.invuln && (!tgt || td > W * 0.22)) { tx = S.boss.x; ty = B.y1 - (B.y1 - B.y0) * 0.25; }
+        // mission 2 wants ships wrecked on the reef: hover high over the island and let them come
+        else if (S.mis && S.mis.deep) { tx = W / 2 + Math.sin(S.t * 0.7) * W * 0.12; ty = B.y0 + (B.y1 - B.y0) * 0.3; }
         else if (tgt) { tx = tgt.x - tgt.dir * 18; ty = B.y1; }
       }
       const dx = tx - mx, dy = ty - my, d = Math.hypot(dx, dy) || 1, step = Math.min(d, 70);
@@ -73,9 +76,9 @@ const PRESETS = {
   }
   const log = await p.evaluate(() => window.__log);
   const picks = await p.evaluate(() => window.__picks);
-  const S = await p.evaluate(() => { const S = window.__luna.S; return S ? { wave: S.wave, t: Math.round(S.t), kills: S.kills, lv: S.lv, hp: Math.round(S.hp), coins: Math.round(S.pearls), golds: S.golds, chests: S.chestsOpened, weapons: S.weapons.map(w => w.id + w.lv + (w.evo ? '*' : '') + (w.union ? 'U' : '')), passives: S.passives, bossKills: S.bossKills, dmgBy: Object.fromEntries(Object.entries(S.dmgBy).map(([k, v]) => [k, Math.round(v)])), ended: S.ended, maxCombo: S.maxCombo } : null; });
+  const S = await p.evaluate(() => { const S = window.__luna.S; return S ? { wave: S.wave, t: Math.round(S.t), kills: S.kills, lv: S.lv, hp: Math.round(S.hp), coins: Math.round(S.pearls), golds: S.golds, chests: S.chestsOpened, weapons: S.weapons.map(w => w.id + w.lv + (w.evo ? '*' : '') + (w.union ? 'U' : '')), passives: S.passives, bossKills: S.bossKills, dmgBy: Object.fromEntries(Object.entries(S.dmgBy).map(([k, v]) => [k, Math.round(v)])), ended: S.ended, maxCombo: S.maxCombo, mg: S.mg, stars: S.stars || null, failWhy: S.failWhy || null } : null; });
   if (shot) await p.screenshot({ path: `${shot}-end.png` });
-  const res = await p.evaluate(() => document.getElementById('rTally')?.innerText.replace(/\n/g, ' | '));
+  const res = await p.evaluate(() => document.getElementById('rTitle')?.innerText + ' | ' + document.getElementById('rTally')?.innerText.replace(/\n/g, ' | '));
   console.log(JSON.stringify({ runMode, isl, danger, preset, reef, real: Math.round((Date.now() - t0) / 1000) + 's', S, res }));
   console.log('LOG', log.map(l => `${l.t}s w${l.w} hp${l.hp}/${l.mhp} lv${l.lv} en${l.en} k${l.k} c${l.c}${l.boss != null ? ' B' + l.boss : ''} ${l.mode}`).join(' / '));
   console.log('PICKS', picks.join(', '));

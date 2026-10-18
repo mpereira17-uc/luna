@@ -22,7 +22,7 @@ const OUT = path.join(__dirname, '..', 'google-play', 'capturas');
   const shot = n => p.screenshot({ path: path.join(OUT, `${n}.png`) });
   const sway = () => p.evaluate(() => { const L = window.__luna; clearInterval(window.__bot); window.__bot = setInterval(() => { if (L.mode === 'levelup') L.pick(0); if (L.mode === 'merchant') L.leaveMerchant(); const S = L.S, B = L.bounds(); if (S) L.moveTo(L.W / 2 + Math.sin(S.t * 0.8) * L.W * 0.28, B.y0 + (B.y1 - B.y0) * (0.55 + 0.35 * Math.sin(S.t * 0.5))); }, 100); });
   await shot('1-titulo');
-  await p.click('#goPlay'); await p.clock.runFor(500); await shot('5-islas');
+  await p.click('#goPlay'); await p.clock.runFor(500); await shot('5-campana');
   // gameplay: weapons at level 3 shredding a boarding party
   await p.evaluate(() => { const L = window.__luna; L.save().tips = new Proxy({}, { get: () => 1, has: () => true }); L.start('island', 0); ['tormenta', 'tiburon', 'canon', 'faro'].forEach(L.give); L.maxw(); L.S.lv = 12; L.jump(9); });
   await sway();
