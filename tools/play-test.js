@@ -27,6 +27,7 @@ const PRESETS = {
   p.on('pageerror', e => errs.push('PAGEERR ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join(' | ')));
   p.on('console', m => m.type() === 'error' && errs.push('CONSOLE ' + m.text()));
   await p.clock.install();
+  if (process.env.FORCEWX) await p.addInitScript(w => { window.__forceWx = w; }, process.env.FORCEWX);
   await p.goto('file://' + OUT);
   await p.clock.runFor(800);
   await p.evaluate(([m, i, bot, danger, meta, reef]) => {
@@ -35,6 +36,8 @@ const PRESETS = {
     sv.isl[['coral', 'escarcha', 'brasa', 'abismo'][+i]] = { best: 0, cleared: true, danger: +danger, dsel: +danger };
     sv.tips = { move: 1, tide: 1, crash: 1, swat: 1, pull: 1, strand: 1, elite: 1, active: 1, ecl: 1, en_sloop: 1, en_pirate: 1, en_gull: 1, en_galleon: 1, en_crab: 1, en_mortar: 1, en_serpent: 1, en_gold: 1 };
     L.start(m, +i);
+    // FORCEWX=calma (etc.): every forecast brings that weather, to measure one weather at a time
+    if (window.__forceWx) window.rollWeather = () => { const S = L.S; S.wx = window.__forceWx; S.wxSide = 1; S.wxFrom = S.wave; return S.wx; };
     window.__log = []; window.__picks = [];
     const rank = c => /union/.test(c.className) ? 0 : /evo/.test(c.className) ? 1 : /k-wup/.test(c.className) ? 2 : /k-wnew|k-pnew/.test(c.className) ? 3 : 4;
     setInterval(() => {
@@ -43,6 +46,8 @@ const PRESETS = {
       if (md === 'merchant') { const before = Math.floor(L.S.pearls); for (let k = 0; k < 3; k++) L.buyMerchant(k); if (L.rerollMerchant) { L.rerollMerchant(); for (let k = 0; k < 3; k++) L.buyMerchant(k); } (window.__shop = window.__shop || []).push(`w${L.S.wave}: ${before} perlas, gastó ${before - Math.floor(L.S.pearls)}`); L.leaveMerchant(); return; }
       if (md === 'revive') { document.getElementById('reviveBtn').click(); return; }
       if (md === 'fuse') { L.skipFuse(); return; }
+      // ocean pacts: take the first one; at the last tide keep going
+      if (md === 'pact') { const last = document.getElementById('chTitle').textContent === 'La última marea'; (window.__pacts = window.__pacts || []).push(last ? 'seguir@' + S.wave : document.querySelector('#chCards .pact b')?.textContent + '@' + S.wave); L.choice(last ? 1 : 0); return; }
       if (md !== 'play' || !S || bot === 'idle') return;
       const B = L.bounds(), W = L.W, mx = S.mx, my = S.my;
       let tx = mx, ty = B.y1;
@@ -50,12 +55,32 @@ const PRESETS = {
       let goal = null, bd = 1e9;
       for (const c of coins) { const d = Math.hypot(c.x - mx, c.y - my); if (d < bd) { bd = d; goal = c; } }
       const gulls = S.enemies.filter(e => e.def.kind === 'fly' && Math.abs(e.x - W / 2) < W * 0.3);
-      if (gulls.length) { const g = gulls[0]; tx = g.x; ty = g.y; }
+      // phase 5: what a mission (or the deep sea) wants sunk first: treasure ships, captains, shamans, the nautilus, the Dutchman
+      const M = S.mis, gi = M && M.gico;
+      const hot = S.enemies.filter(e => !e.dead && !e.decoy && (e.cap || e.def.shaman || e.def.ghost || (gi === 'i_tesoro' && e.type === 'gold') || (e.type === 'nautilo' && (gi === 'i_marea' || !M))));
+      hot.sort((a, b) => (b.def.shaman ? 2 : b.def.ghost && b.atIsland ? 3 : 0) - (a.def.shaman ? 2 : a.def.ghost && a.atIsland ? 3 : 0) || Math.abs(a.x - W / 2) - Math.abs(b.x - W / 2));
+      const bombs = gi === 'i_bombarda' ? S.proj.filter(q => q.type === 'bomb' && q.hostile && !q.done && q.t < q.T * 0.8) : [];
+      const boats = S.convoy ? S.convoy.boats.filter(q => !q.done) : [];
+      if (bombs.length) {
+        // get in the way of the shell: aim where it will be a moment from now
+        bombs.sort((a, b) => Math.hypot(a.x - mx, a.y - my) - Math.hypot(b.x - mx, b.y - my));
+        const q = bombs[0], k = 0.18; tx = q.x + q.vx * k; ty = q.y + (q.vy + q.g * k / 2) * k;
+      } else if (hot.length && !(goal && bd < W * 0.12)) {
+        const e = hot[0]; tx = e.x - (e.dir || 0) * 10; ty = e.type === 'nautilo' ? B.y1 : e.def.ghost ? B.y1 - (B.y1 - B.y0) * 0.15 : B.y1 - (B.y1 - B.y0) * 0.3;
+      } else if (boats.length && !gulls.length) {
+        // escort: hunt whatever sails close to the fishing boats
+        let best = null, bdd = 1e9;
+        for (const q of boats) for (const e of S.enemies) { if (e.dead || e.def.kind === 'walk') continue; const d = Math.abs(e.x - q.x); if (d < bdd) { bdd = d; best = e; } }
+        if (best && bdd < W * 0.25) { tx = best.x; ty = B.y1 - (B.y1 - B.y0) * 0.2; } else { tx = boats[0].x; ty = B.y1 - (B.y1 - B.y0) * 0.3; }
+      }
+      else if (gulls.length) { const g = gulls[0]; tx = g.x; ty = g.y; }
       else if (goal && bd < W * 0.45) { tx = goal.x; ty = goal.y; }
       else {
         let tgt = null, td = 1e9;
         for (const e of S.enemies) { if (e.def.kind === 'fly') continue; const d = Math.abs(e.x - W / 2); if (d < td) { td = d; tgt = e; } }
-        if (S.boss && !S.boss.dead && S.boss.type === 'eclipse' && !S.boss.invuln) { tx = S.boss.x; ty = S.boss.y; }
+        const orb = S.orbs && S.orbs.find(o => !o.done);
+        if (orb) { tx = orb.x; ty = orb.y; }
+        else if (S.boss && !S.boss.dead && S.boss.type === 'eclipse' && !S.boss.invuln) { tx = S.boss.x; ty = S.boss.y; }
         else if (S.boss && !S.boss.dead && !S.boss.invuln && (!tgt || td > W * 0.22)) { tx = S.boss.x; ty = B.y1 - (B.y1 - B.y0) * 0.25; }
         // mission 2 wants ships wrecked on the reef: hover high over the island and let them come
         else if (S.mis && S.mis.deep) { tx = W / 2 + Math.sin(S.t * 0.7) * W * 0.12; ty = B.y0 + (B.y1 - B.y0) * 0.3; }
@@ -63,7 +88,13 @@ const PRESETS = {
       }
       const dx = tx - mx, dy = ty - my, d = Math.hypot(dx, dy) || 1, step = Math.min(d, 70);
       L.moveTo(mx + dx / d * step, my + dy / d * step);
-      if (S.charge >= 1) L.active();
+      if (S.charge >= 1 && !(S.mis && S.mis.gico === 'i_coraza')) L.active();
+      else if (S.charge >= 1 && S.hp < S.maxHp * 0.35) L.active();
+      // the tide button: when the fleet crowds the island
+      if (S.tideCh >= 1 && !S.surge && L.tide && S.enemies.filter(e => !e.dead && Math.abs(e.x - W / 2) < W * 0.3).length >= 4) L.tide();
+      if (S.anom && S.anom !== window.__la) (window.__anoms = window.__anoms || []).push(S.anom + '@' + S.wave); window.__la = S.anom;
+      if (S.wx && S.wx !== window.__lw) (window.__wx = window.__wx || []).push(S.wx + '@' + S.wave); window.__lw = S.wx;
+      if (S.surge && !window.__ls) window.__tides = (window.__tides || 0) + 1; window.__ls = !!S.surge;
     }, 100);
     setInterval(() => { const S = L.S; if (S) window.__log.push({ t: Math.round(S.t), w: S.wave, hp: Math.round(S.hp), mhp: Math.round(S.maxHp), lv: S.lv, en: S.enemies.length, k: S.kills, c: Math.round(S.pearls), boss: S.boss ? Math.round(S.boss.hp) : null, mode: L.mode }); }, 10000);
   }, [runMode, isl, bot, danger, PRESETS[preset], reef]);
@@ -76,13 +107,14 @@ const PRESETS = {
   }
   const log = await p.evaluate(() => window.__log);
   const picks = await p.evaluate(() => window.__picks);
-  const S = await p.evaluate(() => { const S = window.__luna.S; return S ? { wave: S.wave, t: Math.round(S.t), kills: S.kills, lv: S.lv, hp: Math.round(S.hp), coins: Math.round(S.pearls), golds: S.golds, chests: S.chestsOpened, weapons: S.weapons.map(w => w.id + w.lv + (w.evo ? '*' : '') + (w.union ? 'U' : '')), passives: S.passives, bossKills: S.bossKills, dmgBy: Object.fromEntries(Object.entries(S.dmgBy).map(([k, v]) => [k, Math.round(v)])), ended: S.ended, maxCombo: S.maxCombo, mg: S.mg, stars: S.stars || null, failWhy: S.failWhy || null } : null; });
+  const S = await p.evaluate(() => { const S = window.__luna.S; return S ? { wave: S.wave, t: Math.round(S.t), kills: S.kills, lv: S.lv, hp: Math.round(S.hp), coins: Math.round(S.pearls), golds: S.golds, chests: S.chestsOpened, weapons: S.weapons.map(w => w.id + w.lv + (w.evo ? '*' : '') + (w.union ? 'U' : '')), passives: S.passives, bossKills: S.bossKills, dmgBy: Object.fromEntries(Object.entries(S.dmgBy).map(([k, v]) => [k, Math.round(v)])), ended: S.ended, maxCombo: S.maxCombo, mg: S.mg, stars: S.stars || null, failWhy: S.failWhy || null, failTitle: S.failTitle || null, caps: S.cap ? 'vivo' : null, convoy: S.convoy ? S.convoy.arrived + '/' + S.convoy.lost : null, faro: S.faro ? Math.round(S.faro.hp / S.faro.max * 100) : null, stolen: S.stolen || 0, rituals: S.ritualsDone || 0, escaped: S.escaped || 0 } : null; });
   if (shot) await p.screenshot({ path: `${shot}-end.png` });
   const res = await p.evaluate(() => document.getElementById('rTitle')?.innerText + ' | ' + document.getElementById('rTally')?.innerText.replace(/\n/g, ' | '));
   console.log(JSON.stringify({ runMode, isl, danger, preset, reef, real: Math.round((Date.now() - t0) / 1000) + 's', S, res }));
   console.log('LOG', log.map(l => `${l.t}s w${l.w} hp${l.hp}/${l.mhp} lv${l.lv} en${l.en} k${l.k} c${l.c}${l.boss != null ? ' B' + l.boss : ''} ${l.mode}`).join(' / '));
   console.log('PICKS', picks.join(', '));
   console.log('SHOP', JSON.stringify(await p.evaluate(() => window.__shop || [])));
+  console.log('OCEAN', JSON.stringify(await p.evaluate(() => ({ pacts: window.__pacts || [], anoms: window.__anoms || [], wx: window.__wx || [], tides: window.__tides || 0 }))));
   console.log('ERRORS', errs.slice(0, 10));
   await b.close();
 })();

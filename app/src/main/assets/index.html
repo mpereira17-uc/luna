@@ -446,6 +446,54 @@ h3.sec { font-family: var(--display); font-weight: 400; font-size: 20px; color: 
 }
 @media (prefers-reduced-motion: reduce) { .up, #levelUp h2, #comboNum.bump, #comboTxt.bump { animation: none; } #activeBtn.ready { animation: none; } }
 
+/* ---------- the ocean's rules: weather, anomalies, tide button, pacts ---------- */
+.wave-row { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+#wxIco { line-height: 0; color: #cfeaff; filter: drop-shadow(0 1px 2px #000); }
+#wxIco:empty { display: none; }
+.hud-sr { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+#seaInfo { line-height: 0; }
+#seaInfo .anom { display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; padding: 3px 9px 3px 6px; border-radius: 999px; background: rgba(7,14,32,0.66); border: 1px solid color-mix(in srgb, var(--ac) 60%, transparent); color: var(--ac); font-size: 12.5px; line-height: 1.25; font-weight: 900; white-space: nowrap; box-shadow: 0 0 14px color-mix(in srgb, var(--ac) 30%, transparent); }
+#seaInfo .anom.next { border-style: dashed; color: var(--ink); box-shadow: none; }
+#seaInfo .anom.next svg { color: var(--ac); }
+.abtns { display: flex; align-items: flex-end; gap: 10px; }
+#tideBtn { pointer-events: auto; width: 58px; height: 58px; border-radius: 50%; border: 0; position: relative; padding: 0; display: grid; place-items: center; color: #9fdcff;
+  background: conic-gradient(#7fd0ff calc(var(--p, 0) * 1turn), rgba(255,255,255,0.12) 0); }
+#tideBtn::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #0c1630; }
+#tideBtn > * { position: relative; }
+#tideBtn svg { opacity: 0.5; }
+#tideLbl { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; color: var(--ink-dim); }
+#tideBtn.ready { animation: tidePulse 0.9s infinite alternate; }
+#tideBtn.ready svg { opacity: 1; }
+#tideBtn.ready #tideLbl { color: #9fe3ff; }
+@keyframes tidePulse { from { box-shadow: 0 0 0 0 rgba(127,208,255,0.65); } to { box-shadow: 0 0 0 11px rgba(127,208,255,0); } }
+#scrChoice { justify-content: center; background: radial-gradient(130% 75% at 50% 28%, color-mix(in srgb, #0d4a70 62%, transparent), color-mix(in srgb, #050915 88%, transparent)); }
+#scrChoice .eyebrow { text-align: center; color: #9fdcff; }
+#scrChoice h2 { font-family: var(--display); font-weight: 400; font-size: 36px; margin: 0; color: #bfe9ff; text-align: center; text-shadow: 0 0 30px rgba(127,208,255,0.55); animation: pop 0.35s both; }
+#chLede { text-align: center; margin: 0; }
+.pact { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; text-align: left; padding: 14px; min-height: 92px; border-radius: 20px; font: inherit; color: var(--ink);
+  border: 1px solid color-mix(in srgb, #7fd0ff 38%, var(--line)); background: linear-gradient(160deg, color-mix(in srgb, #1d5d86 32%, var(--panel)), var(--panel)); animation: slide 0.3s both; }
+.pact:nth-child(2) { animation-delay: 0.06s; }
+.pact:nth-child(3) { animation-delay: 0.12s; }
+.pact:active { transform: scale(0.98); }
+.pact .ico { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: var(--panel-2); }
+.pact b { display: block; font-size: 18px; }
+.pact .g, .pact .b { display: flex; gap: 6px; align-items: baseline; font-size: 13.5px; font-weight: 700; line-height: 1.3; margin-top: 4px; }
+.pact .g { color: var(--ok); }
+.pact .b { color: #ff9a8a; }
+.pact .g::before, .pact .b::before { font-size: 9px; flex: none; }
+.pact .g::before { content: "▲"; }
+.pact .b::before { content: "▼"; }
+.pact.safe { border-color: color-mix(in srgb, var(--gold) 60%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--gold) 14%, var(--panel)), var(--panel)); }
+.psea { display: grid; gap: 6px; }
+.srow { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 14px; background: color-mix(in srgb, #7fd0ff 7%, transparent); border: 1px solid var(--line); font-size: 14px; }
+.srow .si { line-height: 0; color: #9fdcff; display: grid; place-items: center; }
+.srow small { display: block; color: var(--ink-dim); font-size: 12.5px; margin-top: 1px; }
+.srow.anomr .si, .srow.anomr b { color: var(--ac); }
+.srow .g { color: var(--ok); }
+.srow .b { color: #ff9a8a; }
+.rbuild .pk, #rBuild .pk { border-color: color-mix(in srgb, #7fd0ff 50%, transparent); }
+@media (prefers-reduced-motion: reduce) { #tideBtn.ready, .pact, #scrChoice h2 { animation: none; } }
+
 /* ---------- campaign map ---------- */
 .map-head { display: flex; gap: 10px; align-items: stretch; }
 .map-head .moon-pick { flex: 1; min-width: 0; }
@@ -541,7 +589,7 @@ body.guiding #banner { top: 34%; }
     <div class="hud-row">
       <button class="icon-btn" id="pauseBtn" type="button" aria-label="Pausa">❚❚</button>
       <div class="hpbox"><span class="castle" id="hpIco" aria-hidden="true"></span><div class="bar hp"><i id="hpFill"></i><span id="hpText"></span></div><span id="hpHurt" aria-hidden="true"></span></div>
-      <div class="hud-r"><div class="wave" id="waveText"></div><span class="coins-hud"><i class="pearl"></i><span id="coinText">0</span></span></div>
+      <div class="hud-r"><div class="wave-row"><span id="wxIco" aria-hidden="true"></span><div class="wave" id="waveText"></div></div><span class="coins-hud"><i class="pearl"></i><span id="coinText">0</span></span></div>
     </div>
     <div class="xpline"><span class="lv" id="lvText">Nv 1</span><div class="bar xp"><i id="xpFill"></i></div></div>
     <div id="bossBar" hidden>
@@ -549,13 +597,16 @@ body.guiding #banner { top: 34%; }
       <span id="bossCast" hidden></span>
       <div class="bar"><i id="bossFill"></i></div>
     </div>
-    <div class="hud-sub"><div id="combo"><span id="comboNum"></span><span id="comboTxt"></span></div><div id="goal" hidden aria-live="polite"></div></div>
+    <div class="hud-sub"><div id="combo"><span id="comboNum"></span><span id="comboTxt"></span></div><div class="hud-sr"><div id="seaInfo" hidden></div><div id="goal" hidden aria-live="polite"></div></div></div>
   </div>
   <div id="guide" hidden aria-live="polite"><span class="gstep" id="gStep"></span><b id="gTitle"></b><small id="gSub"></small></div>
   <div id="chestPop" hidden><span class="cpi" id="chestIco"></span><span><b id="chestTitle"></b><small id="chestSub"></small></span></div>
   <div class="hud-bottom">
     <div class="kit" id="kitW"></div>
-    <button id="activeBtn" type="button" aria-label="Habilidad de la luna"><span id="activeIco"></span><span id="activeLbl">Tsunami</span></button>
+    <div class="abtns">
+      <button id="tideBtn" type="button" aria-label="Botón de marea" hidden><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3"/><path d="M2 18c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3"/><path d="M12 2v5M9.5 4.5 12 2l2.5 2.5"/></svg><span id="tideLbl">Marea</span></button>
+      <button id="activeBtn" type="button" aria-label="Habilidad de la luna"><span id="activeIco"></span><span id="activeLbl">Tsunami</span></button>
+    </div>
     <div class="kit r" id="kitP"></div>
   </div>
 </div>
@@ -719,6 +770,17 @@ body.guiding #banner { top: 34%; }
   </div>
 </div>
 
+<!-- Ocean pact and the last tide -->
+<div class="screen" id="scrChoice" hidden>
+  <div class="inner">
+    <span class="eyebrow" id="chEyebrow"></span>
+    <h2 id="chTitle"></h2>
+    <p class="lede" id="chLede"></p>
+    <div class="cards" id="chCards"></div>
+    <button class="btn ghost center" id="chSkip" type="button">Seguir sin pacto</button>
+  </div>
+</div>
+
 <!-- Level up -->
 <div class="screen" id="levelUp" hidden>
   <div class="inner">
@@ -734,6 +796,7 @@ body.guiding #banner { top: 34%; }
   <div class="inner">
     <h2 class="st">Pausa</h2>
     <p class="pmis" id="pMis" hidden></p>
+    <div class="psea" id="pSea" hidden></div>
     <div class="seg seg3" role="tablist">
       <button type="button" role="tab" id="pTabGear" aria-selected="true">Mejoras</button>
       <button type="button" role="tab" id="pTabCombo" aria-selected="false">Combinaciones<span class="badge" id="pComboBadge" hidden>!</span></button>
@@ -1170,9 +1233,10 @@ function pullAt(x) {
   const isl = clamp((Math.abs(x - W / 2) - 43 * u) / (30 * u), 0, 1);
   return (S ? S.pull : 0.18) * Math.exp(-d * d) * isl;
 }
-function levelAt(x) { return seaLevel() + pullAt(x); }
+// anomalies bend the moon's pull and split the sea; rain raises it a little everywhere
+function levelAt(x) { return seaLevel() + pullAt(x) * anomPull() + anomSplit(x) + (S && S.wx === 'lluvia' ? 0.07 : 0); }
 function waveY(x) {
-  return levelY(levelAt(x)) + Math.sin(x * 0.025 + T * 1.6) * 2.5 + Math.sin(x * 0.06 - T * 2.3) * 1.2;
+  return levelY(levelAt(x)) + (Math.sin(x * 0.025 + T * 1.6) * 2.5 + Math.sin(x * 0.06 - T * 2.3) * 1.2) * seaRough();
 }
 
 // =====================================================================
@@ -1326,7 +1390,7 @@ function vib(p) { if (save.vib !== false && navigator.vibrate) { try { navigator
 // RUN STATE
 // =====================================================================
 let S = null;
-let mode = 'menu';       // menu | play | levelup | merchant | paused | revive | result
+let mode = 'menu';       // menu | play | levelup | merchant | paused | revive | result | fuse | pact
 let lastRun = { mode: 'island', isl: 0 };
 
 function seeded(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -1367,6 +1431,7 @@ function newRun(runMode, islIdx) {
     seen: {}, faroBeams: [], coralWall: false, spdMul: (mods.spd || 1) * isl.spd, runDmg: 1, magnetMul: 1, merchantDone: false,
     warn: [], theme: null, ghostT: null, waveHurt: 0, bonusCoins: 0, intro: 0, bought: 0, runCd: 1, runCrit: 0, runXp: 1, runReef: 1, runTaken: 1, intercepts: 0,
     mis, mg: 0, mx3: false, misWon: false, tut: null,
+    anom: null, anomNext: null, anomK: 0, wx: null, wxSide: 1, tideCh: 0, surge: null, pacts: [], tideBonus: 0, retired: false,
   };
   addWeapon(moon.weapon);
   if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
@@ -1410,6 +1475,7 @@ const DRAG_GAIN = 1.25;
 function moveMoon(dx, dy) {
   if (!S || S.moonLock > 0) return;
   if (S.moonSlow > 0) { dx *= 0.4; dy *= 0.4; }   // inked or frozen by a boss
+  if (S.anom === 'pesada') { dx *= 0.55; dy *= 0.55; }
   const B = moonBounds();
   const x0 = S.mx, y0 = S.my;
   S.mx = clamp(S.mx + dx, B.x0, B.x1); S.my = clamp(S.my + dy, B.y0, B.y1);
@@ -1574,6 +1640,9 @@ function nextWave() {
   if (S.mode === 'endless') missionProgress('endless', S.wave, true);
   // the merchant docks every 5 waves (after waves 5, 10 and 15 on an island); once, at wave 4, in a mission (and at 7 in the long ones)
   if (S.mis ? (S.wave === 4 || (S.mis.waves >= 10 && S.wave === 7)) : (S.wave % 5 === 1 && S.wave > 1)) S.merchantDue = 1.2;
+  oceanWave();
+  // the endless sea: at waves 25, 35, 45... the last tide asks whether to retire
+  if (S.mode === 'endless' && S.wave >= 25 && (S.wave - 25) % 10 === 0) S.lastTideDue = 1;
 }
 // =====================================================================
 // BOSSES: they come in from one side of the sea (the eclipse flies in), then cycle
@@ -1848,6 +1917,7 @@ function killBoss(b) {
   dropCoins(b.x, b.y - 20 * u, Math.round(24 * S.isl.coin * (1 + 0.3 * S.danger)), true);
   dropChest(b.x, b.y - 30 * u);
   missionProgress('boss', 1);
+  if (pactAfterBoss()) S.pactDue = 1.6;
   banner('¡Jefe derrotado!', 'La onda expansiva hunde a toda la flota', 2.2);
   MUS.boss = false;
   for (const e of S.enemies) if (!e.dead && !e.def.ghost) { e.hp = 0; kill(e, true); }
@@ -1859,7 +1929,7 @@ function killBoss(b) {
 let SRC = null;
 function hit(e, base, o) {
   if (e.dead || e.invuln || e.shield || e.phased) return 0;
-  let d = base * S.st.dmg * (S.furia > 0 ? 2 : 1) * (S.eclipse > 0 ? 1.6 : 1);
+  let d = base * S.st.dmg * (S.furia > 0 ? 2 : 1) * (S.eclipse > 0 ? 1.6 : 1) * (S.anom === 'sangre' ? 1.25 : 1);
   let crit = false;
   const dot = o && o.dot;
   if (!dot) { if (Math.random() < S.st.crit) { d *= 2; crit = true; } }
@@ -1914,6 +1984,7 @@ function kill(e, silent) {
   S.combo++; S.comboT = 1.9; if (S.combo > S.maxCombo) { S.maxCombo = S.combo; missionProgress('combo', S.combo, true); }
   addXp(e.def.xp * (e.elite ? 5 : 1) * (e.xpK || 1));
   S.charge = Math.min(1, S.charge + 0.011 * S.chargeMul * (e.elite ? 4 : 1));
+  tideCharge(e);
   const def = e.def;
   if (e.type === 'gold') {
     S.golds++; save.stats.golds++; missionProgress('gold', 1);
@@ -1966,7 +2037,7 @@ function dropCoins(x, y, n, burstOut) {
 }
 function dropChest(x, y) { S.chests.push({ x, y, vy: -160 * u, t: 0, hy: Math.min(y, levelY(1.0)) - 30 * u, home: false }); }
 function updPickups(dt) {
-  const m = moonPos(), R = (S.fiebre > 0 ? W : S.st.magnet * u);
+  const m = moonPos(), R = (S.fiebre > 0 ? W : S.st.magnet * u * (S.wx === 'calma' ? 1.4 : 1));
   for (const c of S.coins) {
     c.t += dt;
     const dx = m.x - c.x, dy = m.y - c.y, d = Math.hypot(dx, dy) || 1;
@@ -2020,7 +2091,7 @@ function moonSwat(dt) {
 function islandDamage(d, ignoreEclipse, src = 'boss') {
   if (S.eclipse > 0 && !ignoreEclipse) return;
   if (S.eclipse > 0) d *= 0.3;
-  d *= (S.mods.dmgTaken || 1) * S.st.taken * (1 + 0.12 * S.danger);
+  d *= (S.mods.dmgTaken || 1) * S.st.taken * (1 + 0.12 * S.danger) * (S.anom === 'sangre' ? 1.25 : 1);
   S.hp -= d; S.hurtAcc += d; S.dmgBy[src] = (S.dmgBy[src] || 0) + d; S.waveHurt += d;
   if (S.hurtT <= 0) {
     S.hurtT = 0.35;
@@ -2029,7 +2100,7 @@ function islandDamage(d, ignoreEclipse, src = 'boss') {
   }
 }
 // reef scrape damage per second (tier 1 coral cuts twice as hard)
-const reefDps = () => 16 * (reefHas(1) ? 2 : 1) * S.st.reef * tideW();
+const reefDps = () => 16 * (reefHas(1) ? 2 : 1) * S.st.reef * tideW() * (S.wx === 'agitado' ? 1.3 : 1);
 function comboCheck() {
   for (const [n, txt] of COMBO_TXT) if (S.combo === n) { comboAnnounce(txt); S.face = 'cool'; S.faceT = 1.4; break; }
   if (S.combo > 500 && S.combo % 250 === 0) comboAnnounce('¡Leyenda!');
@@ -2526,7 +2597,7 @@ function updEnemy(e, dt) {
   e.t += dt; if (e.flash > 0) e.flash -= dt; if (e.dotT > 0) e.dotT -= dt;
   const def = e.def, I = ISL();
   if (def.ghost) { updGhost(e, dt, I); return; }
-  let sp = e.spd * S.spdMul;
+  let sp = e.spd * S.spdMul * wxSpeed(e);
   if (e.psn > 0) { e.psn -= dt; SRC = 'veneno'; hit(e, e.psnD * dt, { dot: true, col: '#9be15d' }); SRC = 'mar'; if (e.dead) return; if (e.psn <= 0) e.psnD = 0; }
   if (e.tr) {
     // spectral: every few seconds it fades out of reach for a moment
@@ -2860,12 +2931,15 @@ function chooseCard(i) {
   afterCard();
 }
 function afterCard() {
+  if (S.ended) return;
   if (S.xp >= S.need) { openLevelUp(); return; }
   mode = 'play'; show(null); setAudioGains();
 }
 // ---- a fusion or union gets its own moment: the two pieces fly together, a flash, the new weapon's name
 let fuseBack = 'play', fuseTimer = 0;
 function fuseMoment(kind, aIco, bIco, rIco, name, desc) {
+  // a chest picked up in the slow motion after the run ended: the weapon is already yours, skip the show
+  if (!S || S.ended) return;
   const el = $('fuseFx');
   $('fzA').innerHTML = ico(aIco, 84); $('fzB').innerHTML = ico(bIco, 84); $('fzR').innerHTML = ico(rIco, 132);
   $('fzKind').textContent = kind === 'union' ? '¡Unión de armas!' : '¡Fusión!'; $('fzName').textContent = name; $('fzDesc').textContent = desc;
@@ -2950,7 +3024,7 @@ function passiveGained(id) { if (id === 'nacar') { S.maxHp *= 1.15; S.hp = Math.
 // MAIN UPDATE
 // =====================================================================
 // the tide cycles on its own, faster as the waves get harder; it lingers a little at low and high water
-const tidePeriod = () => Math.max(7.5, 15 - 0.35 * (S.wave - 1)) * S.isl.tide * (S.mods.tide || 1) * (1 - 0.04 * S.danger);
+const tidePeriod = () => Math.max(7.5, 15 - 0.35 * (S.wave - 1)) * S.isl.tide * (S.mods.tide || 1) * (1 - 0.04 * S.danger) * (S.wx === 'calma' ? 1.15 : 1);
 function tideShape(p) { const s = Math.sin(p); return Math.sign(s) * Math.pow(Math.abs(s), 0.6); }
 function updTide(dt) {
   const prev = S.level;
@@ -2958,8 +3032,9 @@ function updTide(dt) {
   else {
     S.tideP += dt * TAU / tidePeriod();
     if (S.mods.storm) S.tideP += Math.sin(S.t * 0.9) * Math.sin(S.t * 2.3) * dt * 2.2;
+    if (S.anom === 'loca') S.tideP += Math.sin(S.t * 1.3) * Math.sin(S.t * 3.1) * dt * 3.2 * S.anomK;
   }
-  S.level = (TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * tideShape(S.tideP);
+  S.level = surgeLevel((TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * tideShape(S.tideP));
   const d = Math.sign(S.level - prev);
   if (d && d !== S.tideDir) { S.tideDir = d; if (!S.seen.tideTip && S.t > 3) { S.seen.tideTip = 1; tip('tide', 'La marea sube y baja sola', 'Bajamar: los barcos encallan · Pleamar: los piratas se ahogan'); } }
   const B = moonBounds(), c = clamp((S.my - B.y0) / (B.y1 - B.y0), 0, 1);
@@ -2985,6 +3060,7 @@ function update(dt) {
   }
   if (S.faceT > 0) S.faceT -= dt;
   if (S.tut) tutTick(dt);
+  oceanTick(dt);
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
@@ -3026,6 +3102,7 @@ function update(dt) {
   S.shake = Math.max(0, S.shake - dt * 1.6);
   S.flash = Math.max(0, S.flash - dt);
   if (S.hp <= 0 && !S.ended) { onDeath(); return; }
+  if (mode === 'play' && oceanDue(dt)) return;
   if (S.merchantDue !== undefined && (S.merchantDue -= dt) <= 0 && mode === 'play') { delete S.merchantDue; openMerchant(); return; }
   if (S.xp >= S.need && mode === 'play') openLevelUp();
 }
@@ -3320,7 +3397,7 @@ function drawEnemy(e, dying) {
   if (e.air) rot = (e.air.t / e.air.T) * TAU * 0.6 * -e.dir;
   if (e.phased) alpha *= 0.28 + 0.1 * Math.sin(T * 20);
   if (e.def.ghost) alpha *= 0.82 * (e.fade ? Math.max(0, 1 - e.fade / 1.4) : 1) * (0.9 + 0.1 * Math.sin(T * 5));
-  ctx.globalAlpha = alpha;
+  ctx.globalAlpha = alpha * fogAlpha(e);
   if (def.kind === 'ship') {
     if (!dying && !e.air) rot = Math.sin(T * 2 + e.wob) * 0.05;
     const fr = Math.floor(T * 3 + e.wob) % 2, s = SHIP_K[e.type] * k * u, dy = e.deep && !dying ? 4 * u : 0;
@@ -3887,6 +3964,7 @@ function draw() {
     for (const e of S.enemies) if (e.def.kind === 'fly') drawEnemy(e, false);
     drawAnchors();
     drawPickups(); drawProj(); drawFx(); drawParts(); drawWarn();
+    drawWeather();
   }
   drawMoon();
   if (S && S.tut && mode === 'play') drawTutHint();
@@ -3943,6 +4021,7 @@ function updateHUD() {
   if (kw !== hudCache.kw) { hudCache.kw = kw; $('kitW').innerHTML = kw; }
   const kp = Object.keys(S.passives).map(id => `<span>${ico(PASSIVES[id].ico, 24)}<i>${S.passives[id]}</i></span>`).join('');
   if (kp !== hudCache.kp) { hudCache.kp = kp; $('kitP').innerHTML = kp; }
+  oceanHud();
 }
 // damage to the island shows in red right under the health bar, and the bar jolts
 function hudHurt(v) {
@@ -4020,7 +4099,7 @@ const missionsReady = () => { ensureMissions(); return save.missions.list.concat
 // =====================================================================
 // SCREENS
 // =====================================================================
-const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrPause', 'scrRevive', 'scrResult'];
+const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep', 'scrMoons', 'scrShop', 'scrAch', 'scrDaily', 'scrMissions', 'levelUp', 'scrMerchant', 'scrChoice', 'scrPause', 'scrRevive', 'scrResult'];
 function show(id) {
   SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
   $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant');
@@ -4405,6 +4484,8 @@ function renderPause() {
     b.classList.add('sel'); $('pInfo').innerHTML = info[+b.dataset.i];
   });
   $('pMis').hidden = !S.mis; if (S.mis) $('pMis').innerHTML = misLine();
+  const sea = seaRows();
+  $('pSea').hidden = !sea; $('pSea').innerHTML = sea;
   $('pSGrid').innerHTML = [[waveMax() ? `${S.wave}/${waveMax()}` : S.wave, 'Oleada'], [fmtT(S.t), 'Tiempo'], [S.kills.toLocaleString('es'), 'Hundidos'], [S.maxCombo, 'Racha máx.']].map(([v, l]) => `<span><b>${v}</b>${l}</span>`).join('');
   const dr = dmgRows();
   $('pDmgTot').textContent = dr.length ? `${fmtN(dr.reduce((a, r) => a + r.v, 0))} en total` : '';
@@ -4446,7 +4527,8 @@ function comboRows() {
 }
 function buildHtml() {
   return S.weapons.map(w => `<span class="${w.evo || w.union ? 'evo' : ''}">${ico(wIco(w), 20)} ${wName(w)}${w.evo || w.union ? '' : ` ${lvStars(w.lv)}`}</span>`).join('')
-    + Object.keys(S.passives).map(p => `<span>${ico(PASSIVES[p].ico, 20)} ${PASSIVES[p].name} ${lvStars(S.passives[p])}</span>`).join('');
+    + Object.keys(S.passives).map(p => `<span>${ico(PASSIVES[p].ico, 20)} ${PASSIVES[p].name} ${lvStars(S.passives[p])}</span>`).join('')
+    + S.pacts.map(id => `<span class="pk">${ico(PACT[id].ico, 20)} ${PACT[id].name}</span>`).join('');
 }
 function resume() { audioInit(); mode = 'play'; show(null); setAudioGains(); }
 function onDeath() {
@@ -4492,12 +4574,14 @@ function endRun(won, quit) {
   }
   if (S.maxCombo > save.stats.maxCombo) save.stats.maxCombo = S.maxCombo;
   // workshop coins are paid at the end of the run (pearls stay in the run)
-  const cm = ic * S.coinMul * (1 + 0.1 * metaLv('codicia')) * (1 + 0.3 * S.danger);
+  const cm = ic * S.coinMul * (1 + 0.1 * metaLv('codicia')) * (1 + 0.3 * S.danger) * (1 + S.tideBonus);
   const fromKills = Math.round(S.kills * 0.35 * cm), fromBoss = Math.round(S.bossKills * 40 * cm);
   const waveBonus = Math.round((S.wave - 1) * 2 * ic * (1 + 0.3 * S.danger));
   // pearls left over are exchanged at 1 coin per 4, plus whatever the money changer promised
   const fromPearls = Math.floor(S.pearls / 4) + S.bonusCoins;
-  const total = fromKills + fromBoss + waveBonus + bonus + fromPearls + (camp ? camp.coins : 0);
+  // retiring at the last tide pays a quarter more
+  const fromRetire = S.retired ? Math.round((fromKills + fromBoss + waveBonus) * 0.25) : 0;
+  const total = fromKills + fromBoss + waveBonus + bonus + fromPearls + fromRetire + (camp ? camp.coins : 0);
   save.coins += total;
   const cl = achClaimable(); if (cl) unlocks.push(`${cl} logro${cl > 1 ? 's' : ''} listo${cl > 1 ? 's' : ''} para cobrar`);
   const mr = missionsReady(); if (mr) unlocks.push(`${mr} misi${mr > 1 ? 'ones' : 'ón'} cumplida${mr > 1 ? 's' : ''}: cóbrala${mr > 1 ? 's' : ''} en Misiones`);
@@ -4511,7 +4595,7 @@ function endRun(won, quit) {
   setTimeout(() => {
     const M = S.mis, wm = waveMax();
     $('rEyebrow').textContent = M ? `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}` : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
-    $('rTitle').textContent = M ? (won ? '¡Misión cumplida!' : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : 'La isla ha caído') : won ? 'Isla salvada' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
+    $('rTitle').textContent = M ? (won ? '¡Misión cumplida!' : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
     const wv = wm ? `Oleada ${won && !M ? wm : S.wave} de ${wm}` : `Oleada ${S.wave}`;
     $('rSum').textContent = `${wv} · ${fmtT(S.t)} · ${S.kills.toLocaleString('es')} hundidos`;
     // the cause of a defeat: whatever did the most damage to the island
@@ -4530,6 +4614,7 @@ function endRun(won, quit) {
     // the rewards roll up one after another
     const coins = [['Monedas por hundidos', fromKills], ['Monedas por jefes', fromBoss], ['Bonus de oleadas', waveBonus + bonus]];
     if (fromPearls) coins.push(['Perlas cambiadas', fromPearls]);
+    if (fromRetire) coins.push(['La última marea', fromRetire]);
     if (camp) coins.unshift(...camp.rows);
     $('rCoins').dataset.total = total;
     $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
@@ -4601,7 +4686,7 @@ window.lunaBack = () => {
   if (mode === 'play') { pause(); return true; }
   if (mode === 'paused') { if (!$('pConfirm').hidden) closeConfirm(); else resume(); return true; }
   if (mode === 'fuse') { fuseEnd(); return true; }
-  if (mode === 'levelup' || mode === 'revive' || mode === 'merchant') return true;
+  if (mode === 'levelup' || mode === 'revive' || mode === 'merchant' || mode === 'pact') return true;
   if (mode === 'result') { openTitle(); return true; }
   if (!$('scrTitle').hidden) return false;
   openTitle(); return true;
@@ -4613,7 +4698,7 @@ $('rMenu').onclick = () => { if (S && S.mis) { const c = S.mis.ch; toMenu(); ope
 $('rNext').onclick = () => { const i = +$('rNext').dataset.m; toMenu(); openPrep(i); };
 
 // test hooks for automated play-testing
-window.__luna = { get S() { return S; }, get mode() { return mode; }, pick: i => chooseCard(i), moveTo: (x, y) => { if (S) { const B = moonBounds(); S.mx = clamp(x, B.x0, B.x1); S.my = clamp(y, B.y0, B.y1); } }, active: () => useActive(),
+window.__luna = { get S() { return S; }, get mode() { return mode; }, pick: i => chooseCard(i), choice: i => chooseOpt(i), tide: () => useTide(), moveTo: (x, y) => { if (S) { const B = moonBounds(); S.mx = clamp(x, B.x0, B.x1); S.my = clamp(y, B.y0, B.y1); } }, active: () => useActive(),
   jump: w => { if (S) { S.wave = w - 1; nextWave(); } }, give: id => { if (S) { if (WEAPONS[id] && !hasW(id)) addWeapon(id); else if (PASSIVES[id]) S.passives[id] = Math.min(3, (S.passives[id] || 0) + 1); recompute(); syncEnts(); } },
   maxw: () => { if (S) { S.weapons.forEach(w => { if (!w.union) w.lv = 3; }); syncEnts(); } }, start: (m, i) => { audioInit(); beginRun(m, i || 0); }, save: () => save, pairOf: id => WEAPONS[id].pair,
   buyMerchant: i => { const w = wares[i]; if (w && !w.sold && purse() >= wareCost(w)) { spend(wareCost(w)); buyWare(w); w.sold = true; renderMerchant(); } }, leaveMerchant: () => { if (mode === 'merchant') resume(); }, rerollMerchant: () => rerollWares(),
@@ -4887,6 +4972,219 @@ function drawTutHint() {
   }
   ctx.restore();
 }
+
+// =====================================================================
+// THE OCEAN'S RULES: pacts after a boss, lunar anomalies, the weather forecast,
+// the tide button and the last tide of the endless sea
+// =====================================================================
+const svgI = (d, size = 20) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+
+// ---- pacts: a blessing with a curse, offered after a boss or a mini boss (every 10 waves in the endless sea)
+const PACTS = [
+  { id: 'furia', name: 'Furia del mar', ico: 'i_furia', good: '+30% de daño', bad: 'Los enemigos van un 20% más rápido', apply: () => { S.runDmg *= 1.3; S.spdMul *= 1.2; } },
+  { id: 'nacar', name: 'Escudo de nácar', ico: 'i_nacar', good: 'La isla recibe un 25% menos de daño', bad: '-20% de experiencia', apply: () => { S.runTaken *= 0.75; S.runXp *= 0.8; } },
+  { id: 'codicia', name: 'Marea codiciosa', ico: 'i_codicia', good: '+50% de perlas y monedas', bad: '-20% de vida máxima', apply: () => { S.coinMul *= 1.5; S.maxHp *= 0.8; S.hp = Math.min(S.hp, S.maxHp); } },
+  { id: 'corazon', name: 'Corazón de la luna', ico: 'i_motor', good: 'La habilidad se carga un 50% más rápido', bad: '-15% de daño', apply: () => { S.chargeMul *= 1.5; S.runDmg *= 0.85; } },
+  { id: 'arrecife', name: 'Arrecife hambriento', ico: 'i_arrecife', good: '+50% de daño del arrecife y la marea', bad: 'Los enemigos tienen un 15% más de vida', apply: () => { S.runReef *= 1.5; S.mods.hp = (S.mods.hp || 1) * 1.15; } },
+  { id: 'ojo', name: 'Ojo de la tormenta', ico: 'i_critico', good: '+12% de probabilidad de crítico', bad: 'Llegan un 20% más de enemigos', apply: () => { S.runCrit += 0.12; S.mods.spawn = (S.mods.spawn || 1) * 1.2; } },
+  { id: 'sabio', name: 'Sabiduría abisal', ico: 'i_sabio', good: '+35% de experiencia', bad: 'Las armas disparan un 10% más lento', apply: () => { S.runXp *= 1.35; S.runCd *= 1.1; } },
+  { id: 'bravas', name: 'Mareas bravas', ico: 'i_marea', good: 'Las armas disparan un 15% más rápido', bad: 'La marea sube y baja un 30% más rápido', apply: () => { S.runCd *= 0.85; S.mods.tide = (S.mods.tide || 1) * 0.77; } },
+];
+const PACT = Object.fromEntries(PACTS.map(p => [p.id, p]));
+// no pact after the boss that ends the run
+const pactAfterBoss = () => !waveMax() || S.wave < waveMax();
+
+// ---- anomalies: a wave that bends the rules, announced one wave ahead
+const ANOMS = {
+  invertida: { name: 'Marea invertida', sub: 'La luna hunde el agua en vez de levantarla', col: '#7fd0ff', svg: '<path d="M4 6h16"/><path d="M12 9v9"/><path d="m8 14 4 4 4-4"/>' },
+  loca: { name: 'Marea loca', sub: 'El mar sube y baja sin ningún ritmo', col: '#9fe3ff', svg: '<path d="M3 12l3-5 3 10 3-10 3 10 3-10 3 5"/>' },
+  pesada: { name: 'Luna pesada', sub: 'La luna va más lenta, pero levanta el doble de agua', col: '#c9b8ff', svg: '<circle cx="12" cy="6" r="2.5"/><path d="M6 21l2-11h8l2 11z"/>' },
+  sangre: { name: 'Luna de sangre', sub: 'Todos golpean un 25% más fuerte, tú también', col: '#ff6b5a', svg: '<circle cx="12" cy="12" r="7"/><path d="M9 10.5h.01M15 10.5h.01M9.5 15c1.6-1 3.4-1 5 0"/>' },
+  divididas: { name: 'Aguas divididas', sub: 'Pleamar a la izquierda y bajamar a la derecha', col: '#7fe0b5', svg: '<path d="M12 3v18"/><path d="M3 9c2-1.5 4-1.5 6 0"/><path d="M15 16c2-1.5 4-1.5 6 0"/>' },
+  eclipse: { name: 'Eclipse parcial', sub: 'Solo se ve bien cerca de la luna', col: '#b49cff', svg: '<circle cx="12" cy="12" r="7"/><path d="M14 5.5a7 7 0 0 1 0 13 7 7 0 0 0 0-13z" fill="currentColor"/>' },
+};
+const anomOk = w => !isBossWave(w) && (waveMax() ? w <= waveMax() : true) && (S.mis ? false : S.mode === 'endless' ? w >= 16 : w >= 6);
+const anomIs = id => S && S.anom === id;
+// what the anomalies do to the water level under the moon and across the sea
+const anomPull = () => !S || !S.anom ? 1 : S.anom === 'invertida' ? 1 - 2 * S.anomK : S.anom === 'pesada' ? 1 + 0.8 * S.anomK : 1;
+const anomSplit = x => S && S.anom === 'divididas' ? (x < W / 2 ? 0.2 : -0.2) * S.anomK * clamp(Math.abs(x - W / 2) / (60 * u), 0, 1) : 0;
+
+// ---- the weather: every 5 waves the forecast for the next 5
+const WEATHER = {
+  calma: { name: 'Calma', sub: 'Marea lenta, y las perlas se atraen desde más lejos', svg: '<path d="M3 17h18"/><circle cx="12" cy="10" r="4"/>' },
+  viento: { name: 'Viento', sub: '', svg: '<path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h16a3 3 0 1 1-3 3"/><path d="M3 16h7"/>' },
+  lluvia: { name: 'Lluvia', sub: 'Más agua: los piratas se ahogan antes y los barcos encallan menos', svg: '<path d="M7 14a4 4 0 0 1 .5-8 5 5 0 0 1 9.5 1.5A3.5 3.5 0 0 1 17 14z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/>' },
+  niebla: { name: 'Niebla', sub: 'Solo ves bien cerca de la luna, y la flota navega con cautela', svg: '<path d="M3 8c3-2 6 2 9 0s6 2 9 0"/><path d="M3 13c3-2 6 2 9 0s6 2 9 0"/><path d="M3 18c3-2 6 2 9 0s6 2 9 0"/>' },
+  agitado: { name: 'Mar agitado', sub: 'Olas grandes: el arrecife golpea un 30% más fuerte', svg: '<path d="M2 17c2.5 0 3-6 7-6 3 0 3 3 1.5 4 3 1 6-3 6-6 2 2 3 5 5.5 6"/><path d="M2 21h20"/>' },
+};
+const wxIs = id => S && S.wx === id;
+const wxSub = () => S.wx === 'viento' ? `Los barcos que llegan por la ${S.wxSide < 0 ? 'izquierda' : 'derecha'} van más rápido` : WEATHER[S.wx].sub;
+const seaRough = () => !S ? 1 : S.wx === 'agitado' ? 3 : S.wx === 'calma' ? 0.5 : 1;
+// a ship sails faster with the wind behind it, slower against it, and carefully in the fog
+function wxSpeed(e) {
+  if (!S.wx || S.wx === 'calma' || S.wx === 'lluvia' || S.wx === 'agitado') return 1;
+  if (S.wx === 'niebla') return 0.9;
+  if (e.def.kind !== 'ship') return 1;
+  return (e.dir > 0 ? -1 : 1) === S.wxSide ? 1.25 : 0.85;
+}
+function rollWeather() {
+  const pool = ['calma', 'viento', 'lluvia', 'niebla', 'agitado'].filter(k => k !== S.wx);
+  S.wx = pick(pool); S.wxSide = Math.random() < 0.5 ? -1 : 1; S.wxFrom = S.wave;
+  return S.wx;
+}
+
+// called at the start of every wave, after nextWave() has set it up
+function oceanWave() {
+  const busy = isBossWave(S.wave) || !!S.theme;
+  const later = (fn, d) => setTimeout(() => { if (S && !S.ended) fn(); }, d);
+  // the anomaly announced a wave ago arrives; the next one is announced a wave ahead
+  S.anom = S.anomNext || null; S.anomNext = null; S.anomK = 0;
+  if (S.anom) { const A = ANOMS[S.anom]; later(() => { banner(A.name, A.sub, 2.4, true); sfx('warn'); }, busy ? 2200 : 900); missionProgress('anom', 1); }
+  else if (anomOk(S.wave + 1) && Math.random() < (S.mode === 'endless' ? 0.35 : 0.28)) S.anomNext = pick(Object.keys(ANOMS));
+  // the forecast comes every 5 waves from wave 6 (a mission keeps its own weather)
+  if (!S.mis && S.wave >= 6 && S.wave % 5 === 1 && (!waveMax() || S.wave <= waveMax())) {
+    rollWeather();
+    later(() => banner(`Pronóstico: ${WEATHER[S.wx].name}`, `Oleadas ${S.wave} a ${S.wave + 4} · ${wxSub()}`, 2.6), busy || S.anom ? 4600 : 1500);
+  }
+}
+function oceanTick(dt) {
+  S.anomK = S.anom ? Math.min(1, S.anomK + dt / 1.2) : 0;
+  if (S.surge) {
+    const sg = S.surge; sg.t -= dt;
+    // the current carries the fleet away from the moon's side of the island
+    const k = Math.min(1, sg.t / 0.6, (3.2 - sg.t) / 0.3);
+    for (const e of S.enemies) if (!e.dead && e.def.kind !== 'fly' && !e.def.ghost && Math.sign(e.x - W / 2) === sg.side) { e.x += sg.side * 75 * u * k * dt; e.atIsland = false; }
+    if (Math.random() < dt * 30) { const x = W / 2 + sg.side * rand(60, W / 2) * u / u; S.parts.push({ x, y: waveY(x) - rand(0, 6) * u, vx: sg.side * rand(80, 160) * u, vy: -rand(10, 40) * u, t: 0, life: 0.6, c: '#e6f6ff', s: rand(1.5, 2.6), g: 120 }); }
+    if (sg.t <= 0) S.surge = null;
+  }
+}
+// the tide button forces a strong high or low tide for a moment
+function surgeLevel(level) {
+  if (!S.surge) return level;
+  const sg = S.surge, k = Math.min(1, sg.t / 0.6, (3.2 - sg.t) / 0.35);
+  return level + ((sg.dir > 0 ? TIDE_HI + 0.08 : TIDE_LO - 0.06) - level) * clamp(k, 0, 1);
+}
+const tideBtnOn = () => S && !(S.mis && S.mis.tut);
+function tideCharge(e) {
+  if (!tideBtnOn() || S.surge) return;
+  const before = S.tideCh;
+  S.tideCh = Math.min(1, S.tideCh + (e.def.kind === 'ship' ? 0.05 : e.def.kind === 'walk' ? 0.025 : 0.02) * (e.elite ? 3 : 1));
+  if (before < 1 && S.tideCh >= 1) { sfx('card'); tip('tidebtn', '¡Botón de marea listo!', 'Fuerza una pleamar o una bajamar y aparta la flota de tu lado'); }
+}
+function useTide() {
+  if (mode !== 'play' || !tideBtnOn() || S.tideCh < 1 || S.surge) return;
+  const mid = (TIDE_LO + TIDE_HI) / 2, dir = S.level > mid ? -1 : 1, side = S.mx < W / 2 ? -1 : 1;
+  S.tideCh = 0; S.surge = { t: 3.2, dir, side };
+  banner(dir > 0 ? '¡Pleamar!' : '¡Bajamar!', dir > 0 ? 'Los piratas se ahogan y la corriente aparta la flota' : 'Los barcos encallan y la corriente aparta la flota', 1.4);
+  sfx('tsunami'); vib([30, 40, 60]); S.shake = Math.max(S.shake, 0.35);
+  for (let i = 0; i < 26; i++) { const x = rand(0, W); splash(x, waveY(x), 4); }
+  missionProgress('tide', 1);
+}
+
+// ---- the choice screen (pacts and the last tide)
+let choiceOpts = [], choiceSkip = null;
+function openChoice(eyebrow, title, lede, opts, skipTxt, onSkip) {
+  mode = 'pact'; dragId = null; choiceOpts = opts; choiceSkip = onSkip;
+  clearTimeout(bannerTimer); $('banner').classList.remove('show');
+  $('chEyebrow').textContent = eyebrow; $('chTitle').textContent = title; $('chLede').textContent = lede;
+  $('chCards').innerHTML = opts.map((o, i) => `<button type="button" class="pact${o.cls ? ' ' + o.cls : ''}" data-i="${i}"><span class="ico" aria-hidden="true">${o.icoHtml || ico(o.ico, 48)}</span><span class="txt"><b>${o.name}</b>${o.good ? `<span class="g">${o.good}</span>` : ''}${o.bad ? `<span class="b">${o.bad}</span>` : ''}</span></button>`).join('');
+  $('chCards').querySelectorAll('.pact').forEach(b => b.onclick = () => chooseOpt(+b.dataset.i));
+  $('chSkip').textContent = skipTxt; $('chSkip').hidden = !skipTxt;
+  show('scrChoice'); setAudioGains(); sfx('evo');
+}
+function chooseOpt(i) {
+  if (mode !== 'pact') return;
+  const o = i < 0 ? null : choiceOpts[i];
+  mode = 'play'; show(null); setAudioGains();
+  if (o) o.pick(); else if (choiceSkip) choiceSkip();
+}
+$('chSkip').onclick = () => chooseOpt(-1);
+function openPact() {
+  const taken = new Set(S.pacts), pool = PACTS.filter(p => !taken.has(p.id)), opts = [];
+  while (opts.length < 3 && pool.length) opts.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  if (!opts.length) return;
+  openChoice('El océano te ofrece', 'Pacto del océano', 'Cada pacto trae una bendición y una maldición para el resto de la partida.',
+    opts.map(p => ({ name: p.name, ico: p.ico, good: p.good, bad: p.bad, pick: () => { S.pacts.push(p.id); p.apply(); recompute(); banner(p.name, 'Pacto sellado', 1.4); sfx('evo'); missionProgress('pact', 1); } })),
+    'Seguir sin pacto', () => banner('Sin pacto', 'El mar sigue como estaba', 1.1));
+}
+// endless, waves 25, 35, 45…: retire with a bonus or push on for more per wave
+function openLastTide() {
+  const more = Math.round((S.tideBonus + 0.1) * 100);
+  openChoice(`Oleada ${S.wave}`, 'La última marea', 'El Holandés Errante acecha. Puedes retirarte ahora con un extra o seguir por más.', [
+    { name: 'Retirarte', ico: 'i_monedas', good: 'Cobras todo ahora con un 25% extra', cls: 'safe', pick: () => { S.retired = true; endRun(false, true); } },
+    { name: 'Seguir', ico: 'i_sinfin', good: `Desde ahora cada oleada paga un ${more}% más`, bad: 'El mar será aún más duro', pick: () => { S.tideBonus += 0.1; banner('¡Seguimos!', `Recompensa +${more}% por oleada`, 1.4); } },
+  ], '', null);
+}
+function oceanDue(dt) {
+  if (S.pactDue !== undefined && (S.pactDue -= dt) <= 0) { delete S.pactDue; openPact(); return true; }
+  if (S.lastTideDue !== undefined && (S.lastTideDue -= dt) <= 0) { delete S.lastTideDue; openLastTide(); return true; }
+  return false;
+}
+
+// the pause shows the weather, the anomaly and every pact sealed in this run
+function seaRows() {
+  const row = (svg, name, sub, cls = '', style = '') => `<div class="srow${cls}"${style}><span class="si">${svg}</span><span><b>${name}</b><small>${sub}</small></span></div>`;
+  const out = [];
+  if (S.wx) out.push(row(svgI(WEATHER[S.wx].svg, 22), `Tiempo: ${WEATHER[S.wx].name}`, wxSub()));
+  const a = S.anom || S.anomNext;
+  if (a) out.push(row(svgI(ANOMS[a].svg, 22), S.anom ? ANOMS[a].name : `Próxima oleada: ${ANOMS[a].name}`, ANOMS[a].sub, ' anomr', ` style="--ac:${ANOMS[a].col}"`));
+  for (const id of S.pacts) { const p = PACT[id]; out.push(row(ico(p.ico, 26), p.name, `<span class="g">${p.good}</span> · <span class="b">${p.bad}</span>`, ' pactr')); }
+  return out.join('');
+}
+
+// ---- HUD: weather icon by the wave counter, the anomaly (or the one coming) under it, the tide button
+function oceanHud() {
+  const wx = S.wx ? `<span class="wxi" title="${WEATHER[S.wx].name}">${svgI(WEATHER[S.wx].svg, 18)}</span>` : '';
+  if (wx !== hudCache.wx) { hudCache.wx = wx; $('wxIco').innerHTML = wx; }
+  const a = S.anom ? ANOMS[S.anom] : S.anomNext ? ANOMS[S.anomNext] : null;
+  const ah = a ? `<span class="anom${S.anom ? '' : ' next'}" style="--ac:${a.col}">${svgI(a.svg, 16)}${S.anom ? a.name : `Próxima: ${a.name}`}</span>` : '';
+  if (ah !== hudCache.anom) { hudCache.anom = ah; $('seaInfo').innerHTML = ah; $('seaInfo').hidden = !ah; }
+  const on = tideBtnOn();
+  if (on !== hudCache.tideOn) { hudCache.tideOn = on; $('tideBtn').hidden = !on; }
+  if (on) {
+    setStyle('tideBtn', '--p', String(Math.round((S.surge ? S.surge.t / 3.2 : S.tideCh) * 100) / 100));
+    const r = S.tideCh >= 1 && !S.surge;
+    if (r !== hudCache.tideReady) { hudCache.tideReady = r; $('tideBtn').classList.toggle('ready', r); }
+  }
+}
+$('tideBtn').addEventListener('pointerdown', e => { e.preventDefault(); useTide(); });
+
+// ---- drawing: rain, fog, wind, blood moon and the eclipse
+let rainDrops = [];
+function drawWeather() {
+  if (!S) return;
+  if (S.wx === 'lluvia') {
+    if (!rainDrops.length) rainDrops = Array.from({ length: 70 }, () => ({ x: rand(0, 1), y: rand(0, 1), v: rand(0.7, 1.1) }));
+    ctx.strokeStyle = 'rgba(190,220,255,0.35)'; ctx.lineWidth = 1.3 * u; ctx.beginPath();
+    for (const d of rainDrops) { d.y += d.v * 0.016 * 1.4; if (d.y > 1) { d.y = 0; d.x = rand(0, 1); } const x = d.x * W, y = d.y * H; ctx.moveTo(x, y); ctx.lineTo(x - 4 * u, y + 14 * u); }
+    ctx.stroke();
+  } else if (S.wx === 'viento') {
+    ctx.strokeStyle = 'rgba(230,246,255,0.22)'; ctx.lineWidth = 1.6 * u; ctx.beginPath();
+    for (let i = 0; i < 9; i++) { const y = H * (0.18 + 0.07 * i), x = ((T * 260 * u * -S.wxSide + i * 197 * u) % (W + 200 * u) + W + 200 * u) % (W + 200 * u) - 100 * u; ctx.moveTo(x, y); ctx.lineTo(x + 46 * u * -S.wxSide, y); }
+    ctx.stroke();
+  } else if (S.wx === 'niebla') {
+    const m = moonPos(), g = ctx.createRadialGradient(m.x, levelY(0.5), W * 0.2, m.x, levelY(0.5), W * 0.75);
+    g.addColorStop(0, 'rgba(200,215,235,0)'); g.addColorStop(1, 'rgba(200,215,235,0.36)');
+    ctx.fillStyle = g; ctx.fillRect(0, H * 0.25, W, H * 0.75);
+  }
+  if (S.anom === 'sangre') { ctx.fillStyle = `rgba(170,20,30,${0.14 * S.anomK})`; ctx.fillRect(0, 0, W, H); }
+  if (S.anom === 'eclipse') {
+    const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, g = ctx.createRadialGradient(m.x, cy, W * 0.16, m.x, cy, W * 0.62);
+    g.addColorStop(0, 'rgba(4,0,14,0)'); g.addColorStop(1, `rgba(4,0,14,${0.8 * S.anomK})`);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  // the current of the tide button: foam arrows racing out to sea on the moon's side
+  if (S.surge) {
+    const sg = S.surge, a = Math.min(1, sg.t / 0.6);
+    ctx.strokeStyle = `rgba(230,246,255,${0.7 * a})`; ctx.lineWidth = 2.5 * u;
+    for (let i = 0; i < 4; i++) {
+      const x0 = W / 2 + sg.side * (70 + ((T * 140 + i * 60) % 240)) * u, y = waveY(x0) + 10 * u;
+      ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + sg.side * 18 * u, y); ctx.lineTo(x0 + sg.side * 11 * u, y - 6 * u); ctx.moveTo(x0 + sg.side * 18 * u, y); ctx.lineTo(x0 + sg.side * 11 * u, y + 6 * u); ctx.stroke();
+    }
+  }
+}
+// in the fog, what sails far from the moon is hard to make out
+const fogAlpha = e => S && S.wx === 'niebla' ? clamp(1.25 - Math.abs(e.x - S.mx) / (W * 0.42), 0.28, 1) : 1;
 // =====================================================================
 // LOOP
 // =====================================================================
