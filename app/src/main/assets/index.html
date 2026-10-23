@@ -698,6 +698,16 @@ body.guiding #banner { top: 34%; }
 /* ---------- phase 9: the HUD steps aside while a boss makes its entrance ---------- */
 #hud { transition: opacity 0.3s; }
 #hud.cine { opacity: 0; pointer-events: none; }
+
+/* ---------- phase 10: the weekly challenge, the rival and the secrets ---------- */
+.wk-cfg { display: grid; gap: 8px; }
+.wk-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, var(--magia) 10%, transparent); border: 1px solid color-mix(in srgb, var(--magia) 30%, transparent); }
+.wk-row b { display: block; font-size: 14px; }
+.wk-row small { display: block; font-size: 12px; color: var(--ink-dim); }
+.lc.rivalc { border-color: color-mix(in srgb, var(--cc, var(--coral)) 70%, var(--line)); }
+.lc.rivalc .ico { background: color-mix(in srgb, var(--cc, var(--coral)) 18%, transparent); }
+.lc.rivalc.won .ico { background: color-mix(in srgb, var(--dorado) 20%, transparent); }
+.lc.rivalc + .beasts { margin-top: 4px; }
 </style>
 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
@@ -750,7 +760,7 @@ body.guiding #banner { top: 34%; }
       <button class="btn primary big" id="goPlay" type="button"><span>Jugar<small id="playSub">Isla Coral</small></span><span aria-hidden="true">→</span></button>
       <div class="row">
         <button class="btn sea" id="goEndless" type="button"><span>Marea sin fin<small id="endlessSub"></small></span></button>
-        <button class="btn hot" id="goDaily" type="button"><span>Reto diario<small id="dailySub"></small></span><span class="badge" id="dailyBadge">NUEVO</span></button>
+        <button class="btn hot" id="goDaily" type="button"><span>Retos<small id="dailySub"></small></span><span class="badge" id="dailyBadge">NUEVO</span></button>
       </div>
       <div class="tiles">
         <button class="tile" id="goMoons" type="button"><span data-ico="i_dorada"></span>Lunas</button>
@@ -931,15 +941,25 @@ body.guiding #banner { top: 34%; }
 
 <!-- Daily -->
 <div class="screen" id="scrDaily" hidden>
-  <div class="topbar"><button class="icon-btn" data-go="title" type="button" aria-label="Volver">←</button><h2 class="st">Reto diario</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
+  <div class="topbar"><button class="icon-btn" data-go="title" type="button" aria-label="Volver">←</button><h2 class="st">Retos</h2><span class="chip"><i class="coin"></i><span class="coinCount">0</span></span></div>
   <div class="inner">
+    <h3 class="sec">Reto diario</h3>
     <div class="card">
       <span class="eyebrow" id="dailyDate"></span>
       <p class="lede">Oleadas sin fin con reglas especiales que cambian cada día. La primera partida del día da perlas extra.</p>
       <div class="mods" id="dailyMods"></div>
       <p class="lede" id="dailyBest"></p>
     </div>
-    <button class="btn hot center" id="startDaily" type="button">Empezar reto</button>
+    <button class="btn hot center" id="startDaily" type="button">Empezar reto diario</button>
+    <h3 class="sec">Reto semanal</h3>
+    <div class="card">
+      <span class="eyebrow" id="weekDate"></span>
+      <p class="lede">La misma partida para todos durante la semana: luna, mar, segunda arma y tres reglas que salen de una semilla. Tu mejor intento te acompaña como un eco.</p>
+      <div class="wk-cfg" id="weekCfg"></div>
+      <div class="mods" id="weekMods"></div>
+      <p class="lede" id="weekBest"></p>
+    </div>
+    <button class="btn sea center" id="startWeekly" type="button">Empezar reto semanal</button>
   </div>
 </div>
 
@@ -1760,9 +1780,9 @@ function newRun(runMode, islIdx) {
   // a campaign mission plays on its chapter's island with its own waves, fleet and objective
   const mis = runMode === 'mission' ? CAMPAIGN[islIdx] : runMode === 'echo' ? ECHOES[islIdx] : runMode === 'puzzle' ? PUZZLES[islIdx] : null;
   if (mis) { runMode = 'island'; islIdx = mis.ch; }
-  const moon = MOONS.find(m => m.id === save.moon) || MOONS[0];
+  const moon = runMode === 'weekly' ? weeklyCfg().moon : MOONS.find(m => m.id === save.moon) || MOONS[0];
   const mods = {};
-  const dm = runMode === 'daily' ? dailyMods() : [];
+  const dm = runMode === 'daily' ? dailyMods() : runMode === 'weekly' ? weeklyCfg().mods : [];
   dm.forEach(m => m.apply(mods));
   if (mis && mis.mods) Object.assign(mods, mis.mods);
   const isl = ISLANDS[runMode === 'island' ? islIdx : 0];
@@ -1789,7 +1809,8 @@ function newRun(runMode, islIdx) {
     wrecks: [], treasure: null, treasures: 0, trT: rand(26, 40), mig: null, migT: rand(42, 60),
   };
   addWeapon(moon.weapon);
-  if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
+  if (runMode === 'weekly') addWeapon(weeklyCfg().weapon);
+  else if (metaLv('arsenal')) { const pool = Object.keys(WEAPONS).filter(id => id !== moon.weapon); addWeapon(pick(pool)); }
   recompute();
   lastRun = mis ? (mis.puz ? { mode: 'puzzle', isl: mis.k } : mis.echo ? { mode: 'echo', isl: mis.k } : { mode: 'mission', isl: mis.i }) : { mode: runMode, isl: islIdx };
 }
@@ -1888,7 +1909,7 @@ function spawnEnemy(type, side, k = 0, x0) {
   const e = { type, def, dir, x, y: levelY(0.5), hp, maxHp: hp, spd: def.spd * rand(0.9, 1.1) * (1 + 0.01 * Math.min(S.wave - 1, 40)), r: def.r, t: 0, wob: rand(0, TAU),
     flash: 0, slow: 0, slowAmt: 0, frozen: 0, shatter: 0, atIsland: false, dotAcc: 0, dotT: 0, fireT: rand(1, 2), bleed: 0, air: null, dpsK: 1, xpK: 1, shots: 0 };
   if (def.ghost) { e.life = 42; e.back = 0; e.repels = 0; }
-  else if (x0 === undefined && type !== 'gold' && S.wave >= 5 && Math.random() < 0.04 + 0.004 * S.wave + 0.03 * S.danger) { e.elite = true; e.hp *= 3; e.maxHp = e.hp; e.r *= 1.3; e.spd *= 0.9; }
+  else if (x0 === undefined && type !== 'gold' && S.wave >= 5 && Math.random() < 0.04 + 0.004 * S.wave + 0.03 * S.danger + (routeIs('risk') ? 0.06 : 0)) { e.elite = true; e.hp *= 3; e.maxHp = e.hp; e.r *= 1.3; e.spd *= 0.9; }
   if (type === 'brulote') e.tr = { igneo: 1 };
   else if (!def.ghost && type !== 'gold') {
     const pool = Object.keys(TRAITS).filter(id => S.wave >= TRAITS[id].w);
@@ -1973,9 +1994,9 @@ function waves(dt) {
 }
 function pickTheme() {
   const w = S.wave - (S.mode === 'island' ? 2 : 0);   // on the islands themes arrive two waves later
-  if (isBossWave(S.wave) || w < 6 || S.mods.heavy) return null;
+  if (isBossWave(S.wave) || w < 6 || S.mods.heavy || routeIs('safe')) return null;
   // one wave in three on average (a little more often later), never two in a row
-  if (S.theme || Math.random() > 0.3 + Math.min(0.2, (w - 6) * 0.01)) return null;
+  if (S.theme || (!S.forceTheme && Math.random() > 0.3 + Math.min(0.2, (w - 6) * 0.01))) return null;
   const pool = THEMES.filter(t => w >= t.w);
   return pool.length ? pick(pool) : null;
 }
@@ -1994,7 +2015,7 @@ function nextWave() {
   // endless: the Flying Dutchman haunts wave 25, 35, 45... and later almost any wave
   const gw = S.mode === 'endless' && !isBossWave(S.wave) && S.wave >= 25 && (S.wave % 10 === 5 || (S.wave >= 50 && Math.random() < 0.35));
   S.ghostT = gw ? rand(2, 5) : null;
-  if (S.mode !== 'island') S.palIdx = Math.floor((S.wave - 1) / 10) % 4;
+  if (S.mode !== 'island') S.palIdx = (Math.floor((S.wave - 1) / 10) + (S.palBase || 0)) % 4;
   if (isBossWave(S.wave)) banner('¡Se acerca un jefe!', '', 1.8, true);
   else if (S.theme) { banner(S.theme.name, `Oleada ${S.wave} · ${S.theme.sub}`, 2, true); sfx('warn'); }
   else if (S.mis) { if (S.wave === S.mis.waves) banner('¡Última oleada!', S.mis.goal, 1.6, true); else if (S.wave <= 3 || S.wave % 5 === 1) banner(`Oleada ${S.wave} de ${S.mis.waves}`, '', 1.3); }
@@ -3227,7 +3248,7 @@ function useActive() {
   else if (id === 'dorada') { S.fiebre = S.corr === 'dorada' ? 11 : 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
   S.face = id === 'roja' ? 'angry' : 'effort'; S.faceT = 1.6;
   S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.5, r1: MOON_R() * 3, c: S.moon.color });
-  sfx('act_' + id); vib([60, 40, 140]); moonFx('active');
+  sfx('act_' + id); vib([60, 40, 140]); moonFx('active'); ghostMark(1);
   S.shake = Math.max(S.shake, 0.6);
 }
 function tsunami(mult) { S.ents.push({ type: 'tsunami', r: 0, t: 0, hits: new Set(), dmg: (120 + 18 * S.wave) * mult }); S.shake = Math.max(S.shake, 0.8); }
@@ -3435,6 +3456,7 @@ function updTide(dt) {
     if (S.anom === 'loca') S.tideP += Math.sin(S.t * 1.3) * Math.sin(S.t * 3.1) * dt * 3.2 * S.anomK;
   }
   S.level = S.puz ? puzLevel(dt) : surgeLevel((TIDE_LO + TIDE_HI) / 2 + (TIDE_HI - TIDE_LO) / 2 * tideShape(S.tideP));
+  S.level += evSwell();
   if (S.orbs) S.level = 0.62 + 0.04 * Math.sin(S.t * 2);
   const d = Math.sign(S.level - prev);
   if (d && d !== S.tideDir) { S.tideDir = d; if (!S.seen.tideTip && S.t > 3) { S.seen.tideTip = 1; tip('tide', 'La marea sube y baja sola', 'Bajamar: los barcos encallan · Pleamar: los piratas se ahogan'); } }
@@ -3467,6 +3489,8 @@ function update(dt) {
   guardTick(dt);
   p7Tick(dt);
   heroTick(); tipTick();
+  evTick(dt); rivalTick(dt); doorTick(dt); ghostTick(dt);
+  if (S.forceTheme && S.theme) S.forceTheme = false;
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
@@ -4346,7 +4370,7 @@ function drawDark() {
   const hz = S ? (S.mode === 'island' ? S.isl.hazard : ISLANDS[S.palIdx].hazard) : null;
   const night = S && S.night > 0 ? Math.min(1, S.night * 1.5, (5 - S.night) * 3) : 0;
   // a mission or an echo can bring its own night to any sea
-  const md = S && (S.mis && S.mis.dark || (S.corr === 'nueva' ? 0.6 : 0));
+  const md = S && (S.mis && S.mis.dark || (S.mods.dark ? 0.85 : 0) || (S.corr === 'nueva' ? 0.6 : 0));
   if (hz !== 'dark' && !night && !md) return;
   const m = moonPos(), cy = (m.y + levelY(0.45)) / 2, k = hz === 'dark' || md ? Math.max(md || 0.82, 0.93 * night) : 0.93 * night;
   const g = ctx.createRadialGradient(m.x, cy, W * (0.18 - 0.06 * night), m.x, cy, W * (0.8 - 0.35 * night));
@@ -4508,7 +4532,7 @@ function ensureMissions() {
   if (ch) persist();
 }
 function missionProgress(id, v, isMax) {
-  if (!S || S.mode === 'daily' && id === 'wave') return;
+  if (!S || (S.mode === 'daily' || S.mode === 'weekly') && id === 'wave') return;
   chainProg(id, v, isMax);
   ensureMissions();
   for (const [list, pool] of [[save.missions.list, MISSIONS], [save.weekly.list, WEEKLY]]) for (const m of list) {
@@ -4577,8 +4601,8 @@ function openTitle() {
   const nx = misNext();
   $('playSub').textContent = nx ? `Misión ${nx.n} · ${nx.name}` : 'Campaña y expediciones';
   const dm = dailyMods();
-  $('dailySub').textContent = dm.map(m => m.name).join(' + ');
-  $('dailyBadge').hidden = save.daily.date === today() && save.daily.played;
+  $('dailySub').textContent = weeklyNew() ? 'Diario y semanal' : dm.map(m => m.name).join(' + ');
+  $('dailyBadge').hidden = save.daily.date === today() && save.daily.played && !weeklyNew();
   const eo = endlessOpen();
   $('goEndless').disabled = !eo;
   $('endlessSub').textContent = !eo ? 'Supera el capítulo I' : save.endlessBest ? `Récord: oleada ${save.endlessBest}` : 'Sin final';
@@ -4827,6 +4851,7 @@ function openDaily() {
   $('dailyDate').textContent = new Date().toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' });
   $('dailyMods').innerHTML = dm.map(m => `<div class="mod"><b>${m.name}:</b> ${m.desc}</div>`).join('');
   const played = save.daily.date === today();
+  weeklyInto();
   $('dailyBest').textContent = played && save.daily.best ? `Tu mejor marca de hoy: oleada ${save.daily.best}.` : 'Aún no lo has jugado hoy: la primera partida da +80 monedas.';
   show('scrDaily');
 }
@@ -4858,6 +4883,7 @@ function beginRun(runMode, islIdx) {
   if (S.mis) { misStart(); banner(S.mis.name, S.mis.goal, 2.4); (S.mis.tips || []).forEach(([k, a, b]) => setTimeout(() => S && tip(k, a, b), 2600)); if (S.mis.tut) tutStart(); }
   else if (runMode === 'island') banner(S.isl.name, S.danger ? DANGER_TXT[S.danger] : ISLANDS[islIdx].sub, 2);
   else if (runMode === 'daily') banner('Reto diario', S.dailyList.map(x => x.name).join(' + '), 2.4);
+  else if (runMode === 'weekly') banner('Reto semanal', S.dailyList.map(x => x.name).join(' + '), 2.6);
   else if (runMode === 'lab') labBegin();
   else banner('Marea sin fin', 'Aguanta todo lo que puedas', 2);
   if (!save.tips.move) setTimeout(() => tip('move', 'Arrastra para mover la luna', 'Dispara a lo que tiene cerca, recoge perlas y levanta el agua'), 2100);
@@ -4995,7 +5021,7 @@ function revive() {
 }
 function victory() { endRun(true); }
 // what sank the island, by the source key of islandDamage
-const CAUSE = { sloop: 'las balandras', galleon: 'los galeones', mortar: 'los morteros', pirate: 'los piratas', crab: 'los cangrejos', gull: 'las gaviotas', serpent: 'las serpientes', brulote: 'los brulotes', ghost: 'el Holandés Errante', lava: 'las rocas de lava', gold: 'el barco del tesoro' };
+const CAUSE = { sloop: 'las balandras', galleon: 'los galeones', mortar: 'los morteros', pirate: 'los piratas', crab: 'los cangrejos', gull: 'las gaviotas', serpent: 'las serpientes', brulote: 'los brulotes', ghost: 'el Holandés Errante', lava: 'las rocas de lava', meteor: 'la lluvia de estrellas', gold: 'el barco del tesoro' };
 const lowArt = n => n.replace(/^El /, 'el ').replace(/^La /, 'la ').replace(/^(Demonio|Kraken)/, 'el $1');
 let resultFace = 'calm';
 function endRun(won, quit) {
@@ -5020,7 +5046,8 @@ function endRun(won, quit) {
     }
   } else if (S.mode === 'endless') {
     if (S.wave > save.endlessBest) { save.endlessBest = S.wave; unlocks.push(`Nuevo récord: oleada ${S.wave}`); }
-  } else {
+  } else if (S.mode === 'weekly') bonus += weeklyEnd(unlocks);
+  else {
     const first = save.daily.date !== today() || !save.daily.played;
     if (save.daily.date !== today()) save.daily = { date: today(), best: 0, played: false };
     if (first) { bonus += 80; save.stats.dailies++; missionProgress('daily', 1); }
@@ -5037,7 +5064,7 @@ function endRun(won, quit) {
   const fromPearls = Math.floor(S.pearls / 4) + S.bonusCoins;
   // retiring at the last tide pays a quarter more
   const fromRetire = S.retired ? Math.round((fromKills + fromBoss + waveBonus) * 0.25) : 0;
-  const total = fromKills + fromBoss + waveBonus + bonus + fromPearls + fromRetire + (camp ? camp.coins : 0);
+  const total = fromKills + fromBoss + waveBonus + bonus + fromPearls + fromRetire + (camp ? camp.coins : 0) + xCoins();
   save.coins += total;
   const cl = achClaimable(); if (cl) unlocks.push(`${cl} logro${cl > 1 ? 's' : ''} listo${cl > 1 ? 's' : ''} para cobrar`);
   const mr = missionsReady(); if (mr) unlocks.push(`${mr} misi${mr > 1 ? 'ones' : 'ón'} cumplida${mr > 1 ? 's' : ''}: cóbrala${mr > 1 ? 's' : ''} en Misiones`);
@@ -5050,7 +5077,7 @@ function endRun(won, quit) {
   mode = 'result';
   setTimeout(() => {
     const M = S.mis, wm = waveMax();
-    $('rEyebrow').textContent = M ? (M.puz ? `${M.n} · Desafío de marea` : M.echo ? `${M.n} · ${ISLANDS[M.ch].name}` : `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}`) : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : 'Reto diario';
+    $('rEyebrow').textContent = M ? (M.puz ? `${M.n} · Desafío de marea` : M.echo ? `${M.n} · ${ISLANDS[M.ch].name}` : `Capítulo ${CHAPTERS[M.ch].n} · Misión ${M.n}`) : S.mode === 'island' ? `${S.isl.name}${S.danger ? ` · ${DANGER_TXT[S.danger]}` : ''}` : S.mode === 'endless' ? 'Marea sin fin' : S.mode === 'weekly' ? 'Reto semanal' : 'Reto diario';
     $('rTitle').textContent = M ? (won ? (M.puz ? '¡Desafío superado!' : M.echo ? '¡Eco superado!' : '¡Misión cumplida!') : quit ? 'Misión abandonada' : S.failWhy === 'waves' ? 'Se acabaron las oleadas' : S.failWhy === 'mission' ? S.failTitle : 'La isla ha caído') : won ? 'Isla salvada' : S.retired ? 'Te retiraste a tiempo' : quit ? 'Retirada a tiempo' : S.mode === 'island' ? 'La isla ha caído' : `Oleada ${S.wave}`;
     const wv = M && M.puz ? M.name : wm ? `Oleada ${won && !M ? wm : S.wave} de ${wm}` : `Oleada ${S.wave}`;
     $('rSum').textContent = `${wv} · ${fmtT(S.t)} · ${S.kills.toLocaleString('es')} hundidos`;
@@ -5073,6 +5100,7 @@ function endRun(won, quit) {
     const coins = [['Monedas por hundidos', fromKills], ['Monedas por jefes', fromBoss], ['Bonus de oleadas', waveBonus + bonus]];
     if (fromPearls) coins.push(['Perlas cambiadas', fromPearls]);
     if (fromRetire) coins.push(['La última marea', fromRetire]);
+    coins.push(...(S.xRows || []));
     if (camp) coins.unshift(...camp.rows);
     $('rCoins').dataset.total = total;
     $('rCoins').innerHTML = coins.map(([a, v]) => `<dt>${a}</dt><dd data-v="${v}">+${v.toLocaleString('es')}</dd>`).join('') + `<dt class="tot">Total</dt><dd class="tot"><i class="coin"></i><span data-v="${total}" data-pre="">${total.toLocaleString('es')}</span></dd>`;
@@ -5116,6 +5144,7 @@ $('goDaily').onclick = () => { audioInit(); openDaily(); };
 $('goEndless').onclick = () => { audioInit(); if (save.intro) startRun('endless', 0); else openIntro(() => startRun('endless', 0)); };
 $('setFx').onclick = () => { save.fxLow = !save.fxLow; persist(); openSettings(); sfx('card'); };
 $('startDaily').onclick = () => startRun('daily', 0);
+$('startWeekly').onclick = () => startRun('weekly', 0);
 $('goMoons').onclick = () => openMoons('title');
 $('goShop').onclick = () => openShop('title');
 $('goAch').onclick = () => { audioInit(); openArchive(achClaimable() ? 'ach' : 'hist'); };
@@ -5492,7 +5521,7 @@ const ANOMS = {
   divididas: { name: 'Aguas divididas', sub: 'Pleamar a la izquierda y bajamar a la derecha', col: '#7fe0b5', svg: '<path d="M12 3v18"/><path d="M3 9c2-1.5 4-1.5 6 0"/><path d="M15 16c2-1.5 4-1.5 6 0"/>' },
   eclipse: { name: 'Eclipse parcial', sub: 'Solo se ve bien cerca de la luna', col: '#b49cff', svg: '<circle cx="12" cy="12" r="7"/><path d="M14 5.5a7 7 0 0 1 0 13 7 7 0 0 0 0-13z" fill="currentColor"/>' },
 };
-const anomOk = w => !isBossWave(w) && (waveMax() ? w <= waveMax() : true) && (S.mis ? false : S.mode === 'endless' ? w >= 16 : w >= 6);
+const anomOk = w => !routeIs('safe') && !isBossWave(w) && (waveMax() ? w <= waveMax() : true) && (S.mis ? false : S.mode === 'endless' ? w >= 16 : w >= 6);
 const anomIs = id => S && S.anom === id;
 // what the anomalies do to the water level under the moon and across the sea
 const anomPull = () => !S || !S.anom ? 1 : S.anom === 'invertida' ? 1 - 2 * S.anomK : S.anom === 'pesada' ? 1 + 0.8 * S.anomK : 1;
@@ -5517,6 +5546,7 @@ function wxSpeed(e) {
   return (e.dir > 0 ? -1 : 1) === S.wxSide ? 1.25 : 0.85;
 }
 function rollWeather() {
+  if (S.mods.fog) { S.wx = 'niebla'; S.wxFrom = S.wave; return S.wx; }
   const pool = ['calma', 'viento', 'lluvia', 'niebla', 'agitado'].filter(k => k !== S.wx);
   S.wx = pick(pool); S.wxSide = Math.random() < 0.5 ? -1 : 1; S.wxFrom = S.wave;
   return S.wx;
@@ -5537,6 +5567,7 @@ function oceanWave() {
     rollWeather();
     later(() => banner(`Pronóstico: ${WEATHER[S.wx].name}`, `Oleadas ${S.wave} a ${S.wave + 4} · ${wxSub()}`, 2.6), busy || S.anom ? 4600 : 1500);
   }
+  p10Wave();
 }
 function oceanTick(dt) {
   S.anomK = S.anom ? Math.min(1, S.anomK + dt / 1.2) : 0;
@@ -5555,7 +5586,7 @@ function surgeLevel(level) {
   const sg = S.surge, k = Math.min(1, sg.t / 0.6, ((sg.T || 3.2) - sg.t) / 0.35);
   return level + ((sg.dir > 0 ? TIDE_HI + 0.08 : TIDE_LO - 0.06) - level) * clamp(k, 0, 1);
 }
-const tideBtnOn = () => S && !(S.mis && S.mis.tut) && !(S.puz && !S.puz.tides);
+const tideBtnOn = () => S && !(S.mis && S.mis.tut) && !(S.puz && !S.puz.tides) && !S.mods.noTide;
 function tideCharge(e) {
   if (!tideBtnOn() || S.surge || S.puz) return;
   const before = S.tideCh;
@@ -5608,6 +5639,7 @@ function openLastTide() {
   ], '', null);
 }
 function oceanDue(dt) {
+  if (routeTick(dt)) return true;
   if (S.pactDue !== undefined && (S.pactDue -= dt) <= 0) { delete S.pactDue; openPact(); return true; }
   if (S.lastTideDue !== undefined && (S.lastTideDue -= dt) <= 0) { delete S.lastTideDue; openLastTide(); return true; }
   return false;
@@ -5677,7 +5709,7 @@ function drawWeather() {
   }
 }
 // in the fog, what sails far from the moon is hard to make out
-const fogAlpha = e => S && S.wx === 'niebla' ? clamp(1.25 - Math.abs(e.x - S.mx) / (W * 0.42), 0.28, 1) : 1;
+const fogAlpha = e => S && (S.wx === 'niebla' || evFog()) ? clamp(1.25 - Math.abs(e.x - S.mx) / (W * 0.42), 0.28, 1) : 1;
 // =====================================================================
 // THE SEA REMEMBERS: wrecks that slow the fleet and run aground as a reef at low tide,
 // sunken treasure that shows at very low tide, and whales and turtles crossing the sea
@@ -5733,7 +5765,7 @@ function updTreasure(dt) {
     S.trT = rand(36, 52) * (S.trK || 1);
     let x, n = 0;
     do { x = rand(0.07, 0.93) * W; n++; } while (n < 30 && (Math.abs(x - W / 2) < 72 * u || inReef(x, 10 * u) || wreckAt(x, 12 * u)));
-    S.treasure = { x, kind: Math.random() < 0.6 ? 'chest' : 'amphora', t: 0, life: 45, hold: 0, show: 0, got: 0, ph: rand(0, TAU) };
+    S.treasure = { x, kind: tabletDue() ? 'tablet' : Math.random() < 0.6 ? 'chest' : 'amphora', t: 0, life: 45, hold: 0, show: 0, got: 0, ph: rand(0, TAU) };
     return;
   }
   tr.t += dt;
@@ -5744,7 +5776,7 @@ function updTreasure(dt) {
   if (tr.show >= 1) tip('treasure', '¡Un tesoro asoma en el fondo!', 'Deja la luna encima un segundo para sacarlo');
   const over = Math.abs(S.mx - tr.x) < 30 * u;
   tr.hold = tr.show > 0.5 && over ? tr.hold + dt : Math.max(0, tr.hold - dt * 1.5);
-  if (tr.hold >= 1) { tr.got = 0.01; if (tr.kind === 'conch') echoFound(tr.echo); else raiseTreasure(tr); return; }
+  if (tr.hold >= 1) { tr.got = 0.01; if (tr.kind === 'conch') echoFound(tr.echo); else if (tr.kind === 'tablet') tabletFound(); else raiseTreasure(tr); return; }
   if (tr.t > tr.life && tr.show <= 0) S.treasure = null;
 }
 function raiseTreasure(tr) {
@@ -5865,8 +5897,9 @@ function drawTreasure(tr) {
   const y = fy + (1 - k) * 18 * u - rise * 30 * u;
   ctx.save(); ctx.globalAlpha = tr.got ? Math.max(0, 1 - (tr.got - 0.7) / 0.6) : 1;
   if (!tr.got) { ctx.beginPath(); ctx.rect(0, 0, W, fy + 2 * u); ctx.clip(); }
-  softGlow(tr.x, y - 10 * u, (26 + 5 * Math.sin(T * 4 + tr.ph)) * u, tr.kind === 'conch' ? '#9fe3ff' : '#ffd36b', 0.4 * k);
+  softGlow(tr.x, y - 10 * u, (26 + 5 * Math.sin(T * 4 + tr.ph)) * u, tr.kind === 'conch' || tr.kind === 'tablet' ? '#9fe3ff' : '#ffd36b', 0.4 * k);
   if (tr.kind === 'chest') spr('chest', tr.x, y - 15 * u, 0.8 * u, false, Math.sin(T * 2 + tr.ph) * 0.04);
+  else if (tr.kind === 'tablet') drawTablet(tr.x, y - 4 * u, 0.6 * u, Math.sin(T * 1.5 + tr.ph) * 0.05);
   else if (tr.kind === 'conch') drawConch(tr.x, y - 6 * u, 0.55 * u, -0.25 + Math.sin(T * 1.5 + tr.ph) * 0.06);
   else drawAmphora(tr.x, y - 6 * u, 0.6 * u, -1.15 + Math.sin(T * 1.5 + tr.ph) * 0.03);
   // a glint now and then, so it catches the eye
@@ -5936,6 +5969,7 @@ function drawSeaUnder() {
     const up = m.ph === 'stay' ? 1 : m.ph === 'in' ? clamp(1 - Math.abs(m.x - (W / 2 + m.side * 92 * u)) / (120 * u), 0, 1) : Math.max(0, 1 - m.phT / 1.2);
     drawWhale(m.x, Math.min(waveY(m.x) + (40 - 30 * up) * u, floorY() - 8 * u), 0.72 * u, -m.side * (m.ph === 'out' ? -1 : 1), m.t);
   }
+  evUnder();
 }
 // on the surface: planks around the floating hulls and the ring while the moon pulls up a treasure
 function drawSeaTop() {
@@ -6014,7 +6048,7 @@ function capTick(e, dt, sp, I) {
   if (!e.escTold && e.capT > 2.6) { e.escTold = true; banner(`Escolta de ${C.name}`, e.escTxt, 1.8); }
   if (e.capFlee) {
     e.x += e.dir * sp * 1.8 * u * dt; e.atIsland = false;
-    if (e.x < -90 * u || e.x > W + 90 * u) { e.dead = true; if (S.cap === e) S.cap = null; banner(`${C.name} ha huido`, '', 1.4); if (S.mis && S.mis.capFled) S.mis.capFled(e); }
+    if (e.x < -90 * u || e.x > W + 90 * u) { e.dead = true; if (S.cap === e) S.cap = null; if (!rivalFled(e)) banner(`${C.name} ha huido`, '', 1.4); if (S.mis && S.mis.capFled) S.mis.capFled(e); }
     return true;
   }
   if (e.capT > e.capLife) { e.capFlee = true; e.dir = -e.dir; e.cloak = 0; e.phased = false; banner(`¡${C.name} huye!`, 'Húndelo antes de que escape', 1.6, true); return true; }
@@ -6029,6 +6063,8 @@ function capTick(e, dt, sp, I) {
   return true;
 }
 function capAbility(e) {
+  // a rival from level 3 on alternates its own trick with one stolen from another captain
+  if (e.capAlt && !e.inAlt && (e.altN = (e.altN || 0) + 1) % 2 === 0) { const own = e.cap; e.cap = e.capAlt; e.inAlt = true; capAbility(e); e.inAlt = false; e.cap = own; return; }
   const C = CAPTAINS[e.cap];
   S.nums.push({ x: e.x, y: e.y - 74 * u, v: C.ab, txt: true, col: C.col, t: 0 }); sfx('warn');
   if (e.cap === 'perla') {
@@ -6062,6 +6098,7 @@ function capDown(e) {
   for (const d of S.enemies) if (d.decoy && !d.dead) { d.hp = 0; kill(d, true); }
   banner(`¡${C.name} hundido!`, 'Un capitán legendario menos', 2); sfx('bigboom'); vib([80, 40, 140]); S.shake = Math.max(S.shake, 0.6); S.slowmo = 0.8;
   missionProgress('captain', 1);
+  if (e.rival) rivalDown(e);
 }
 const capCast = b => b.capFlee ? '¡Huye!' : b.cloak > 0 ? 'Invisible' : b.capLife > 500 ? CAPTAINS[b.cap].ab : `Huye en ${Math.max(0, Math.ceil(b.capLife - b.capT))} s`;
 
@@ -6426,7 +6463,8 @@ const capFor = () => S.mis && S.mis.cap || (S.mode === 'island' ? CAP_IDS[S.islI
 function capDueTick(dt) {
   if (S.capDue == null || (S.capDue -= dt) > 0) return;
   S.capDue = null;
-  spawnCaptain(capFor(), S.mis ? (S.mis.capOpts || { hpK: 4, life: 50 }) : { hpK: 5, life: 45 });
+  const cid = capFor(); if (!S.mis && rivalCap(cid)) { rivalSpawn(); return; }
+  spawnCaptain(cid, S.mis ? (S.mis.capOpts || { hpK: 4, life: 50 }) : { hpK: 5, life: 45 });
 }
 
 // =====================================================================
@@ -7320,6 +7358,7 @@ function openArchive(tab) {
   } else if (arcTab === 'beast') {
     const seenN = BEAST.filter(beastSeen).length;
     body.insertAdjacentHTML('beforeend', `<p class="lede small">${seenN} de ${BEAST.length} criaturas vistas. Los jefes y los capitanes, abajo.</p>`);
+    body.insertAdjacentHTML('beforeend', rivalRows());
     const grid = document.createElement('div'); grid.className = 'beasts';
     for (const b of BEAST) {
       const seen = beastSeen(b), el = document.createElement('div');
@@ -7350,6 +7389,7 @@ function openArchive(tab) {
       rb.onclick = () => { save.relic = save.relic === m.relic ? null : m.relic; persist(); sfx('card'); openArchive('sec'); };
       r.appendChild(rb); body.appendChild(r);
     }
+    body.insertAdjacentHTML('beforeend', secretRows());
   } else achInto(body, () => openArchive('ach'));
   show('scrArchive');
 }
@@ -7668,7 +7708,7 @@ function mastStart() {
   if (lv >= 2) S.charge = Math.max(S.charge, 0.3);
   if (lv >= 4) S.runDmg *= 1.05;
   if (lv >= 5) S.chargeMul *= 1.1;
-  if (corrOn(id)) {
+  if (corrOn(id) && S.mode !== 'weekly') {
     S.corr = id;
     if (id === 'llena') { S.tideMul = (S.tideMul || 1) * 2; S.runDmg *= 0.85; }
     else if (id === 'roja') S.runTaken *= 1.25;
@@ -8068,21 +8108,7 @@ function xtrTick(dt) {
     const xs = [-0.7, 0, 0.7].sort(() => Math.random() - 0.5);
     xs.forEach((f, i) => X.stars.push({ x: W / 2 + f * (I.r - I.l) / 2 + rand(-4, 4) * u, t: -3 - i * 0.7, dx: rand(-60, 60) * u }));
   }
-  for (const s of X.stars) {
-    s.t += dt;
-    if (s.t < -0.9) continue;
-    const f = clamp((s.t + 0.9) / 0.9, 0, 1);
-    s.px = s.x + s.dx * (1 - f); s.py = -20 * u + (I.top - 4 * u + 20 * u) * f * f;
-    if (Math.hypot(s.px - m.x, s.py - m.y) < MOON_R() + 9 * u) {
-      s.done = true; S.intercepts++; missionProgress('intercept', 1); S.moonKick = 0.15;
-      burst(s.px, s.py, 18, '#b08cff', 200); sfx('boom'); vib(15);
-      S.nums.push({ x: s.px, y: s.py - 14 * u, v: '¡Bloqueada!', txt: true, col: '#cdb6ff', t: 0 });
-    } else if (s.t >= 0) {
-      s.done = true; islandDamage(S.maxHp * 0.12, false, 'meteoro');
-      boomFx(s.x, I.top, 34 * u, '#9b6cff'); sfx('bigboom'); S.shake = Math.max(S.shake, 0.6); vib([50, 30, 80]);
-    }
-  }
-  X.stars = X.stars.filter(s => !s.done);
+  X.stars = starFall(X.stars, dt);
   // waterspouts: one walks in from a side; the moon held over it for 2 s undoes it
   if (!X.sp && (X.spT -= dt) <= 0) {
     const side = Math.random() < 0.5 ? -1 : 1;
@@ -8108,26 +8134,7 @@ function drawXtr() {
     drawWhirl({ x: p.x, r: 26 * u, t: 1, life: 99, perm: true, spout: true });
     if (p.hold > 0) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(p.x, waveY(p.x) - 60 * u, 12 * u, -Math.PI / 2, -Math.PI / 2 + TAU * p.hold / 2); ctx.stroke(); }
   }
-  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  for (const s of X.stars) {
-    const a = 0.55 + 0.45 * Math.sin(T * 12);
-    ctx.strokeStyle = `rgba(176,140,255,${a})`; ctx.lineWidth = 2.2 * u; ctx.setLineDash([4 * u, 3 * u]);
-    ctx.beginPath(); ctx.ellipse(s.x, I.top + 1 * u, 13 * u, 4.5 * u, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
-    if (s.t < -0.9) {
-      ctx.font = `900 ${15 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.fillStyle = '#e6dcff';
-      const n = String(Math.min(3, Math.ceil(-s.t - 0.9))); ctx.strokeText(n, s.x, I.top - 16 * u); ctx.fillText(n, s.x, I.top - 16 * u);
-    } else if (s.px !== undefined) {
-      // a dark star with a violet tail
-      const g = ctx.createLinearGradient(s.px - s.dx * 0.3, s.py - 60 * u, s.px, s.py);
-      g.addColorStop(0, 'rgba(120,70,220,0)'); g.addColorStop(1, 'rgba(160,110,255,0.8)');
-      ctx.strokeStyle = g; ctx.lineWidth = 7 * u; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(s.px + s.dx * 0.25, s.py - 60 * u); ctx.lineTo(s.px, s.py); ctx.stroke();
-      softGlow(s.px, s.py, 16 * u, '#9b6cff', 0.7);
-      ctx.fillStyle = '#1b0d33'; ctx.strokeStyle = '#cdb6ff'; ctx.lineWidth = 1.6 * u; ctx.beginPath();
-      for (let i = 0; i < 10; i++) { const r = (i % 2 ? 4 : 9) * u, an = i * Math.PI / 5 + T * 4; i ? ctx.lineTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r) : ctx.moveTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r); }
-      ctx.closePath(); ctx.fill(); ctx.stroke();
-    }
-  }
-  ctx.restore();
+  drawStarMarks(X.stars);
 }
 // =====================================================================
 // SPECIAL MISSIONS: six that never expire, each one a feat inside a single run.
@@ -8314,7 +8321,7 @@ $('shareSheet').addEventListener('click', e => { if (e.target.id === 'shareSheet
 // ---- phase 7 hooks
 function p7Start() {
   S.p7 = { sea: 0, reef: 0, low: 0 };
-  mastStart(); defStart(); terrStart();
+  mastStart(); defStart(); terrStart(); rulesStart();
 }
 function p7Tick(dt) {
   mastTick(dt); defTick(dt); terrTick(dt);
@@ -8326,9 +8333,9 @@ function p7Tick(dt) {
     if (d > 1 && Math.random() < Math.min(0.9, d * 0.08)) S.parts.push({ x: m.x + rand(-1, 1) * MOON_R() * 0.6, y: m.y + rand(-1, 1) * MOON_R() * 0.6, vx: rand(-20, 20), vy: rand(10, 40), t: 0, life: 0.7, c: Math.random() < 0.5 ? '#f4e6ff' : '#ffe9b0', s: rand(1.6, 2.8), g: 30 });
   }
 }
-function p7Draw() { drawDefs(); drawTerrMark(); drawXtr(); mastDraw(); }
+function p7Draw() { drawDefs(); drawTerrMark(); drawXtr(); mastDraw(); evDraw(); doorDraw(); rivalDraw(); ghostDraw(); }
 function p7Kill(e) {
-  mastKill(e);
+  mastKill(e); evFleetKill(e);
   if (!runCounts()) return;
   if (e.def.kind === 'ship') {
     if (SRC === 'mar' && (e.seaD || 0) >= e.maxHp * 0.9) { S.p7.sea++; if (S.p7.sea >= 10) specDone('dominio'); }
@@ -8794,6 +8801,605 @@ function twinkle(x, y, s, col) {
   ctx.moveTo(x, y - s); ctx.lineTo(x + s * 0.28, y - s * 0.28); ctx.lineTo(x + s, y); ctx.lineTo(x + s * 0.28, y + s * 0.28);
   ctx.lineTo(x, y + s); ctx.lineTo(x - s * 0.28, y + s * 0.28); ctx.lineTo(x - s, y); ctx.lineTo(x - s * 0.28, y - s * 0.28); ctx.closePath(); ctx.fill();
 }
+// =====================================================================
+// SURPRISES AT SEA: now and then a wave brings an event (a merchant chased by pirates, a ghost fleet
+// that dares you, the great whale of the tides, a rain of stars, a cursed chest), and twice in an
+// Expedition the route forks: calm waters, or a dangerous passage that pays more.
+// =====================================================================
+const EVENTS = {
+  mercante: { name: 'Mercante en apuros', sub: 'Lo persiguen piratas: hunde a los que lo aborden', w: 4 },
+  flota: { name: 'Flota fantasma', w: 7, choice: true },
+  ballena: { name: 'La gran ballena', sub: 'Su paso agita la marea; cuando sopla, llueven perlas', w: 5 },
+  estrellas: { name: 'Lluvia de estrellas', sub: 'Golpean a la flota; atrapa con la luna las doradas que van al castillo', w: 6 },
+  cofre: { name: 'Cofre maldito', w: 6, choice: true },
+};
+// events happen in Expeditions, the endless sea and the challenges, never in a campaign mission
+const evOn = () => runCounts() && !S.mis && S.mode !== 'lab';
+// an announcement that new-enemy tips wait for
+function holdBanner(secs) { S.bannerHold = Math.max(S.bannerHold || 0, S.t + secs); }
+// extra coins paid at the end of the run, each with its own row
+function xRow(label, coins) { (S.xRows = S.xRows || []).push([label, Math.round(coins)]); }
+const xCoins = () => (S && S.xRows || []).reduce((a, r) => a + r[1], 0);
+
+// called at the start of every wave (from oceanWave): maybe an event, the forks of the route, the rival
+function p10Wave() {
+  if (!evOn()) return;
+  routeWave();
+  rivalWave();
+  if (S.curse) { S.curse = false; const sd = Math.random() < 0.5 ? -1 : 1; for (let i = 0; i < 2 + (S.wave >= 12 ? 1 : 0); i++) spawnEnemy('brulote', sd, i * 2); banner('La maldición del cofre', 'Luna de sangre y brulotes', 2, true); }
+  if (S.ev || S.evDue) return;
+  const w = S.wave, first = S.mode === 'island' ? 4 : 6;
+  if (w < first || isBossWave(w) || S.theme || S.anom || S.horde || S.routeDue !== undefined || (S.evLast && w - S.evLast < 3)) return;
+  if (waveMax() && w >= waveMax() - 1) return;
+  if (Math.random() > (S.mode === 'island' ? 0.32 : 0.26)) return;
+  const pool = Object.keys(EVENTS).filter(k => w >= EVENTS[k].w && !(S.evDone || []).includes(k));
+  if (!pool.length) return;
+  S.evLast = w; S.evDue = { k: pick(pool), t: 2.4 };
+}
+function startEvent(k) {
+  (S.evDone = S.evDone || []).push(k);
+  const E = EVENTS[k], side = Math.random() < 0.5 ? -1 : 1, dir = -side;
+  if (k === 'flota') {
+    openChoice('Evento', 'Flota fantasma', 'Unas velas grises salen de la niebla. Si te enfrentas a ellas, pagan el doble.', [
+      { name: 'Enfrentarla', ico: 'i_barco', good: 'Cada barco fantasma suelta el doble de perlas y, si los hundes todos, un cofre', bad: 'Seis barcos espectrales y niebla en todo el mar', pick: () => fleetStart(side) },
+      { name: 'Dejarla pasar', ico: 'i_marea', good: 'La flota se pierde en la niebla', cls: 'safe', pick: () => banner('La flota se aleja', 'Las velas grises desaparecen', 1.4) },
+    ], '', null);
+    return;
+  }
+  if (k === 'cofre') {
+    openChoice('Evento', 'Cofre maldito', 'Un cofre con cadenas flota a la deriva. Dicen que trae suerte… y mala suerte.', [
+      { name: 'Abrirlo', ico: 'i_cofre', good: 'Un cofre de mejora y un puñado de perlas ahora', bad: 'La próxima oleada llega con Luna de sangre y brulotes', pick: () => { const x = W / 2 + side * 90 * u, y = levelY(0.55); dropChest(x, y); dropCoins(x, y, 12, true); S.anomNext = 'sangre'; S.curse = true; banner('¡Cofre abierto!', 'La maldición llegará con la próxima oleada', 1.8, true); sfx('coin'); } },
+      { name: 'Dejarlo', ico: 'i_marea', good: 'El mar se lo lleva', cls: 'safe', pick: () => banner('El cofre se hunde', 'Mejor no tentar a la suerte', 1.4) },
+    ], '', null);
+    return;
+  }
+  banner(E.name, E.sub, 2.4, true); holdBanner(2.4); sfx('warn'); vib('tap');
+  if (k === 'mercante') {
+    const x0 = side < 0 ? -40 * u : W + 40 * u;
+    S.ev = { k, x: x0, side, dir, hp: 1, t: 0, ph: 'sail' };
+    const n = S.wave >= 10 ? 4 : 3;
+    for (let i = 0; i < n; i++) { const e = spawnEnemy(i === n - 1 && S.wave >= 8 ? 'galleon' : 'sloop', side, i, x0 - dir * (80 + i * 34) * u); e.chase = true; }
+  } else if (k === 'ballena') {
+    S.ev = { k, x: side < 0 ? -150 * u : W + 150 * u, side, t: 0, ph: 'in', phT: 0, spout: 1.2, swell: 0 };
+  } else if (k === 'estrellas') {
+    S.ev = { k, t: 0, T: 14, next: 0.5, mark: 1.5, mets: [], marks: [], caught: 0, aimed: 0 };
+  }
+}
+function fleetStart(side) {
+  S.ev = { k: 'flota', t: 0, n: 0, spawned: 0, N: 6, side, next: 0.6 };
+  banner('¡Flota fantasma!', 'Hunde los seis barcos antes de que se desvanezcan', 2, true); sfx('roar');
+}
+
+// the merchant sails to the island; pirates that reach it board it and slow it down
+function evMerchant(v, dt) {
+  const I = ISL(), stop = v.dir > 0 ? I.l - 34 * u : I.r + 34 * u;
+  let board = 0;
+  for (const e of S.enemies) {
+    if (!e.chase || e.dead || e.frozen > 0) continue;
+    if (Math.abs(e.x - v.x) < 30 * u) { board++; e.x = v.x - v.dir * 18 * u + Math.sin(e.t * 3 + e.wob) * 6 * u; e.atIsland = false; }
+  }
+  if (v.ph === 'sail') {
+    v.x += v.dir * (board ? 10 : 24) * u * dt;
+    v.hp -= board * 0.085 * dt;
+    if (board && Math.random() < dt * 4) sparks(v.x - v.dir * 10 * u, waveY(v.x) - 14 * u);
+    if (v.hp <= 0) { v.ph = 'sunk'; v.t = 0; splash(v.x, waveY(v.x), 16); debris(v.x, waveY(v.x)); sfx('sink', 0, v.x); banner('El mercante se ha hundido', 'Los piratas se quedan con su carga', 1.8); for (const e of S.enemies) e.chase = false; return; }
+    if ((stop - v.x) * v.dir <= 0) {
+      v.x = stop; v.ph = 'safe'; v.t = 0;
+      for (const e of S.enemies) e.chase = false;
+      dropChest(v.x, waveY(v.x) - 24 * u); dropCoins(v.x, waveY(v.x) - 10 * u, 10, true);
+      xRow('Mercante rescatado', 40 * S.isl.coin);
+      banner('¡El mercante está a salvo!', 'Te deja un cofre y perlas en agradecimiento', 2); sfx('coin'); vib('win');
+    }
+  } else if (v.t > (v.ph === 'sunk' ? 1.2 : 3)) {
+    if (v.ph === 'safe') { v.x -= v.dir * 40 * u * dt; if (v.x < -80 * u || v.x > W + 80 * u) S.ev = null; }
+    else S.ev = null;
+  }
+  if (v.t > 50) S.ev = null;
+}
+// the ghost fleet: six spectral ships come in two by two; it fades out with the wave
+function evFleet(v, dt) {
+  if (v.spawned < v.N && (v.next -= dt) <= 0) {
+    v.next = 2.2;
+    for (let i = 0; i < 2 && v.spawned < v.N; i++, v.spawned++) {
+      const e = spawnEnemy(v.spawned % 3 === 2 ? 'galleon' : 'sloop', v.spawned % 2 ? -v.side : v.side, i);
+      e.tr = null; e.armor = 0; addTrait(e, 'espectral'); e.fleet = true; e.elite = false;
+    }
+  }
+  if (v.spawned >= v.N && !S.enemies.some(e => e.fleet && !e.dead)) {
+    if (v.n >= v.N) { dropChest(W / 2, levelY(0.6)); xRow('Flota fantasma hundida', 50 * S.isl.coin); banner('¡La flota fantasma se hunde!', 'Te deja un cofre', 2); sfx('evo'); }
+    S.ev = null;
+  }
+}
+function evFleetKill(e) {
+  if (!e.fleet || !S.ev || S.ev.k !== 'flota') return;
+  S.ev.n++; dropCoins(e.x, e.y, (e.def.cv || 1) * 2 + 1, true);
+}
+// the great whale rises on one side and stays a while: the tide heaves, it pushes ships away and blows pearls
+function evWhale(v, dt) {
+  v.phT += dt;
+  const dir = -v.side, stop = W / 2 + v.side * 120 * u;
+  if (v.ph === 'in') { v.x += dir * 60 * u * dt; if ((stop - v.x) * dir <= 0) { v.x = stop; v.ph = 'stay'; v.phT = 0; sfx('splash'); S.shake = Math.max(S.shake, 0.3); } }
+  else if (v.ph === 'stay') {
+    if ((v.spout -= dt) <= 0) {
+      v.spout = 2.4; sfx('whirl', 0, v.x);
+      dropCoins(v.x + dir * 40 * u, waveY(v.x) - 16 * u, 5, true);
+      for (let i = 0; i < 26; i++) S.parts.push({ x: v.x + dir * 40 * u + rand(-4, 4) * u, y: waveY(v.x) - 4 * u, vx: rand(-50, 50), vy: -rand(240, 360), t: 0, life: rand(0.6, 1), c: '#e6f6ff', s: rand(1.8, 3.2), g: 520 });
+    }
+    if (v.phT >= 8.5) { v.ph = 'out'; v.phT = 0; }
+  } else { v.x -= dir * 70 * u * dt; if (Math.abs(v.x - W / 2) > W / 2 + 170 * u) S.ev = null; }
+  v.swell = clamp(v.swell + (v.ph === 'stay' ? dt : -dt) / 1.2, 0, 1);
+  // its wake carries the fleet near it back out to sea
+  if (v.ph === 'stay') for (const e of S.enemies) if (!e.dead && (e.def.kind === 'ship' || e.def.kind === 'swim') && !e.def.ghost && Math.abs(e.x - v.x) < 90 * u) { e.x += v.side * 90 * u * dt; e.atIsland = false; }
+}
+// how much the whale heaves the tide (read by updTide)
+const evSwell = () => S && S.ev && S.ev.k === 'ballena' ? S.ev.swell * 0.11 * Math.sin(S.t * 2.6) : 0;
+// a rain of stars: most fall in the sea (they hit the fleet and leave pearls); now and then a golden one
+// marks the castle and falls on it like the black stars of the extreme sea, unless the moon catches it
+function evStars(v, dt) {
+  v.t += dt;
+  if (v.t < v.T && (v.next -= dt) <= 0) {
+    v.next = rand(0.45, 0.75);
+    let tx; do { tx = rand(0.05, 0.95) * W; } while (Math.abs(tx - W / 2) < 70 * u);
+    const x = tx + rand(-1, 1) * W * 0.25, y = -20 * u;
+    v.mets.push({ x, y, x0: x, y0: y, tx, ty: waveY(tx), t: 0, T: 1.4 });
+  }
+  if (v.t < v.T - 3 && (v.mark -= dt) <= 0) {
+    v.mark = 3.2; v.aimed++;
+    const I = ISL();
+    v.marks.push({ x: W / 2 + rand(-0.7, 0.7) * (I.r - I.l) / 2, t: -3, dx: rand(-60, 60) * u, gold: true });
+    sfx('warn');
+  }
+  for (const s of v.mets) {
+    s.t += dt; const k = Math.min(1, s.t / s.T), kk = k * k;
+    s.x = s.x0 + (s.tx - s.x0) * kk; s.y = s.y0 + (s.ty - s.y0) * kk;
+    if (k < 1) continue;
+    s.done = true;
+    boomFx(s.x, s.y, 46 * u, '#fff0b0'); splash(s.x, s.y, 10); sfx('boom', 0, s.x);
+    const prev = SRC; SRC = 'otros';
+    for (const e of S.enemies) if (!e.dead && !e.isBoss && !e.def.ghost && Math.hypot(e.x - s.x, e.y - s.y) < 52 * u) hit(e, EN.sloop.hp * hpMul() * 0.6);
+    SRC = prev;
+    dropCoins(s.x, s.y - 6 * u, 1, true);
+  }
+  v.mets = v.mets.filter(s => !s.done);
+  v.marks = starFall(v.marks, dt);
+  if (v.t >= v.T && !v.mets.length && !v.marks.length) {
+    if (v.aimed && v.caught >= v.aimed) { dropChest(W / 2, levelY(0.6)); banner('¡Ni una estrella en el castillo!', `Atrapaste las ${v.caught}: te ganas un cofre`, 2); sfx('evo'); }
+    else if (v.aimed) banner('Fin de la lluvia de estrellas', `Atrapaste ${v.caught} de ${v.aimed}`, 1.6);
+    S.ev = null;
+  }
+}
+// stars falling on the castle (the black stars of the extreme sea, the golden ones of the rain of stars):
+// a mark and a 3-2-1 on the castle, then they fall; the moon in their way stops them
+function starFall(list, dt) {
+  const I = ISL(), m = moonPos();
+  for (const s of list) {
+    s.t += dt;
+    if (s.t < -0.9) continue;
+    const f = clamp((s.t + 0.9) / 0.9, 0, 1);
+    s.px = s.x + s.dx * (1 - f); s.py = -20 * u + (I.top - 4 * u + 20 * u) * f * f;
+    if (Math.hypot(s.px - m.x, s.py - m.y) < MOON_R() + 9 * u) {
+      s.done = true; S.intercepts++; missionProgress('intercept', 1); S.moonKick = 0.15; vib(15);
+      if (s.gold) { burst(s.px, s.py, 18, '#fff3c4', 200); dropCoins(s.px, s.py, 3, true); sfx('star', 0, s.px); if (S.ev && S.ev.k === 'estrellas') S.ev.caught++; }
+      else { burst(s.px, s.py, 18, '#b08cff', 200); sfx('boom'); }
+      S.nums.push({ x: s.px, y: s.py - 14 * u, v: s.gold ? '¡Atrapada!' : '¡Bloqueada!', txt: true, col: s.gold ? '#fff3c4' : '#cdb6ff', t: 0 });
+    } else if (s.t >= 0) {
+      s.done = true;
+      if (s.gold) { islandDamage(S.maxHp * 0.03, false, 'meteor'); boomFx(s.x, I.top, 30 * u, '#ffd36b'); sfx('boom', 0, s.x); vib(30); }
+      else { islandDamage(S.maxHp * 0.12, false, 'meteoro'); boomFx(s.x, I.top, 34 * u, '#9b6cff'); sfx('bigboom'); S.shake = Math.max(S.shake, 0.6); vib([50, 30, 80]); }
+    }
+  }
+  return list.filter(s => !s.done);
+}
+function drawStarMarks(list) {
+  const I = ISL();
+  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const s of list) {
+    const a = 0.55 + 0.45 * Math.sin(T * 12), gd = s.gold;
+    ctx.strokeStyle = gd ? `rgba(255,211,107,${a})` : `rgba(176,140,255,${a})`; ctx.lineWidth = 2.2 * u; ctx.setLineDash([4 * u, 3 * u]);
+    ctx.beginPath(); ctx.ellipse(s.x, I.top + 1 * u, 13 * u, 4.5 * u, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    if (s.t < -0.9) {
+      ctx.font = `900 ${15 * Math.max(0.9, u)}px Figtree, system-ui, sans-serif`; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.fillStyle = gd ? '#fff3c4' : '#e6dcff';
+      const n = String(Math.min(3, Math.ceil(-s.t - 0.9))); ctx.strokeText(n, s.x, I.top - 16 * u); ctx.fillText(n, s.x, I.top - 16 * u);
+    } else if (s.px !== undefined) {
+      // a dark star with a violet tail, or a golden one
+      const g = ctx.createLinearGradient(s.px - s.dx * 0.3, s.py - 60 * u, s.px, s.py);
+      g.addColorStop(0, gd ? 'rgba(255,200,90,0)' : 'rgba(120,70,220,0)'); g.addColorStop(1, gd ? 'rgba(255,225,140,0.85)' : 'rgba(160,110,255,0.8)');
+      ctx.strokeStyle = g; ctx.lineWidth = 7 * u; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(s.px + s.dx * 0.25, s.py - 60 * u); ctx.lineTo(s.px, s.py); ctx.stroke();
+      softGlow(s.px, s.py, 16 * u, gd ? '#ffd36b' : '#9b6cff', 0.7);
+      ctx.fillStyle = gd ? '#ffd36b' : '#1b0d33'; ctx.strokeStyle = gd ? '#fff8de' : '#cdb6ff'; ctx.lineWidth = 1.6 * u; ctx.beginPath();
+      for (let i = 0; i < 10; i++) { const r = (i % 2 ? 4 : 9) * u, an = i * Math.PI / 5 + T * 4; i ? ctx.lineTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r) : ctx.moveTo(s.px + Math.cos(an) * r, s.py + Math.sin(an) * r); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+function evTick(dt) {
+  if (S.evDue && mode === 'play' && (S.evDue.t -= dt) <= 0) { const k = S.evDue.k; S.evDue = null; startEvent(k); return; }
+  const v = S.ev; if (!v) return;
+  if (v.k === 'mercante' || v.k === 'flota') v.t += dt;
+  if (v.k === 'mercante') evMerchant(v, dt);
+  else if (v.k === 'flota') evFleet(v, dt);
+  else if (v.k === 'ballena') evWhale(v, dt);
+  else if (v.k === 'estrellas') evStars(v, dt);
+}
+// the fleet's fog and what sails far from the moon fades, as in the weather's fog
+const evFog = () => S && S.ev && S.ev.k === 'flota';
+
+// ---- drawing
+function evUnder() {
+  const v = S.ev; if (!v || v.k !== 'ballena') return;
+  const up = v.ph === 'stay' ? 1 : v.ph === 'in' ? clamp(1 - Math.abs(v.x - (W / 2 + v.side * 120 * u)) / (140 * u), 0, 1) : Math.max(0, 1 - v.phT / 1.4);
+  ctx.save(); ctx.globalAlpha = 0.95;
+  softGlow(v.x, waveY(v.x) + 30 * u, 120 * u, '#9fe3ff', 0.18 * up);
+  drawWhale(v.x, Math.min(waveY(v.x) + (52 - 34 * up) * u, floorY() - 14 * u), 1.05 * u, -v.side * (v.ph === 'out' ? -1 : 1), T);
+  ctx.restore();
+}
+function evDraw() {
+  const v = S.ev;
+  if (evFog() && S.wx !== 'niebla') {
+    const m = moonPos(), g = ctx.createRadialGradient(m.x, levelY(0.5), W * 0.2, m.x, levelY(0.5), W * 0.75);
+    g.addColorStop(0, 'rgba(200,205,235,0)'); g.addColorStop(1, 'rgba(200,205,235,0.34)');
+    ctx.fillStyle = g; ctx.fillRect(0, H * 0.25, W, H * 0.75);
+  }
+  if (!v) return;
+  if (v.k === 'mercante' && v.ph !== 'sunk') {
+    const s = 0.62 * u, y = waveY(v.x), fr = Math.floor(T * 3) % 2;
+    softGlow(v.x, y - 16 * u, 44 * u, '#9be15d', 0.22);
+    spr(`merchant${fr}`, v.x, y + 3 * s, s, v.dir < 0, Math.sin(T * 2) * 0.05);
+    if (v.ph === 'sail') {
+      const w = 40 * u, bx = v.x - w / 2, by = y - 52 * u;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; rr(bx - 1, by - 1, w + 2, 6, 3); ctx.fill();
+      ctx.fillStyle = v.hp > 0.35 ? '#9be15d' : '#ffb347'; rr(bx, by, w * clamp(v.hp, 0, 1), 4, 2); ctx.fill();
+    }
+  }
+  if (v.k === 'estrellas') {
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (const s of v.mets) {
+      const k = Math.min(1, s.t / s.T), dx = s.tx - s.x0, dy = s.ty - s.y0, l = Math.hypot(dx, dy) || 1, tl = (24 + 40 * k) * u;
+      const g = ctx.createLinearGradient(s.x, s.y, s.x - dx / l * tl, s.y - dy / l * tl);
+      g.addColorStop(0, 'rgba(255,245,200,0.9)'); g.addColorStop(1, 'rgba(255,240,200,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = 4 * u; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - dx / l * tl, s.y - dy / l * tl); ctx.stroke();
+      softGlow(s.x, s.y, 14 * u, '#fff3c4', 0.8);
+    }
+    ctx.restore();
+    drawStarMarks(v.marks);
+  }
+}
+
+// ---- the route forks in an Expedition, at waves 6 and 16, once the merchant has gone
+function routeWave() {
+  if (S.route && S.wave >= S.route.until) routeEnd();
+  if (S.mode === 'island' && !S.mis && (S.wave === 6 || S.wave === 16)) S.routeDue = 3.2;
+}
+function routeTick(dt) {
+  if (S.routeDue === undefined || mode !== 'play' || S.merchantDue !== undefined) return false;
+  if ((S.routeDue -= dt) > 0) return false;
+  delete S.routeDue; openRoute(); return true;
+}
+function openRoute() {
+  const until = S.wave + 4, bt = S.wave === 6 ? S.isl.mini : S.isl.boss, boss = bt && BOSS[bt] ? (S.wave === 16 && S.isl.bossName) || BOSS[bt].name : null;
+  openChoice(`Oleadas ${S.wave} a ${until - 1}`, 'Dos rutas', boss ? `Las dos llevan hasta ${lowArt(boss)}. Elige cómo llegar.` : 'Elige cómo cruzar las próximas oleadas.', [
+    { name: 'Aguas tranquilas', ico: 'i_marea', good: 'Un 15% menos de enemigos, sin anomalías ni oleadas temáticas', bad: 'Sin recompensa extra', cls: 'safe', pick: () => routeStart('safe', until) },
+    { name: 'Paso del Remolino', ico: 'i_peligro', good: '+50% de perlas y monedas, y un cofre al cruzarlo', bad: 'Un 25% más de enemigos, más élites y una oleada temática segura', pick: () => routeStart('risk', until) },
+  ], '', null);
+}
+function routeStart(id, until) {
+  S.route = { id, until };
+  if (id === 'safe') { S.mods.spawn = (S.mods.spawn || 1) * 0.85; S.anomNext = null; banner('Aguas tranquilas', 'Un mar más calmado hasta el jefe', 1.6); }
+  else { S.mods.spawn = (S.mods.spawn || 1) * 1.25; S.coinMul *= 1.5; S.forceTheme = true; banner('¡Paso del Remolino!', 'Más enemigos, más botín', 1.6, true); sfx('warn'); }
+}
+function routeEnd() {
+  const r = S.route; S.route = null;
+  if (r.id === 'safe') S.mods.spawn /= 0.85;
+  else {
+    S.mods.spawn /= 1.25; S.coinMul /= 1.5; S.forceTheme = false;
+    dropChest(W / 2, levelY(0.6)); xRow('Paso del Remolino', 60 * S.isl.coin);
+    setTimeout(() => { if (S && !S.ended) banner('Has cruzado el Paso del Remolino', 'Un cofre te espera', 1.8); }, 2600);
+  }
+}
+const routeIs = id => S && S.route && S.route.id === id;
+// =====================================================================
+// THE RIVAL: the first legendary captain who escapes you swears revenge. It comes back in later
+// Expeditions, endless seas and challenges, a little stronger every time it gets away (a mended and
+// plated hull, a second escort, a trick stolen from another captain, then it mends itself under fire).
+// Sink it for a trophy and its reward. The Archive keeps its story.
+// =====================================================================
+const RIVAL_UP = ['', 'Casco reparado y blindado', 'Una segunda escolta', 'Un truco robado a otro capitán', 'Se repara bajo el fuego', 'Todo lo anterior: es tu némesis'];
+const rivalOn = () => evOn() && S.mode !== 'lab';
+// the captain who just escaped (from capTick): a new rival, or the rival getting away again
+function rivalFled(e) {
+  if (!rivalOn() || e.decoy) return false;
+  const C = CAPTAINS[e.cap], r = save.rival;
+  if (e.rival && r) {
+    r.lv = Math.min(5, r.lv + 1); r.esc++; persist();
+    banner(`${C.name} escapa otra vez`, `Volverá: ${RIVAL_UP[r.lv].toLowerCase()}`, 2.6, true); sfx('roar');
+    return true;
+  }
+  if (r) return false;
+  const beaten = (save.rivals || []).map(x => x.id);
+  if (beaten.includes(e.cap) && beaten.length < CAP_IDS.length) return false;
+  save.rival = { id: e.cap, lv: 1, met: 1, esc: 1, since: today() }; persist();
+  banner(`${C.name} jura venganza`, 'Ahora es tu rival: volverá más fuerte', 2.8, true); sfx('roar'); vib('heavy');
+  return true;
+}
+// a chance each wave that the rival shows up (once per run)
+function rivalWave() {
+  const r = save.rival;
+  if (!r || S.rivalMet || S.cap || S.capDue != null || isBossWave(S.wave)) return;
+  if (S.wave < (S.mode === 'island' ? 7 : 12) || (waveMax() && S.wave >= waveMax() - 1)) return;
+  if (Math.random() < 0.2) { S.capDue = rand(5, 9); S.rivalDue = true; }
+}
+// from capDueTick: the rival takes the place of the captain who was coming, when it is the same one
+function rivalCap(id) { return rivalOn() && save.rival && (S.rivalDue || save.rival.id === id) && !S.rivalMet; }
+function rivalSpawn() {
+  const r = save.rival, C = CAPTAINS[r.id], lv = r.lv;
+  S.rivalDue = false; S.rivalMet = true;
+  const e = spawnCaptain(r.id, { hpK: 5 * (1 + 0.22 * lv), life: 45 + 6 * lv });
+  if (!e || e.cap !== r.id || e.rival) return;
+  r.met++; persist();
+  e.rival = lv; e.name = `${C.name} · Rival nv ${lv}`;
+  e.armor = e.maxHp * 0.2;
+  if (lv >= 2) { const k = e.escTxt && e.escTxt.startsWith('Gaviotas') ? 'brulote' : 'gull', sd = e.dir > 0 ? -1 : 1; for (let i = 0; i < (k === 'gull' ? 3 : 2); i++) spawnEnemy(k, sd, i + 6); }
+  if (lv >= 3) e.capAlt = CAP_IDS[(CAP_IDS.indexOf(r.id) + 1 + r.met % 3) % CAP_IDS.length];
+  if (lv >= 4) e.mend = true;
+  banner(`¡${C.name} ha vuelto!`, `Rival nivel ${lv} · ${RIVAL_UP[lv]}`, 2.8, true); holdBanner(2.8);
+}
+function rivalTick(dt) {
+  const e = S.cap;
+  if (!e || e.dead || !e.mend || !e.atIsland || e.frozen > 0) return;
+  e.hp = Math.min(e.maxHp, e.hp + e.maxHp * 0.012 * dt);
+  if (Math.random() < dt * 8) S.parts.push({ x: e.x + rand(-20, 20) * u, y: e.y - rand(10, 40) * u, vx: 0, vy: -rand(30, 60), t: 0, life: 0.7, c: '#9be15d', s: rand(1.6, 2.6), g: -20 });
+}
+// sunk at last: a trophy, a reward that grows with its level, and the way open for a new rival
+function rivalDown(e) {
+  const r = save.rival; if (!r || r.id !== e.cap) return;
+  const C = CAPTAINS[r.id], pay = 150 + 100 * r.lv;
+  xRow(`Rival vencido: ${C.name}`, pay);
+  dropChest(e.x, e.y - 40 * u); dropCoins(e.x, e.y - 20 * u, 10, true);
+  (save.rivals = save.rivals || []).push({ id: r.id, lv: r.lv, met: r.met, esc: r.esc, won: today() });
+  save.rival = null; persist();
+  setTimeout(() => { if (S && !S.ended) banner(`¡Has vencido a ${C.name}!`, `Tu rival se hunde para siempre · +${pay} monedas y un trofeo en el Archivo`, 2.8, true); }, 1500);
+  sfx('heroic'); vib('win');
+}
+// its pennant over the ship: the level it has reached
+function rivalDraw() {
+  const e = S.cap; if (!e || e.dead || !e.rival) return;
+  const y = e.y - 66 * u, txt = `RIVAL · ${e.rival}`;
+  ctx.font = `800 ${Math.round(10 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`;
+  const w = ctx.measureText(txt).width + 14 * u, h = 16 * u;
+  ctx.globalAlpha = e.phased ? 0.4 : 1;
+  ctx.fillStyle = e.rival >= 5 ? '#ffd36b' : '#ff6b5a'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.6 * u;
+  rr(e.x - w / 2, y - h / 2, w, h, 5 * u); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#1c1030'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, e.x, y + 0.5 * u);
+  ctx.globalAlpha = 1;
+}
+// the Archive: the rival you have now and the trophies of the ones you sank
+function rivalRows() {
+  const r = save.rival, out = [], done = save.rivals || [];
+  if (r) {
+    const C = CAPTAINS[r.id];
+    out.push(`<div class="lc rivalc" style="--cc:${C.col}"><span class="ico" aria-hidden="true">${ico('i_calavera', 34)}</span><span><span class="eyebrow">Tu rival · nivel ${r.lv} de 5</span><b>${C.name}</b><span class="d">${C.tip}. Te has cruzado con él ${r.met} ${r.met === 1 ? 'vez' : 'veces'} y se ha escapado ${r.esc}. ${r.lv < 5 ? `Si vuelve a escapar: ${RIVAL_UP[r.lv + 1].toLowerCase()}.` : 'Ya no puede hacerse más fuerte.'} Hundirlo ahora paga ${150 + 100 * r.lv} monedas.</span></span></div>`);
+  } else out.push(`<div class="lc rivalc locked"><span class="ico" aria-hidden="true">${ico('i_calavera', 34)}</span><span><span class="eyebrow">Tu rival</span><b>${done.length ? 'Nadie, por ahora' : 'Ninguno todavía'}</b><span class="d">Si un capitán legendario se te escapa, jurará venganza y volverá más fuerte en otras partidas.</span></span></div>`);
+  for (const t of done) { const C = CAPTAINS[t.id]; out.push(`<div class="lc rivalc won" style="--cc:${C.col}"><span class="ico" aria-hidden="true">${ico('i_trofeo', 34)}</span><span><span class="eyebrow">Trofeo · ${t.won.split('-').reverse().join('/')}</span><b>${C.name}</b><span class="d">Hundido en el nivel ${t.lv}, tras ${t.met} encuentros y ${t.esc} huidas.</span></span></div>`); }
+  return out.join('');
+}
+// =====================================================================
+// SECRETS BETWEEN ISLANDS: in each island's Expedition an old stone tablet can show in the sand at very
+// low tide. Its inscription tells how to open a hidden chamber on the next island; each chamber holds a
+// page of the guardian's diary, and the four together complete the guardian's map.
+// =====================================================================
+const TABLETS = [
+  { to: 1, txt: '«Cuando el mar de Escarcha se congele, mira bajo el hielo, al oeste: allí duerme la puerta.»' },
+  { to: 2, txt: '«En Brasa, después del guardián de la oleada 10, la puerta arde al este cuando baja la marea.»' },
+  { to: 3, txt: '«En el Abismo solo la Luna llena alumbra la puerta. Espera a la oleada 15, entre la isla y el arrecife del este, con la bajamar.»' },
+  { to: 0, txt: '«En Isla Coral, cuando llueva y baje la marea, la puerta asoma entre el arrecife del oeste y la isla.»' },
+];
+const CHAMBERS = [
+  { name: 'La cámara de coral', x: () => W * 0.32, ok: () => S.wx === 'lluvia', low: true,
+    page: 'Me eligió la Luna para guardar estas islas. Escondí cuatro cámaras, una en cada mar, por si un día la luz se apagaba y alguien tenía que encontrar el camino.' },
+  { name: 'La cámara de hielo', x: () => W * 0.08, ok: () => S.frozenSea > 0, low: false,
+    page: 'El invierno sin luna duró un año entero. Aquí guardé el primer farol, para que nadie olvide que la luz también se enciende a mano.' },
+  { name: 'La cámara de lava', x: () => W * 0.92, ok: () => S.wave > 10, low: true,
+    page: 'El volcán forjó el ancla que sujeta las mareas. La escondí entre la lava: solo quien no teme quemarse llegará hasta ella.' },
+  { name: 'La cámara de luz', x: () => W * 0.68, ok: () => S.moon.id === 'llena' && S.wave >= 15, low: true,
+    page: 'Me voy al Abismo a esperar al eclipse. Si lees esto, la Luna ya no está sola. Gracias a quien venga después.' },
+];
+const MAP_PAGE = 'Unidas, las cuatro cámaras dibujan una luna llena sobre el mapa del archipiélago. El guardián nunca se fue: navega todavía, esperando que alguien termine su guardia.';
+const secRec = () => save.secret || (save.secret = { tab: {}, ch: {} });
+const secOn = () => evOn() && S.mode === 'island';
+// the next treasure on this island can be its tablet, from wave 5, until it is found
+const tabletDue = () => secOn() && S.wave >= 5 && !secRec().tab[S.islIdx] && !S.tabGot;
+function tabletFound() {
+  const i = S.islIdx, to = ISLANDS[TABLETS[i].to];
+  secRec().tab[i] = today(); S.tabGot = true; persist();
+  banner('¡Una inscripción antigua!', `Habla de ${to.name}: léela en el Archivo, en Secretos`, 2.8); holdBanner(2.8);
+  sfx('evo'); vib([30, 40, 30, 40, 90]); S.flash = Math.max(S.flash, 0.12);
+  for (let i2 = 0; i2 < 20; i2++) S.parts.push({ x: S.treasure.x, y: floorY() - 14 * u, vx: rand(-90, 90), vy: -rand(80, 220), t: 0, life: rand(0.8, 1.3), c: i2 % 2 ? '#9fe3ff' : '#e6f6ff', s: rand(1.6, 3), g: 120 });
+}
+// the hidden door: it only shows when the inscription's conditions are met, then the moon opens it
+function doorTick(dt) {
+  if (!secOn()) return;
+  const i = S.islIdx, from = TABLETS.findIndex(t => t.to === i), C = CHAMBERS[i], rec = secRec();
+  if (from < 0 || !rec.tab[from] || rec.ch[i] || S.doorGot) return;
+  const d = S.door || (S.door = { x: C.x(), show: 0, hold: 0, got: 0, ph: rand(0, TAU) });
+  if (d.got) { d.got += dt; if (d.got > 1.6) { S.door = null; S.doorGot = true; } return; }
+  const vis = C.ok() && (!C.low || seaLevel() < TREASURE_LO);
+  d.show = clamp(d.show + (vis ? dt : -dt) / 0.8, 0, 1);
+  if (d.show >= 1 && !S.doorTold) { S.doorTold = true; banner('¡Una puerta en el fondo del mar!', 'Deja la luna encima para abrirla', 2.2); sfx('card'); }
+  const over = Math.abs(S.mx - d.x) < 30 * u;
+  d.hold = d.show > 0.5 && over ? d.hold + dt / 1.4 : Math.max(0, d.hold - dt * 1.5);
+  if (d.hold >= 1) chamberOpen(i);
+}
+function chamberOpen(i) {
+  const C = CHAMBERS[i], rec = secRec(), d = S.door;
+  d.got = 0.01; rec.ch[i] = today(); persist();
+  xRow(C.name, 400);
+  banner('¡Has abierto una cámara oculta!', `${C.name}: una página del diario del guardián`, 2.8); holdBanner(2.8);
+  sfx('heroic'); vib('win'); S.flash = Math.max(S.flash, 0.15); S.shake = Math.max(S.shake, 0.3);
+  bubbles(d.x, floorY() - 14 * u, 24); burst(d.x, floorY() - 20 * u, 26, '#9fe3ff', 220);
+  dropCoins(d.x, floorY() - 20 * u, 14, true);
+  if (CHAMBERS.every((_, k) => rec.ch[k])) {
+    xRow('El mapa del guardián', 1000);
+    setTimeout(() => { if (S && !S.ended) { banner('¡Las cuatro cámaras!', 'El mapa del guardián está completo · +1.000 monedas', 3, true); sfx('evo'); } }, 3000);
+  }
+}
+// a stone slab with glowing runes, and the door: an arch of carved stone with a moon on its keystone
+function drawTablet(x, y, s, rot) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+  softGlowAt(0, -14, 34, '#9fe3ff', 0.3 + 0.15 * Math.sin(T * 3));
+  ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = OUTLINE; ctx.fillStyle = '#8c8aa0';
+  ctx.beginPath(); ctx.moveTo(-18, 4); ctx.lineTo(-20, -24); ctx.quadraticCurveTo(0, -38, 20, -24); ctx.lineTo(18, 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.beginPath(); ctx.moveTo(-14, -22); ctx.quadraticCurveTo(0, -32, 12, -24); ctx.lineTo(10, -20); ctx.quadraticCurveTo(0, -27, -12, -18); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = `rgba(159,227,255,${0.7 + 0.3 * Math.sin(T * 4)})`; ctx.lineWidth = 2; ctx.lineCap = 'round';
+  ctx.beginPath();
+  for (let r = 0; r < 3; r++) { const yy = -18 + r * 8; ctx.moveTo(-11, yy); ctx.lineTo(-6, yy - 3); ctx.lineTo(-2, yy); ctx.moveTo(2, yy - 2); ctx.lineTo(2, yy + 2); ctx.moveTo(6, yy); ctx.arc(8, yy, 2, Math.PI, TAU); }
+  ctx.stroke();
+  ctx.restore();
+}
+function drawDoorArt(x, y, s, open) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  softGlowAt(0, -24, 52, '#9fe3ff', 0.32 + 0.14 * Math.sin(T * 2.5) + open * 0.4);
+  ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = OUTLINE;
+  ctx.fillStyle = '#5d5a74';
+  ctx.beginPath(); ctx.moveTo(-26, 4); ctx.lineTo(-26, -28); ctx.arc(0, -28, 26, Math.PI, TAU); ctx.lineTo(26, 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // the doorway: dark, or full of light once open
+  ctx.fillStyle = open ? `rgba(220,248,255,${0.6 + 0.4 * open})` : '#141026';
+  ctx.beginPath(); ctx.moveTo(-15, 4); ctx.lineTo(-15, -26); ctx.arc(0, -26, 15, Math.PI, TAU); ctx.lineTo(15, 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // the moon on the keystone
+  ctx.fillStyle = '#f4ecd0'; ctx.beginPath(); ctx.arc(0, -46, 5.5, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = 'rgba(159,227,255,0.8)'; ctx.lineWidth = 1.6;
+  for (const sx of [-21, 21]) { ctx.beginPath(); ctx.moveTo(sx, -2); ctx.lineTo(sx, -24); ctx.stroke(); }
+  ctx.restore();
+}
+function doorDraw() {
+  const d = S.door; if (!d) return;
+  const k = d.got ? 1 : d.show; if (k <= 0) return;
+  const fy = floorY(), open = d.got ? Math.min(1, d.got / 0.6) : 0;
+  ctx.save(); ctx.globalAlpha = d.got ? Math.max(0, 1 - (d.got - 0.9) / 0.7) : 1;
+  ctx.beginPath(); ctx.rect(0, 0, W, fy + 2 * u); ctx.clip();
+  drawDoorArt(d.x, fy + (1 - k) * 40 * u, 0.8 * u, open);
+  ctx.restore();
+  if (!d.got && d.show > 0.5 && d.hold > 0) {
+    const m = moonPos(), r = MOON_R() + 8 * u;
+    ctx.strokeStyle = 'rgba(159,227,255,0.95)'; ctx.lineWidth = 4 * u; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(m.x, m.y, r, -Math.PI / 2, -Math.PI / 2 + TAU * Math.min(1, d.hold)); ctx.stroke();
+    ctx.strokeStyle = 'rgba(159,227,255,0.35)'; ctx.lineWidth = 2 * u; ctx.setLineDash([4 * u, 6 * u]);
+    ctx.beginPath(); ctx.moveTo(m.x, m.y + MOON_R()); ctx.lineTo(d.x, fy - 30 * u); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+// the Archive: each island's tablet and the chamber it points to
+function secretRows() {
+  const rec = secRec(), out = [`<h3 class="sec">Inscripciones y cámaras</h3>`];
+  ISLANDS.forEach((isl, i) => {
+    const got = rec.tab[i], to = ISLANDS[TABLETS[i].to];
+    out.push(`<div class="lc echo${got ? '' : ' locked'}"><span class="ico" aria-hidden="true">${ico(got ? 'i_libro' : 'i_candado', 32)}</span><span><span class="eyebrow">Inscripción · ${isl.name}</span><b>${got ? `Habla de ${to.name}` : 'Inscripción perdida'}</b><span class="d">${got ? TABLETS[i].txt : `Dicen que asoma en la arena, con la marea muy baja, en una expedición por ${isl.name}.`}</span></span></div>`);
+  });
+  ISLANDS.forEach((isl, i) => {
+    const C = CHAMBERS[i], open = rec.ch[i], from = TABLETS.findIndex(t => t.to === i), clue = rec.tab[from];
+    out.push(`<div class="lc relic${open ? '' : ' locked'}"><span class="ico" aria-hidden="true">${ico(open ? 'i_tesoro' : 'i_candado', 30)}</span><span><span class="eyebrow">Cámara oculta · ${isl.name}</span><b>${open ? C.name : clue ? 'Cámara sellada' : '???'}</b><span class="d">${open ? `Diario del guardián: «${C.page}»` : clue ? `La inscripción de ${ISLANDS[from].name} dice cómo abrirla.` : 'Aún no sabes dónde está.'}</span></span></div>`);
+  });
+  if (CHAMBERS.every((_, k) => rec.ch[k])) out.push(`<div class="lc relic"><span class="ico" aria-hidden="true">${ico('i_estrella', 30)}</span><span><span class="eyebrow">Completo</span><b>El mapa del guardián</b><span class="d">«${MAP_PAGE}»</span></span></div>`);
+  return out.join('');
+}
+// =====================================================================
+// SPECIAL RULES AND THE WEEKLY CHALLENGE: four more rules for the challenges (endless fog, a smaller
+// arsenal, a pitch-black night, no tide button). The weekly challenge is the same run for everyone that
+// week (moon, sea, second weapon and three rules come from a seed, no servers needed), and your best try
+// that week sails with you as an echo: a ghost moon that repeats its path.
+// =====================================================================
+DAILY_MODS.push(
+  { id: 'niebla', name: 'Niebla perpetua', desc: 'La niebla no se levanta: solo ves bien cerca de la luna.', apply: m => { m.fog = true; } },
+  { id: 'arsenal', name: 'Arsenal limitado', desc: 'Solo caben 3 armas, pero ganas un 25% más de experiencia.', apply: m => { m.slots = 3; m.xp = (m.xp || 1) * 1.25; } },
+  { id: 'noche', name: 'Noche cerrada', desc: 'Solo alumbra la luna, pero las perlas valen un 50% más.', apply: m => { m.dark = true; m.coins = (m.coins || 1) * 1.5; } },
+  { id: 'sinboton', name: 'Sin botón de marea', desc: 'No hay botón de marea; la habilidad se carga un 30% más rápido.', apply: m => { m.noTide = true; m.charge = 1.3; } },
+);
+const weekSeed = () => Number(weekKey().replace(/-/g, '')) * 104729;
+// the same for everyone this week: three rules, a moon (lent if it isn't yours), a sea and a second weapon
+function weeklyCfg() {
+  const r = seeded(weekSeed()), pool = DAILY_MODS.slice(), mods = [];
+  while (mods.length < 3) {
+    const m = pool.splice(Math.floor(r() * pool.length), 1)[0];
+    // two rules that cancel each other out never come together
+    if ((m.id === 'loca' && mods.some(x => x.id === 'temporal')) || (m.id === 'temporal' && mods.some(x => x.id === 'loca')) || (m.id === 'sinboton' && mods.some(x => x.id === 'dormida')) || (m.id === 'dormida' && mods.some(x => x.id === 'sinboton'))) continue;
+    mods.push(m);
+  }
+  const moons = MOONS.filter(m => m.id !== 'dorada'), moon = moons[Math.floor(r() * moons.length)];
+  const sea = Math.floor(r() * 4), wp = Object.keys(WEAPONS).filter(id => id !== moon.weapon), weapon = wp[Math.floor(r() * wp.length)];
+  return { mods, moon, sea, weapon };
+}
+const WEEK_GOALS = [[10, 150], [20, 300], [30, 500]];
+const weekRec = () => save.weekRun && save.weekRun.week === weekKey() ? save.weekRun : null;
+// what the rules do at the start of any run that has them (the daily challenge too)
+function rulesStart() {
+  const m = S.mods;
+  if (m.fog) { S.wx = 'niebla'; S.wxSide = 1; S.wxFrom = 1; }
+  if (m.slots) S.slots = Math.min(S.slots, m.slots);
+  if (m.charge) S.chargeMul *= m.charge;
+  if (S.mode === 'weekly') {
+    const c = weeklyCfg(); S.palBase = c.sea; S.palIdx = c.sea; S.isl = ISLANDS[0];
+    const g = weekRec() && weekRec().ghost;
+    S.ghost = g && g.p && g.p.length > 8 ? { ...g, beat: false, endT: g.p.length / 2 * 0.25, told: false } : null;
+    S.gRec = []; S.gMarks = []; S.gT = 0; S.gBK = 0;
+  }
+}
+// ---- the echo: the moon's path sampled every quarter of a second, with the moments that mattered
+function ghostTick(dt) {
+  if (S.mode !== 'weekly') return;
+  if ((S.gT += dt) >= 0.25 && S.gRec.length < 14400) { S.gT -= 0.25; S.gRec.push(Math.round(S.mx / W * 1000), Math.round(S.my / H * 1000)); }
+  if (S.bossKills > S.gBK) { S.gBK = S.bossKills; ghostMark(2); }
+  const g = S.ghost; if (!g) return;
+  if (!g.beat && S.wave > g.best) { g.beat = true; banner('¡Has superado a tu eco!', `Tu mejor intento llegó a la oleada ${g.best}`, 2.4, true); sfx('evo'); vib('win'); }
+  if (!g.told && S.t >= g.endT && !g.beat) { g.told = true; const at = ghostAt(g, g.endT - 0.01); if (at) S.nums.push({ x: at.x, y: at.y - 30 * u, v: `Tu eco cayó aquí · oleada ${g.best}`, txt: true, col: '#9fe3ff', t: 0 }); }
+}
+function ghostMark(k) { if (S && S.mode === 'weekly' && S.gMarks) S.gMarks.push([Math.round(S.t * 10) / 10, k]); }
+const ghostPack = () => ({ p: S.gRec, m: S.gMarks, best: S.wave, moon: S.moon.id });
+function ghostAt(g, t) {
+  const n = g.p.length / 2, f = t / 0.25, i = Math.floor(f);
+  if (i < 0 || i >= n - 1) return null;
+  const k = f - i, x0 = g.p[i * 2], y0 = g.p[i * 2 + 1], x1 = g.p[i * 2 + 2], y1 = g.p[i * 2 + 3];
+  return { x: (x0 + (x1 - x0) * k) / 1000 * W, y: (y0 + (y1 - y0) * k) / 1000 * H };
+}
+function ghostDraw() {
+  const g = S && S.ghost; if (!g || mode === 'result') return;
+  const at = ghostAt(g, S.t); if (!at) return;
+  const fade = Math.min(1, S.t / 1.5, (g.endT - S.t) / 1.2), r = MOON_R(), s = r / 31;
+  if (fade <= 0) return;
+  ctx.save(); ctx.globalAlpha = 0.3 * fade;
+  softGlow(at.x, at.y, r * 2.2, '#9fe3ff', 0.5);
+  if (!spr(`moon_${g.moon}`, at.x, at.y, s)) { ctx.fillStyle = '#cfe9ff'; ctx.beginPath(); ctx.arc(at.x, at.y, r, 0, TAU); ctx.fill(); }
+  ctx.globalAlpha = 0.65 * fade; ctx.strokeStyle = '#9fe3ff'; ctx.lineWidth = 2 * u; ctx.setLineDash([5 * u, 5 * u]);
+  ctx.beginPath(); ctx.arc(at.x, at.y, r + 5 * u, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  // the moments that mattered: its ability and the bosses it sank, as rings
+  for (const [t, k] of g.m || []) { const d = S.t - t; if (d < 0 || d > 0.9) continue; const a = 1 - d / 0.9; ctx.globalAlpha = 0.7 * a * fade; ctx.strokeStyle = k === 2 ? '#ffd36b' : '#9fe3ff'; ctx.lineWidth = 3 * u; ctx.beginPath(); ctx.arc(at.x, at.y, r + d * 90 * u, 0, TAU); ctx.stroke(); }
+  ctx.globalAlpha = 0.8 * fade; ctx.font = `700 ${Math.round(10 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#cfefff'; ctx.fillText('Tu eco', at.x, at.y - r - 12 * u);
+  ctx.restore();
+}
+// the end of a weekly run: the first try of the week, the wave goals and the record that becomes the echo
+function weeklyEnd(unlocks) {
+  const wk = weekKey(), rec = weekRec() || (save.weekRun = { week: wk, best: 0, plays: 0, paid: [] });
+  let bonus = 0;
+  if (!rec.plays) { bonus += 150; unlocks.push('Primera partida del reto semanal: +150 monedas'); }
+  rec.plays++;
+  for (const [w, c] of WEEK_GOALS) if (S.wave >= w && !rec.paid.includes(w)) { rec.paid.push(w); bonus += c; unlocks.push(`Reto semanal: oleada ${w} alcanzada (+${c})`); }
+  if (S.wave > rec.best) { if (rec.best) unlocks.push(`Nuevo récord semanal: oleada ${S.wave}. Tu eco se actualiza`); rec.best = S.wave; rec.ghost = ghostPack(); }
+  return bonus;
+}
+// ---- the challenges screen: the daily one and the weekly one
+function weeklyInto() {
+  const c = weeklyCfg(), rec = weekRec(), owned = save.moons.includes(c.moon.id), W0 = WEAPONS[c.weapon];
+  const d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7); const end = new Date(d); end.setDate(d.getDate() + 6);
+  const fmt = x => x.toLocaleDateString('es', { day: 'numeric', month: 'long' });
+  $('weekDate').textContent = `Del ${fmt(d)} al ${fmt(end)}`;
+  $('weekCfg').innerHTML = `<div class="wk-row">${ico(c.moon.ico, 30)}<span><b>${c.moon.name}</b><small>${owned ? 'Tu luna de esta semana' : 'Te la prestan para el reto'}</small></span></div>`
+    + `<div class="wk-row">${ico('i_isla' + c.sea, 30)}<span><b>${ISLANDS[c.sea].sub}</b><small>El mar donde empieza</small></span></div>`
+    + `<div class="wk-row">${ico(W0.ico, 30)}<span><b>${W0.name}</b><small>Segunda arma desde el principio</small></span></div>`;
+  $('weekMods').innerHTML = c.mods.map(m => `<div class="mod"><b>${m.name}:</b> ${m.desc}</div>`).join('');
+  const goals = WEEK_GOALS.map(([w, v]) => `${rec && rec.paid.includes(w) ? '✓ ' : ''}oleada ${w} (+${v})`).join(' · ');
+  $('weekBest').textContent = rec && rec.best ? `Tu mejor marca de esta semana: oleada ${rec.best}. Tu eco te acompañará. Metas: ${goals}.` : `Aún no lo has jugado esta semana: la primera partida da +150 monedas. Metas: ${goals}.`;
+}
+const weeklyNew = () => !weekRec() || !weekRec().plays;
 // =====================================================================
 // LOOP
 // =====================================================================
