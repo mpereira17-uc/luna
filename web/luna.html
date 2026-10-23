@@ -959,7 +959,7 @@ body.guiding #banner { top: 34%; }
     <h3 class="sec">Reto diario</h3>
     <div class="card">
       <span class="eyebrow" id="dailyDate"></span>
-      <p class="lede">Oleadas sin fin con reglas especiales que cambian cada día. La primera partida del día da perlas extra.</p>
+      <p class="lede">Oleadas sin fin con reglas especiales que cambian cada día. La primera partida del día da monedas extra.</p>
       <div class="mods" id="dailyMods"></div>
       <p class="lede" id="dailyBest"></p>
     </div>
@@ -9600,17 +9600,18 @@ openTitle();
 let last = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; T += dt;
+  let ticked = false;
   if (S && mode === 'play') {
     let g = dt;
     if (S.cine) { cineTick(dt); g = 0; }
     if (S.countT > 0) { countTick(dt); g = 0; }
     if (S.hitstop > 0) { S.hitstop -= dt; g = 0; }
     if (S.slowmo > 0) { S.slowmo -= dt; g *= 0.3; }
-    if (g > 0) update(g);
+    if (g > 0) { update(g); ticked = true; }
     if (S) updateHUD();
   } else if (S && mode === 'result' && S.endT > 0) {
     // the last moments of a run play out in slow motion before the results come up
-    S.endT -= dt; update(dt * 0.25);
+    S.endT -= dt; update(dt * 0.25); ticked = true;
   } else if (!S) {
     // title screen: the big moon floats between the title and the buttons, rising a little over the castle
     const B = moonBounds(), r = MOON_R() * titleMoonK(), I = ISL();
@@ -9629,7 +9630,7 @@ function frame(now) {
   }
   if (S && S.intro > 0) S.intro = Math.max(0, S.intro - dt / 0.9);
   hostTick();
-  if (drawDue(now)) draw();
+  if (drawDue(now)) { const n = S ? S.parts.length : 0; draw(); if (S && !ticked && S.parts.length > n) S.parts.length = n; }
 }
 function loop(now) {
   requestAnimationFrame(loop);
