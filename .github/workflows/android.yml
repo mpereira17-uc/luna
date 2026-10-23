@@ -58,6 +58,23 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug assembleRelease bundleRelease
 
+      - name: Check the bundle
+        continue-on-error: true
+        run: |
+          # what Google Play will read from the bundle: version, SDK levels, permissions, size, signature, native code
+          AAB=app/build/outputs/bundle/release/app-release.aab
+          curl -fsSL -o "$RUNNER_TEMP/bundletool.jar" https://github.com/google/bundletool/releases/download/1.17.2/bundletool-all-1.17.2.jar
+          bt() { java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle "$AAB" --xpath "$1" 2>/dev/null | tr '\n' ' ' | sed 's/ *$//'; }
+          VC=$(bt /manifest/@android:versionCode); VN=$(bt /manifest/@android:versionName)
+          MIN=$(bt /manifest/uses-sdk/@android:minSdkVersion); TGT=$(bt /manifest/uses-sdk/@android:targetSdkVersion)
+          PERMS=$(bt /manifest/uses-permission/@android:name)
+          KB=$(( $(stat -c %s "$AAB") / 1024 ))
+          SIGNER=$(keytool -printcert -jarfile "$AAB" 2>/dev/null | grep -m1 'Owner:' | sed 's/^Owner: //'); SIGNER=${SIGNER:-sin firmar}
+          LIBS=$(unzip -l "$AAB" | grep -c '/lib/.*\.so$' || true)
+          MSG="Version $VN (code $VC), minSdk $MIN, targetSdk $TGT, $KB KB, permissions: ${PERMS:-none}, signed by: $SIGNER, native libraries: $LIBS"
+          echo "::notice title=Bundle for Google Play::$MSG"
+          echo "### Bundle for Google Play" >> "$GITHUB_STEP_SUMMARY"; echo "$MSG" >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         with:
           name: luna-apk-prueba

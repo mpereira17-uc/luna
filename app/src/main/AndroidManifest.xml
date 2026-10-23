@@ -12,6 +12,11 @@
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true">
 
+        <!-- The game is built for a portrait screen: keep it portrait on tablets and foldables with Android 16 too -->
+        <property
+            android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+            android:value="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
