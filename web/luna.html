@@ -693,6 +693,10 @@ body.guiding #banner { top: 34%; }
 .badge { box-shadow: 0 0 0 2px var(--oceano); }
 /* a soft vignette over the sea pulls the eye to the middle (CSS, so it costs the canvas nothing) */
 #vig { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 50% 46%, transparent 58%, rgba(3, 6, 18, 0.34) 100%); }
+
+/* ---------- phase 9: the HUD steps aside while a boss makes its entrance ---------- */
+#hud { transition: opacity 0.3s; }
+#hud.cine { opacity: 0; pointer-events: none; }
 </style>
 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
@@ -1533,7 +1537,8 @@ function pic(n, box) {
 // =====================================================================
 // AUDIO (synthesized, starts after the first tap)
 // =====================================================================
-const AU = { ctx: null, sfx: null, mus: null, noise: null, last: {} };
+const AU = { ctx: null, sfx: null, mus: null, musF: null, padF: null, noise: null, last: {}, lay: {}, lv: {} };
+const LAYERS = ['pad', 'bass', 'drums', 'lead', 'tense'];
 function audioInit() {
   if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume(); return; }
   try {
@@ -1545,7 +1550,16 @@ function audioInit() {
     AU.mus = C.createGain(); AU.mus.gain.value = save.music ? 0.3 : 0; AU.mus.connect(master);
     AU.noise = C.createBuffer(1, C.sampleRate, C.sampleRate);
     const d = AU.noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // the band plays in layers through one filter: it opens with the fight and closes while the game waits
+    AU.musF = C.createBiquadFilter(); AU.musF.type = 'lowpass'; AU.musF.frequency.value = 5000; AU.musF.Q.value = 0.4; AU.musF.connect(AU.mus);
+    for (const k of LAYERS) { const g = C.createGain(); g.gain.value = 0; g.connect(AU.musF); AU.lay[k] = g; AU.lv[k] = 0; }
+    AU.padF = C.createBiquadFilter(); AU.padF.type = 'lowpass'; AU.padF.frequency.value = 1500; AU.padF.connect(AU.lay.pad);
+    // a short echo so the band does not sound dry
+    const dl = C.createDelay(0.6), fb = C.createGain(), wet = C.createGain();
+    dl.delayTime.value = 0.24; fb.gain.value = 0.26; wet.gain.value = 0.2;
+    AU.musF.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(AU.mus);
   } catch (e) { AU.ctx = null; }
+  if (AU.ctx && MUS.want) musicStart(MUS.want);
 }
 function gate(name, gap) { const now = performance.now(); if (now - (AU.last[name] || 0) < gap) return false; AU.last[name] = now; return true; }
 function osc(freq, dur, type, vol, slideTo, dest, when) {
@@ -1555,6 +1569,13 @@ function osc(freq, dur, type, vol, slideTo, dest, when) {
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g); g.connect(dest || AU.sfx); o.start(t); o.stop(t + dur + 0.05);
 }
+// a note with its own attack and a little detune (pads, music box, stingers)
+function tone(freq, t, dur, type, vol, dest, att = 0.01, det = 0) {
+  const C = AU.ctx, o = C.createOscillator(), g = C.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t); if (det) o.detune.setValueAtTime(det, t);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + att); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + 0.05);
+}
 function noise(dur, vol, type, f0, f1, dest, when, q) {
   const C = AU.ctx, t = when || C.currentTime, s = C.createBufferSource(), f = C.createBiquadFilter(), g = C.createGain();
   s.buffer = AU.noise; f.type = type; f.frequency.setValueAtTime(f0, t); if (q) f.Q.value = q;
@@ -1562,58 +1583,161 @@ function noise(dur, vol, type, f0, f1, dest, when, q) {
   g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   s.connect(f); f.connect(g); g.connect(dest || AU.sfx); s.start(t); s.stop(t + dur + 0.05);
 }
-function sfx(name, arg) {
+// sounds sit left or right with what made them
+function sfxOut(x) {
+  if (x == null || !AU.ctx.createStereoPanner || !W) return AU.sfx;
+  const p = AU.ctx.createStereoPanner(); p.pan.value = clamp((x / W) * 2 - 1, -1, 1) * 0.7; p.connect(AU.sfx);
+  setTimeout(() => { try { p.disconnect(); } catch (e) {} }, 2500);
+  return p;
+}
+function sfx(name, arg, x) {
   if (!AU.ctx || !save.sfx) return;
+  const C = AU.ctx, now = C.currentTime, at = dt => now + dt;
+  let D = null;
+  const out = () => D || (D = sfxOut(x));
   switch (name) {
-    case 'zap': if (gate(name, 70)) osc(1200, 0.07, 'square', 0.035, 500); break;
-    case 'pop': if (gate(name, 35)) osc(420 + Math.min(arg || 0, 120) * 7, 0.07, 'triangle', 0.09, 180); break;
-    case 'boom': if (gate(name, 60)) { noise(0.35, 0.5, 'lowpass', 1400, 120); osc(120, 0.3, 'sine', 0.3, 40); } break;
-    case 'bigboom': noise(1.0, 0.9, 'lowpass', 2000, 60); osc(90, 0.9, 'sine', 0.5, 25); break;
-    case 'splash': if (gate(name, 90)) noise(0.3, 0.25, 'bandpass', 1500, 400, null, null, 0.8); break;
-    case 'crash': if (gate(name, 120)) { noise(0.18, 0.25, 'bandpass', 900, 300, null, null, 2); osc(160, 0.12, 'square', 0.04, 70); } break;
-    case 'thunder': if (gate(name, 120)) { noise(0.06, 0.5, 'highpass', 3000); noise(0.7, 0.35, 'lowpass', 600, 80); } break;
-    case 'hurt': if (gate(name, 280)) osc(220, 0.25, 'sawtooth', 0.1, 80); break;
-    case 'level': [523, 659, 784, 1047].forEach((f, i) => osc(f, 0.25, 'triangle', 0.13, null, null, AU.ctx.currentTime + i * 0.06)); break;
+    // weapons
+    case 'zap': if (gate(name, 70)) osc(1200, 0.07, 'square', 0.035, 500, out()); break;
+    case 'ray': if (gate(name, 75)) { osc(1500, 0.09, 'triangle', 0.045, 640, out()); osc(3000, 0.04, 'sine', 0.012, null, out()); } break;
+    case 'star': if (gate(name, 90)) { osc(1760, 0.08, 'triangle', 0.08, null, out()); osc(2637, 0.14, 'sine', 0.06, null, out(), at(0.035)); osc(880, 0.06, 'sine', 0.04, null, out()); } break;
+    case 'cannon': if (gate(name, 80)) { noise(0.24, 0.32, 'lowpass', 1000, 140, out()); osc(110, 0.24, 'sine', 0.32, 42, out()); noise(0.03, 0.14, 'highpass', 3200, null, out()); } break;
+    case 'anchor': if (gate(name, 150)) { osc(330, 0.12, 'square', 0.045, 240, out()); osc(1180, 0.32, 'triangle', 0.035, 1120, out()); noise(0.18, 0.25, 'lowpass', 600, 120, out()); } break;
+    case 'whirl': if (gate(name, 320)) { noise(0.45, 0.5, 'bandpass', 380, 1700, out(), null, 1.1); osc(180, 0.4, 'sine', 0.05, 420, out()); } break;
+    case 'coral': if (gate(name, 120)) { noise(0.08, 0.22, 'bandpass', 2400, 900, out(), null, 4); osc(300, 0.06, 'square', 0.03, 120, out()); } break;
+    case 'pop': if (gate(name, 35)) osc(420 + Math.min(arg || 0, 120) * 7, 0.07, 'triangle', 0.09, 180, out()); break;
+    case 'boom': if (gate(name, 60)) { noise(0.35, 0.5, 'lowpass', 1400, 120, out()); osc(120, 0.3, 'sine', 0.3, 40, out()); } break;
+    case 'bigboom': noise(1.0, 0.9, 'lowpass', 2000, 60, out()); osc(90, 0.9, 'sine', 0.5, 25, out()); noise(0.08, 0.3, 'highpass', 2500, null, out()); break;
+    case 'splash': if (gate(name, 90)) noise(0.3, 0.25, 'bandpass', 1500, 400, out(), null, 0.8); break;
+    case 'crash': if (gate(name, 120)) { noise(0.18, 0.25, 'bandpass', 900, 300, out(), null, 2); osc(160, 0.12, 'square', 0.04, 70, out()); } break;
+    case 'thunder': if (gate(name, 120)) { noise(0.06, 0.5, 'highpass', 3000, null, out()); noise(0.7, 0.35, 'lowpass', 600, 80, out()); } break;
+    case 'bite': if (gate(name, 100)) noise(0.08, 0.3, 'bandpass', 700, 300, out(), null, 3); break;
+    case 'crit': if (gate(name, 70)) { osc(2100, 0.05, 'square', 0.025, null, out()); osc(3150, 0.09, 'sine', 0.025, null, out(), at(0.02)); } break;
+    case 'laser': if (gate(name, 400)) osc(300, 0.35, 'sawtooth', 0.02, 600, out()); break;
+    // what sinks, falls or drowns
+    case 'sink': if (gate(name, 110)) { osc(150, 0.35, 'sawtooth', 0.04, 70, out()); noise(0.5, 0.18, 'lowpass', 800, 180, out()); [0.16, 0.26, 0.38].forEach((d, i) => osc(520 + i * 160, 0.05, 'sine', 0.05, 900 + i * 120, out(), at(d))); } break;
+    case 'squawk': if (gate(name, 160)) { osc(1350, 0.1, 'sawtooth', 0.025, 900, out()); osc(1150, 0.12, 'sawtooth', 0.022, 760, out(), at(0.09)); } break;
+    case 'drown': if (gate(name, 120)) { osc(300, 0.08, 'sine', 0.07, 620, out()); osc(380, 0.08, 'sine', 0.06, 760, out(), at(0.09)); } break;
+    // the island and the moon
+    case 'hurt': if (gate(name, 280)) { noise(0.16, 0.28, 'bandpass', 520, 220, out(), null, 1.4); osc(95, 0.22, 'sine', 0.3, 48, out()); osc(220, 0.2, 'sawtooth', 0.045, 80, out()); } break;
+    case 'heal': if (gate(name, 400)) [784, 988, 1319].forEach((f, i) => osc(f, 0.3, 'sine', 0.05, null, out(), at(i * 0.06))); break;
+    case 'shield': if (gate(name, 200)) { osc(620, 0.6, 'triangle', 0.05, null, out()); osc(1390, 0.5, 'sine', 0.03, null, out()); } break;
+    case 'level': [523, 659, 784, 1047].forEach((f, i) => osc(f, 0.25, 'triangle', 0.13, null, null, at(i * 0.06))); break;
     case 'card': osc(880, 0.08, 'square', 0.05, 1320); break;
-    case 'evo': [784, 988, 1175, 1568, 1976].forEach((f, i) => osc(f, 0.4, 'sine', 0.12, null, null, AU.ctx.currentTime + i * 0.07)); break;
+    case 'evo': [784, 988, 1175, 1568, 1976].forEach((f, i) => osc(f, 0.4, 'sine', 0.12, null, null, at(i * 0.07))); break;
+    case 'union': [523, 659, 784, 988, 1175, 1568].forEach((f, i) => { osc(f, 0.7, 'triangle', 0.08, null, null, at(i * 0.05)); osc(f * 2, 0.5, 'sine', 0.03, null, null, at(0.3 + i * 0.05)); }); noise(0.8, 0.12, 'highpass', 6000, 2000); break;
     case 'tsunami': noise(1.4, 0.8, 'lowpass', 200, 3000); osc(55, 1.2, 'sine', 0.5, 30); break;
+    case 'tide': noise(0.8, 0.32, 'bandpass', 280, 1300, null, null, 0.9); osc(70, 0.6, 'sine', 0.18, 115); break;
     case 'roar': osc(70, 1.4, 'sawtooth', 0.25, 45); noise(1.2, 0.3, 'lowpass', 500, 100); break;
-    case 'warn': if (gate(name, 300)) { osc(740, 0.1, 'square', 0.05, 560); osc(740, 0.12, 'square', 0.05, 560, null, null, AU.ctx.currentTime + 0.15); } break;
+    case 'warn': if (gate(name, 300)) { osc(740, 0.1, 'square', 0.05, 560); osc(740, 0.12, 'square', 0.05, 560, null, at(0.15)); } break;
     case 'freeze': osc(2400, 0.5, 'sine', 0.08, 600); noise(0.5, 0.15, 'highpass', 5000); break;
-    case 'combo': [660, 880, 1320].forEach((f, i) => osc(f, 0.18, 'square', 0.05, null, null, AU.ctx.currentTime + i * 0.05)); break;
-    case 'coin': if (gate(name, 60)) { osc(1568, 0.08, 'square', 0.04); osc(2093, 0.12, 'square', 0.04, null, null, AU.ctx.currentTime + 0.06); } break;
-    case 'laser': if (gate(name, 400)) osc(300, 0.35, 'sawtooth', 0.02, 600); break;
-    case 'bite': if (gate(name, 100)) noise(0.08, 0.3, 'bandpass', 700, 300, null, null, 3); break;
+    case 'combo': [660, 880, 1320].forEach((f, i) => osc(f, 0.18, 'square', 0.05, null, null, at(i * 0.05))); break;
+    case 'coin': if (gate(name, 60)) { osc(1568, 0.08, 'square', 0.04); osc(2093, 0.12, 'square', 0.04, null, null, at(0.06)); } break;
+    // each moon's ability has its own voice
+    case 'act_llena': noise(1.4, 0.8, 'lowpass', 200, 3000); osc(55, 1.2, 'sine', 0.5, 30); [659, 784, 988].forEach((f, i) => osc(f, 0.5, 'triangle', 0.05, null, null, at(0.1 + i * 0.08))); break;
+    case 'act_roja': noise(0.9, 0.55, 'lowpass', 300, 2600); osc(90, 0.7, 'sawtooth', 0.16, 170); for (let i = 0; i < 6; i++) noise(0.04, 0.18, 'highpass', 3000, null, null, at(0.15 + i * 0.09)); break;
+    case 'act_hielo': [2093, 2637, 3136, 4186, 3136, 4186].forEach((f, i) => osc(f, 0.35, 'sine', 0.05, null, null, at(i * 0.05))); noise(0.7, 0.15, 'highpass', 5000); break;
+    case 'act_nueva': osc(58, 1.5, 'sine', 0.42, 40); noise(1.1, 0.3, 'lowpass', 3000, 180); osc(466, 1.2, 'triangle', 0.04, 415); break;
+    case 'act_tormenta': noise(1.6, 0.14, 'highpass', 6000, 3000); noise(0.06, 0.5, 'highpass', 3000); noise(0.8, 0.4, 'lowpass', 600, 70); break;
+    case 'act_dorada': for (let i = 0; i < 9; i++) osc(1568 + i * 110, 0.1, 'square', 0.035, null, null, at(i * 0.05)); osc(2637, 0.4, 'sine', 0.04, null, null, at(0.48)); break;
+    // big moments
+    case 'intro': noise(1.6, 0.5, 'lowpass', 900, 60); [38, 45, 50].forEach(m => { tone(mtof(m), now, 1.5, 'sawtooth', 0.06, AU.sfx, 0.08); tone(mtof(m), now, 1.5, 'sawtooth', 0.04, AU.sfx, 0.08, 9); }); osc(55, 1.3, 'sine', 0.45, 32); break;
+    case 'heroic': [523, 659, 784, 1047, 1319].forEach((f, i) => osc(f, 0.6, 'triangle', 0.07, null, null, at(i * 0.06))); noise(0.7, 0.1, 'highpass', 7000, 3000); break;
   }
 }
-// tiny sequencer: kick, hats, bass and arpeggio over Am-F-C-G; intensity follows the fight
-const MUS = { on: false, step: 0, next: 0, timer: null, intensity: 0, boss: false };
+
+// ---- MUSIC: a small band in layers. Pad and bass always play; the drums come in with the threat, the lead with the
+// fight, a heartbeat of tension when the island is in danger. Bosses bring their own song, the title its own lullaby.
+const MUS = { on: false, step: 0, next: 0, timer: null, intensity: 0, boss: false, song: 'sea', want: null };
 const PROG = [[45, [0, 3, 7]], [41, [0, 4, 7]], [48, [0, 4, 7]], [43, [0, 4, 7]]];
+const SONGS = {
+  title: { bpm: 84, prog: [[48, [0, 4, 7]], [43, [0, 4, 7]], [45, [0, 3, 7]], [41, [0, 4, 7]]], box: [12, 16, 19, 24, 19, 16, 14, 12] },
+  sea: { bpm: 108, prog: PROG },
+  kraken: { bpm: 126, prog: [[50, [0, 3, 7]], [46, [0, 4, 7]], [43, [0, 3, 7]], [45, [0, 4, 7]]], motif: [0, null, 3, 5, 7, null, 5, 3, 1, null, 0, null, -2, null, 0, null] },
+  armada: { bpm: 134, prog: [[52, [0, 3, 7]], [48, [0, 4, 7]], [50, [0, 4, 7]], [47, [0, 4, 7]]], motif: [0, 0, 7, null, 5, 3, 2, null, 0, 0, 7, null, 10, 8, 7, null], march: true },
+  leviatan: { bpm: 116, prog: [[48, [0, 3, 7]], [44, [0, 4, 7]], [41, [0, 3, 7]], [43, [0, 4, 7]]], motif: [0, null, null, 3, 2, null, null, -1, 0, null, null, 3, 7, null, 6, null] },
+  eclipse: { bpm: 122, prog: [[46, [0, 3, 7]], [42, [0, 4, 7]], [49, [0, 4, 7]], [41, [0, 4, 7]]], motif: [12, null, 11, null, 7, null, 6, null, 3, null, 6, 7, null, null, null, null] },
+};
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
-function musicStart() { if (!AU.ctx) return; MUS.on = true; MUS.step = 0; MUS.next = AU.ctx.currentTime + 0.12; if (!MUS.timer) MUS.timer = setInterval(musicTick, 25); }
-function musicStop() { MUS.on = false; }
+function musicStart(song) {
+  MUS.want = song || (S ? 'sea' : 'title');
+  if (!AU.ctx) return;
+  if (!MUS.on || MUS.song !== MUS.want) { MUS.song = MUS.want; MUS.step = 0; MUS.next = AU.ctx.currentTime + 0.12; }
+  MUS.on = true; if (!MUS.timer) MUS.timer = setInterval(musicTick, 25);
+}
+function musicStop() { MUS.on = false; MUS.want = null; if (AU.ctx) for (const k of LAYERS) { AU.lay[k].gain.setTargetAtTime(0, AU.ctx.currentTime, 0.15); AU.lv[k] = 0; } }
+// which song and how much of each layer, from what is happening right now
+function musicMix() {
+  const L = { pad: 0, bass: 0, drums: 0, lead: 0, tense: 0 };
+  let cut = 5200, song = MUS.song;
+  if (!S) { song = 'title'; L.pad = 0.9; L.bass = 0.3; L.lead = 0.8; cut = 3000; }
+  else {
+    const int = MUS.intensity, near = S.enemies.filter(e => !e.dead && Math.abs(e.x - W / 2) < W * 0.32).length, th = clamp(near / 7, 0, 1);
+    if (MUS.boss) { song = SONGS[S.boss && S.boss.type] ? S.boss.type : 'kraken'; L.pad = 0.6; L.bass = 1; L.drums = 1; L.lead = 1; cut = 8000; }
+    else { song = 'sea'; L.pad = 1; L.bass = 0.55 + 0.15 * int; L.drums = int >= 1 ? 0.55 + 0.45 * th : th > 0.4 ? th * 0.8 : 0; L.lead = int >= 2 ? 0.6 + 0.4 * th : th > 0.7 ? 0.5 : 0; cut = 2600 + 5000 * Math.min(1, int / 3 + th * 0.4); }
+    if (S.cine) { L.drums = 0; L.lead = 0; L.bass *= 0.5; }
+    L.tense = S.hp < S.maxHp * 0.3 && !S.ended ? 1 : 0;
+    if (mode !== 'play') cut = 650;
+  }
+  return { L, cut, song };
+}
 function musicTick() {
   if (!MUS.on || !AU.ctx || !save.music) return;
-  const C = AU.ctx, spb = 60 / (112 + MUS.intensity * 8) / 4;
+  const C = AU.ctx, mx = musicMix();
+  for (const k of LAYERS) if (Math.abs(mx.L[k] - AU.lv[k]) > 0.02) { AU.lv[k] = mx.L[k]; AU.lay[k].gain.setTargetAtTime(mx.L[k], C.currentTime, 0.5); }
+  if (Math.abs(AU.musF.frequency.value - mx.cut) > 50) AU.musF.frequency.setTargetAtTime(mx.cut, C.currentTime, 0.3);
+  const Sg = SONGS[MUS.song] || SONGS.sea, spb = 60 / (Sg.bpm + (MUS.song === 'sea' ? MUS.intensity * 4 : 0)) / 4;
   if (MUS.next < C.currentTime - 0.2) MUS.next = C.currentTime + 0.05;
-  while (MUS.next < C.currentTime + 0.12) { playStep(MUS.step, MUS.next, spb); MUS.next += spb; MUS.step = (MUS.step + 1) % 64; }
+  while (MUS.next < C.currentTime + 0.12) {
+    // a new song waits for the start of a bar
+    if (mx.song !== MUS.song && MUS.step % 16 === 0) { MUS.song = mx.song; MUS.step = 0; }
+    playStep(SONGS[MUS.song] || SONGS.sea, MUS.step, MUS.next, spb);
+    MUS.next += spb; MUS.step = (MUS.step + 1) % 64;
+  }
 }
-function playStep(s, t, spb) {
-  const bar = Math.floor(s / 16) % 4, st = s % 16, [root, tri] = PROG[bar], D = AU.mus;
-  if (st % 4 === 0) { osc(150, 0.18, 'sine', 0.7, 40, D, t); }
-  if (MUS.intensity >= 1 && st % 4 === 2) noise(0.04, 0.12, 'highpass', 7000, null, D, t);
-  if (MUS.intensity >= 3 && st % 2 === 1) noise(0.025, 0.06, 'highpass', 9000, null, D, t);
-  if (st % 2 === 0) osc(mtof(root - 12 + (st % 8 === 6 ? 12 : 0)), spb * 1.7, 'sawtooth', 0.11, null, D, t);
-  if (MUS.intensity >= 2) osc(mtof(root + 12 + tri[st % 3] + (st >= 8 ? 12 : 0)), spb * 0.9, 'triangle', 0.05, null, D, t);
-  if (MUS.boss && st % 8 === 0) osc(mtof(root + 24 + tri[(st / 8) % 3]), spb * 3, 'square', 0.035, null, D, t);
+function playStep(Sg, s, t, spb) {
+  const bar = Math.floor(s / 16) % 4, st = s % 16, [root, tri] = Sg.prog[bar], on = k => AU.lv[k] > 0.02, Y = AU.lay;
+  if (on('pad') && st === 0) for (const n of tri) { const f = mtof(root + 12 + n); tone(f, t, spb * 16, 'sawtooth', 0.022, AU.padF, 0.35, -8); tone(f, t, spb * 16, 'sawtooth', 0.022, AU.padF, 0.35, 8); }
+  if (on('bass')) {
+    if (Sg.box) { if (st % 8 === 0) tone(mtof(root - 12), t, spb * 7, 'sine', 0.16, Y.bass, 0.02); }
+    else if (st % 2 === 0) osc(mtof(root - 12 + (st % 8 === 6 ? 12 : 0)), spb * 1.7, 'sawtooth', 0.1, null, Y.bass, t);
+  }
+  if (on('drums')) {
+    if (st % 4 === 0) osc(150, 0.18, 'sine', 0.7, 40, Y.drums, t);
+    if (st % 8 === 4 || (Sg.march && bar === 3 && st >= 12)) { noise(0.12, 0.16, 'bandpass', 1800, 900, Y.drums, t, 0.8); osc(190, 0.08, 'triangle', 0.06, 120, Y.drums, t); }
+    if (st % 2 === 1) noise(0.03, 0.07, 'highpass', 8000, null, Y.drums, t);
+  }
+  if (on('lead')) {
+    if (Sg.box) { if (st % 2 === 0) { const n = Sg.box[(st / 2 + bar * 2) % 8]; tone(mtof(root + 12 + n), t, spb * 6, 'triangle', 0.045, Y.lead, 0.005); } }
+    else if (Sg.motif && bar % 2 === 0) { const n = Sg.motif[st]; if (n != null) { tone(mtof(Sg.prog[0][0] + 24 + n), t, spb * 1.8, 'square', 0.03, Y.lead, 0.01); tone(mtof(Sg.prog[0][0] + 12 + n), t, spb * 1.8, 'triangle', 0.035, Y.lead, 0.01); } }
+    else osc(mtof(root + 12 + tri[st % 3] + (st >= 8 ? 12 : 0)), spb * 0.9, 'triangle', 0.05, null, Y.lead, t);
+  }
+  if (on('tense')) {
+    // a heartbeat, and a thin trembling note a half step above the key
+    if (st === 0 || st === 3 || st === 8 || st === 11) osc(st % 8 === 0 ? 62 : 55, 0.16, 'sine', st % 8 === 0 ? 0.55 : 0.4, 38, Y.tense, t);
+    if (st % 2 === 0) tone(mtof(root + 37), t, spb * 1.5, 'sawtooth', 0.008, Y.tense, 0.02);
+  }
+}
+// short phrases for the end of a run
+function musicSting(kind) {
+  if (!AU.ctx || !kind) return;
+  const D = save.music ? AU.mus : save.sfx ? AU.sfx : null; if (!D) return;
+  const t = AU.ctx.currentTime + 0.05;
+  if (kind === 'win') {
+    [[60, 0], [64, 0.12], [67, 0.24], [72, 0.36]].forEach(([m, d]) => tone(mtof(m), t + d, 0.3, 'triangle', 0.22, D));
+    [72, 76, 79, 84].forEach(m => { tone(mtof(m), t + 0.5, 1.6, 'triangle', 0.12, D, 0.01); tone(mtof(m - 12), t + 0.5, 1.6, 'sawtooth', 0.04, D, 0.05); });
+  } else if (kind === 'lose') {
+    [[69, 0], [65, 0.3], [62, 0.6], [57, 0.9]].forEach(([m, d], i) => tone(mtof(m), t + d, i === 3 ? 1.6 : 0.35, 'triangle', 0.18, D, 0.02));
+    tone(mtof(45), t + 0.9, 1.8, 'sawtooth', 0.05, D, 0.1);
+  }
 }
 function setAudioGains() {
   if (!AU.ctx) return;
   AU.sfx.gain.value = save.sfx ? 0.6 : 0;
-  AU.mus.gain.value = save.music ? (mode === 'play' ? 0.3 : 0.12) : 0;
+  AU.mus.gain.value = save.music ? (mode === 'play' ? 0.3 : 0.16) : 0;
 }
-function vib(p) { if (save.vib !== false && navigator.vibrate) { try { navigator.vibrate(p); } catch (e) {} } }
-
+// vibration, when the player wants it: short and different for each kind of moment, never continuous
+const VIB = { tap: 12, hit: 25, heavy: [50, 30, 90], boss: [90, 60, 180], win: [40, 40, 40, 40, 160], heroic: [30, 30, 60] };
+function vib(p) { if (save.vib !== false && navigator.vibrate) { try { navigator.vibrate(typeof p === 'string' ? VIB[p] : p); } catch (e) {} } }
 
 // =====================================================================
 // RUN STATE
@@ -1713,6 +1837,7 @@ function moveMoon(dx, dy) {
 }
 cv.addEventListener('pointerdown', e => {
   audioInit();
+  if (S && S.cine) { cineSkip(); return; }
   if (mode !== 'play') return;
   dragId = e.pointerId; dragX = e.clientX; dragY = e.clientY;
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
@@ -1952,10 +2077,8 @@ function spawnBoss() {
   if (type === 'eclipse') { b.x = side < 0 ? -90 * u : W + 90 * u; b.y = levelY(2.1); }
   S.boss = b; S.lastBoss = name; markSeen('b_' + type);
   S.face = 'surprised'; S.faceT = 1.3;   // then angry for the whole fight (see moonFace)
-  banner(name, BOSS_INTRO[type], 2.6, true);
   MUS.boss = true; MUS.intensity = 3;
-  sfx('roar'); vib([80, 60, 160]);
-  S.shake = Math.max(S.shake, 0.6);
+  bossCine(b, BOSS_INTRO[type]);
 }
 // boss damage grows with the wave, gently: past wave 30 the endless modes used to one-shot the island
 function bossScale() { return (1 + 0.04 * S.wave) * (S.mis && S.boss && S.boss.mini ? 0.75 : 1) * (S.mode !== 'island' ? 1 + Math.floor((S.wave - 1) / 10) * 0.15 : 1) * (S.boss && S.boss.enraged ? 1.25 : 1); }
@@ -1977,7 +2100,7 @@ function raiseGuard(b) {
 function breakShield(b, won) {
   b.shield = false;
   for (const e of S.enemies) if (e.guard === b) e.guard = null;
-  burst(b.x, b.y - 30 * u, 30, '#bff3ff', 260); sfx('crash');
+  burst(b.x, b.y - 30 * u, 30, '#bff3ff', 260); sfx('crash'); sfx('shield', 0, b.x); S.hitstop = Math.max(S.hitstop, 0.06);
   if (won) { b.frozen = Math.max(b.frozen, 1.8); banner('¡Escudo roto!', 'Está aturdido: ¡a por él!', 1.4); missionProgress('shield', 1); vib([30, 30, 80]); }
   else banner('El escudo se apaga', '', 1);
 }
@@ -2161,7 +2284,7 @@ function killBoss(b) {
   if (b.dead) return;
   b.dead = true; S.bossKills++; save.stats.bosses++; countSink('b_' + b.type);
   b.cast = null; b.wave = null; b.beam = null; b.volley = 0; S.night = Math.min(S.night, 0.6);
-  S.slowmo = 1.4; S.shake = 1.2; S.flash = 0.5;
+  S.hitstop = 0.12; S.slowmo = 1.4; S.shake = 1.2; S.flash = 0.5;
   for (let i = 0; i < 6; i++) setTimeout(() => { if (S) { boomFx(b.x + rand(-50, 50) * u, b.y + rand(-40, 20) * u, 50 * u); } }, i * 120);
   sfx('bigboom'); vib([100, 50, 100, 50, 250]);
   addXp(40);
@@ -2200,7 +2323,7 @@ function hit(e, base, o) {
   if (dot) {
     e.dotAcc += d;
     if (e.dotT <= 0) { if (e.dotAcc >= 1) num(e.x, e.y - e.r * u, e.dotAcc, false, armored ? '#c3d2e6' : o.col, e); e.dotAcc = 0; e.dotT = 0.4; }
-  } else num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit, armored ? '#c3d2e6' : undefined, e);
+  } else { num(e.x + rand(-6, 6) * u, e.y - e.r * u, d, crit, armored ? '#c3d2e6' : undefined, e); if (crit) sfx('crit', 0, e.x); }
   if (e.hp <= 0) { if (e.isBoss) killBoss(e); else if (e.def.ghost) repel(e); else kill(e); }
   return d;
 }
@@ -2217,7 +2340,7 @@ function repel(e) {
 }
 // a fire ship blows up: against the island it hurts a lot; sunk at sea it only scorches the ships around it
 function bruloteBoom(e, atIsland) {
-  boomFx(e.x, e.y - 8 * u, (atIsland ? 70 : 52) * u, '#ff8a3d'); sfx('bigboom'); vib(atIsland ? [80, 40, 160] : 40);
+  boomFx(e.x, e.y - 8 * u, (atIsland ? 70 : 52) * u, '#ff8a3d'); sfx('bigboom', 0, e.x); S.hitstop = Math.max(S.hitstop, 0.05); vib(atIsland ? [80, 40, 160] : 40);
   S.shake = Math.max(S.shake, atIsland ? 0.9 : 0.35);
   if (atIsland) {
     islandDamage(S.maxHp * 0.08 + 4 * scaleW(), false, 'brulote');
@@ -2255,7 +2378,7 @@ function kill(e, silent) {
   } else if (e.elite) {
     dropCoins(e.x, e.y, 5, true);
     if (Math.random() < 0.05) dropChest(e.x, e.y - 14 * u);
-    burst(e.x, e.y, 18, '#ffd36b', 200); S.shake = Math.max(S.shake, 0.18); vib(20);
+    burst(e.x, e.y, 18, '#ffd36b', 200); S.shake = Math.max(S.shake, 0.18); vib(20); S.hitstop = Math.max(S.hitstop, 0.04);
   } else if (Math.random() < def.coin * 1.25 * (1 + 0.1 * metaLv('codicia')) * (e.tr ? 1.5 : 1) || S.fiebre > 0 || S.tutDrop) dropCoins(e.x, e.y, (def.cv || 1) * (e.tr && e.tr.gigante ? 3 : 1));
   e.dyT = 0; S.dying.push(e);
   const k = def.kind;
@@ -2263,7 +2386,7 @@ function kill(e, silent) {
   else if (k === 'walk') bubbles(e.x, e.y, 8);
   else if (k === 'fly') feathers(e.x, e.y);
   else splash(e.x, e.y, 18);
-  if (!silent) sfx('pop', S.combo);
+  if (!silent) { sfx('pop', S.combo, e.x); sfx(k === 'ship' ? 'sink' : k === 'fly' ? 'squawk' : k === 'walk' ? 'drown' : 'splash', 0, e.x); }
   comboCheck();
 }
 function addXp(v) { S.xp += v * S.st.xp; }
@@ -2358,7 +2481,7 @@ function islandDamage(d, ignoreEclipse, src = 'boss') {
   if (S.mis && S.mis.hurt) S.mis.hurt(d, src);
   if (S.hurtT <= 0) {
     S.hurtT = 0.35;
-    if (S.hurtAcc >= 1) { hudHurt(S.hurtAcc); sfx('hurt'); vib(30); S.islHit = 0.32; S.flash = Math.min(0.4, S.flash + (S.hurtAcc >= 6 ? 0.12 : 0.05)); if (S.hurtAcc >= 4) { S.face = 'hurt'; S.faceT = 0.8; } }
+    if (S.hurtAcc >= 1) { hudHurt(S.hurtAcc); sfx('hurt'); vib(30); S.islHit = 0.32; S.flash = Math.min(0.4, S.flash + (S.hurtAcc >= 6 ? 0.12 : 0.05)); if (S.hurtAcc >= 4) { S.face = 'hurt'; S.faceT = 0.8; moonFx('hurt'); } }
     S.hurtAcc = 0;
   }
 }
@@ -2372,7 +2495,7 @@ let comboTxtTimer = 0;
 function comboAnnounce(txt) {
   const el = $('comboTxt'); el.textContent = txt; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
   clearTimeout(comboTxtTimer); comboTxtTimer = setTimeout(() => { el.textContent = ''; }, 1400);
-  sfx('combo'); vib(20);
+  sfx('combo'); vib(20); moonFx('combo');
 }
 // damage numbers: quick hits on the same enemy add up into one number, and there are never more than 14
 // on screen (8 with reduced effects); crits always show, the oldest plain number makes room
@@ -2517,7 +2640,7 @@ const WUP = {
     // relic: the echo's conch makes every ray bounce on to another ship, a little weaker at first
     const echo = S.relic === 'caracola', ts = nearMoon(L3(w, [1, 2, 3]) + S.st.proj, MOON_RANGE()), dmg = L3(w, [18, 26, 36]) * (echo ? 0.85 : 1);
     for (const e of ts) { hit(e, dmg); S.fx.push({ type: 'beam', x1: m.x, y1: m.y, x2: e.x, y2: e.y, t: 0, life: 0.14, c: S.moon.color }); if (echo) relicBounce(e, dmg * 0.5); }
-    if (ts.length) { sfx('zap'); S.moonKick = 0.12; }
+    if (ts.length) { sfx('ray'); S.moonKick = 0.12; }
   },
   remolino(w, dt) {
     if (w.evo) return;
@@ -2528,7 +2651,7 @@ const WUP = {
     // relic: twin whirlpools, one on each reef, smaller and weaker
     if (S.relic === 'gemelo') for (const q of R) S.ents.push({ type: 'whirl', x: q.c + rand(-10, 10) * u, r: L3(w, [40, 54, 70]) * 0.8 * u * S.st.area, life: L3(w, [3, 3.8, 4.4]), t: 0, dps: L3(w, [22, 30, 48]) * 0.6 });
     else S.ents.push({ type: 'whirl', x: r.c + rand(-10, 10) * u, r: L3(w, [40, 54, 70]) * u * S.st.area, life: L3(w, [3, 3.8, 4.4]), t: 0, dps: L3(w, [22, 30, 48]) });
-    sfx('splash');
+    sfx('whirl');
   },
   coral(w, dt) {
     w.t -= dt; if (w.t > 0) return;
@@ -2539,7 +2662,7 @@ const WUP = {
     let any = false;
     for (const e of S.seaT) if (inReef(e.x, pad + e.r * u)) { hit(e, dmg); any = true; }
     for (const R of REEFS()) S.fx.push({ type: 'spikes', a: R.a - pad, b: R.b + pad, t: 0, life: 0.35, big: evo });
-    if (any) sfx('crash');
+    if (any) sfx('coral');
   },
   tiburon() {},
   escarcha(w, dt) {
@@ -2579,7 +2702,7 @@ const WUP = {
       const e = i < S.threat.length ? (i === 0 ? S.threat[0] : randomTarget(false)) : null; if (!e) break;
       fireBall(e, dmg, r);
     }
-    sfx('boom');
+    sfx('cannon');
   },
   tormenta(w, dt) {
     w.t -= dt; if (w.t > 0) return;
@@ -2604,7 +2727,7 @@ const WUP = {
         const y = waveY(A.x), R = 70 * u * S.st.area;
         for (const e of S.threat) if (Math.hypot(e.x - A.x, e.y - y) < R + e.r * u) { if (hit(e, 120)) shove(e, 30 * u * S.st.kb); }
         S.fx.push({ type: 'ring', x: A.x, y, t: 0, life: 0.5, r1: R, c: '#7dffe0' });
-        splash(A.x, y, 20); S.shake = Math.max(S.shake, 0.3); sfx('boom');
+        splash(A.x, y, 20); S.shake = Math.max(S.shake, 0.3); sfx('anchor', 0, A.x);
       }
       return;
     }
@@ -2646,7 +2769,7 @@ const WUP = {
     w.t = 1.0 * cdm();
     const n = 4 + S.st.proj;
     for (let i = 0; i < n; i++) { const e = i === 0 ? S.threat[0] : randomTarget(false); if (!e) break; fireBall(e, 70, 40 * u * S.st.area * S.st.boom, { thunder: true }); }
-    sfx('boom');
+    sfx('cannon');
   },
   estelar(w, dt) {
     w.t -= dt; w.phase -= dt;
@@ -2661,7 +2784,7 @@ const WUP = {
       for (const o of S.threat) if (o !== e && Math.hypot(o.x - e.x, o.y - e.y) < R + o.r * u) hit(o, 45);
       S.fx.push({ type: 'cspike', x: e.x, y: e.y, t: 0, life: 0.35, r: R });
     }
-    if (ts.length) { sfx('zap'); S.moonKick = 0.12; }
+    if (ts.length) { sfx('star'); S.moonKick = 0.12; }
   },
   galvana(w, dt) {
     const sw = Math.sin(w.phase += dt * 2.6 / Math.max(0.5, cdm()));
@@ -2688,7 +2811,7 @@ const WUP = {
       S.proj.push({ type: 'chainshot', x: sx, y: sy, vx: sd * 560 * u, high, t: 0, dmg: 95, r: 20 * u * S.st.area * S.st.boom, hits: new Set() });
       S.fx.push({ type: 'muzzle', x: sx, y: sy, t: 0, life: 0.15 });
     }
-    S.cannonKick = 0.15; sfx('boom');
+    S.cannonKick = 0.15; sfx('cannon');
   },
   torbellino(w, dt) {
     w.t -= dt; if (w.t > 0) return;
@@ -2698,7 +2821,7 @@ const WUP = {
     const m = moonPos(), R = 190 * u * S.st.area;
     for (const e of S.threat) { if (Math.hypot(e.x - m.x, e.y - m.y) > R + e.r * u) continue; hit(e, 30); if (!e.isBoss) slowE(e, 3 * S.st.cc, 0.5); }
     S.fx.push({ type: 'ring', x: m.x, y: m.y, t: 0, life: 0.6, r1: R, c: '#9fe3ff' });
-    sfx('freeze'); sfx('splash');
+    sfx('freeze'); sfx('whirl');
   },
 };
 function segDist(px, py, x1, y1, x2, y2) {
@@ -3103,7 +3226,7 @@ function useActive() {
   else if (id === 'dorada') { S.fiebre = S.corr === 'dorada' ? 11 : 7; banner('¡Fiebre del oro!', 'Cada enemigo hundido suelta una perla', 1.4); }
   S.face = id === 'roja' ? 'angry' : 'effort'; S.faceT = 1.6;
   S.fx.push({ type: 'ring', x: S.mx, y: S.my, t: 0, life: 0.5, r1: MOON_R() * 3, c: S.moon.color });
-  sfx('tsunami'); vib([60, 40, 140]);
+  sfx('act_' + id); vib([60, 40, 140]); moonFx('active');
   S.shake = Math.max(S.shake, 0.6);
 }
 function tsunami(mult) { S.ents.push({ type: 'tsunami', r: 0, t: 0, hits: new Set(), dmg: (120 + 18 * S.wave) * mult }); S.shake = Math.max(S.shake, 0.8); }
@@ -3223,7 +3346,7 @@ function fuseMoment(kind, aIco, bIco, rIco, name, desc) {
   // restart the animations
   el.querySelectorAll('*').forEach(n => { n.style.animation = 'none'; void n.offsetWidth; n.style.animation = ''; });
   fuseBack = mode === 'fuse' ? fuseBack : mode; mode = 'fuse'; dragId = null; setAudioGains();
-  sfx('evo'); setTimeout(() => { if (mode === 'fuse') sfx('tsunami'); }, 760);
+  sfx(kind === 'union' ? 'union' : 'evo'); setTimeout(() => { if (mode === 'fuse') sfx('tsunami'); }, 760);
   clearTimeout(fuseTimer); fuseTimer = setTimeout(fuseEnd, 2600);
 }
 function fuseEnd() {
@@ -3342,6 +3465,7 @@ function update(dt) {
   legendsTick(dt);
   guardTick(dt);
   p7Tick(dt);
+  heroTick(); tipTick();
   S.comboT -= dt; if (S.comboT <= 0) S.combo = 0;
   S.charge = Math.min(1, S.charge + dt * 0.006 * S.chargeMul);
   if (S.charge >= 1 && !S.seen.activeTip && !S.mods.noActive) { S.seen.activeTip = 1; tip('active', `¡${S.moon.active} listo!`, 'Pulsa el botón de abajo'); }
@@ -4230,7 +4354,7 @@ function drawDark() {
 }
 function draw() {
   ctx.save();
-  if (S && S.shake > 0 && !reduceMotion) { const k = 16 * S.shake * u * (save.fxLow ? 0.5 : 1); ctx.translate((Math.random() - 0.5) * k, (Math.random() - 0.5) * k); }
+  if (S && S.shake > 0 && !reduceMotion) { const k = 12 * S.shake * u * (save.fxLow ? 0.5 : 1); ctx.translate(Math.sin(T * 61) * k * 0.45 + Math.sin(T * 23) * k * 0.2, Math.cos(T * 53) * k * 0.4); }
   drawSky();
   drawLand();
   drawWater(true);
@@ -4260,12 +4384,14 @@ function draw() {
   }
   drawMotes();
   drawMoon();
+  moonFxDraw();
   if (S && S.tut && mode === 'play') drawTutHint();
   if (S) drawNums();
   drawDark();
   if (drawBossTop()) drawMoon();   // the moon stays in front of the dark sun
   ctx.restore();
-  if (S && (mode === 'play' || mode === 'levelup' || mode === 'paused' || mode === 'merchant')) drawGauge();
+  drawCine();
+  if (S && !S.cine && (mode === 'play' || mode === 'levelup' || mode === 'paused' || mode === 'merchant')) drawGauge();
   if (S && S.flash > 0) { ctx.fillStyle = `rgba(255,95,109,${S.flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
   if (S && S.eclipse > 0) { ctx.fillStyle = 'rgba(60,20,120,0.18)'; ctx.fillRect(0, 0, W, H); }
   if (S && S.furia > 0) { ctx.fillStyle = 'rgba(255,60,40,0.08)'; ctx.fillRect(0, 0, W, H); }
@@ -4289,7 +4415,7 @@ function setText(id, v) { if (hudCache[id] !== v) { hudCache[id] = v; $(id).text
 function setStyle(id, prop, v) { const k = id + prop; if (hudCache[k] !== v) { hudCache[k] = v; if (prop.startsWith('--')) $(id).style.setProperty(prop, v); else $(id).style[prop] = v; } }
 function updateHUD() {
   setStyle('hpFill', 'width', `${clamp(S.hp / S.maxHp, 0, 1) * 100}%`);
-  setText('hpText', `${Math.max(0, Math.ceil(S.hp))} / ${Math.round(S.maxHp)}`);
+  setText('hpText', `${Math.max(0, Math.min(Math.ceil(S.hp), Math.round(S.maxHp)))} / ${Math.round(S.maxHp)}`);
   setText('waveText', waveMax() ? `Oleada ${S.wave}/${waveMax()}` : `Oleada ${S.wave}`);
   if (S.mis) misHud(); else if (hudCache.goal !== '') { hudCache.goal = ''; $('goal').hidden = true; }
   setText('lvText', `Nv ${S.lv}`);
@@ -4341,7 +4467,7 @@ function banner(title, sub = '', secs = 1.8, boss = false) {
   const b = $('banner'); b.innerHTML = `${title}${sub ? `<small>${sub}</small>` : ''}`; b.classList.toggle('boss', boss); b.classList.add('show');
   clearTimeout(bannerTimer); bannerTimer = setTimeout(() => b.classList.remove('show'), secs * 1000);
 }
-function tip(id, title, sub) { if (save.tips[id] || (S && S.tut)) return; save.tips[id] = 1; persist(); banner(title, sub, 2.6); }
+function tip(id, title, sub) { if (save.tips[id] || (S && S.tut)) return; if (S && (S.cine || S.bannerHold > S.t)) { if (!(S.tipQ = S.tipQ || []).some(q => q[0] === id)) S.tipQ.push([id, title, sub]); return; } save.tips[id] = 1; persist(); banner(title, sub, 2.6); }
 function tipFor(type) {
   const T_ = {
     sloop: ['Balandras piratas', 'Con marea baja se estrellan en el arrecife'],
@@ -4445,7 +4571,7 @@ function openSettings() {
   show('scrSettings');
 }
 function openTitle() {
-  mode = 'menu'; S = null; musicStop(); setAudioGains(); $('game').classList.remove('echo');
+  mode = 'menu'; S = null; musicStart('title'); setAudioGains(); $('game').classList.remove('echo');
   refreshCoins();
   const nx = misNext();
   $('playSub').textContent = nx ? `Misión ${nx.n} · ${nx.name}` : 'Campaña y expediciones';
@@ -4726,7 +4852,7 @@ function beginRun(runMode, islIdx) {
   const m = S.moon;
   $('hpIco').innerHTML = ico('i_murallas', 26); $('chestPop').hidden = true;
   $('activeIco').innerHTML = ico(m.ico, 42); $('activeLbl').textContent = S.mods.noActive ? 'Dormida' : m.active;
-  MUS.intensity = 0; MUS.boss = false; musicStart();
+  MUS.intensity = 0; MUS.boss = false; musicStart('sea');
   $('goal').hidden = true; $('guide').hidden = true; $('activeBtn').classList.remove('hint'); document.body.classList.remove('guiding');
   if (S.mis) { misStart(); banner(S.mis.name, S.mis.goal, 2.4); (S.mis.tips || []).forEach(([k, a, b]) => setTimeout(() => S && tip(k, a, b), 2600)); if (S.mis.tut) tutStart(); }
   else if (runMode === 'island') banner(S.isl.name, S.danger ? DANGER_TXT[S.danger] : ISLANDS[islIdx].sub, 2);
@@ -4916,10 +5042,10 @@ function endRun(won, quit) {
   const mr = missionsReady(); if (mr) unlocks.push(`${mr} misi${mr > 1 ? 'ones' : 'ón'} cumplida${mr > 1 ? 's' : ''}: cóbrala${mr > 1 ? 's' : ''} en Misiones`);
   if (canBuySomething()) unlocks.push('Tienes monedas para mejorar el taller');
   persist();
-  musicStop();
+  musicStop(); musicSting(won && !quit ? 'win' : quit ? null : 'lose');
   const delay = won ? 1600 : quit ? 250 : 900;
   S.endT = quit ? 0 : delay / 1000;
-  if (won) { banner(S.mis ? '¡Misión cumplida!' : '¡Victoria!', S.mis ? S.mis.name : `${S.isl.name} está a salvo`, 1.6); sfx('evo'); }
+  if (won) { banner(S.mis ? '¡Misión cumplida!' : '¡Victoria!', S.mis ? S.mis.name : `${S.isl.name} está a salvo`, 1.6); sfx('evo'); moonFx('win'); vib('win'); }
   mode = 'result';
   setTimeout(() => {
     const M = S.mis, wm = waveMax();
@@ -5031,7 +5157,7 @@ window.lunaBack = () => {
 };
 document.addEventListener('visibilitychange', () => { if (document.hidden) window.lunaPause(); else if (AU.ctx && AU.ctx.state === 'suspended' && mode !== 'paused') AU.ctx.resume(); });
 // back from a mission: to the map, or straight to the next mission's briefing
-const toMenu = () => { S = null; mode = 'menu'; musicStop(); setAudioGains(); $('game').classList.remove('echo'); };
+const toMenu = () => { S = null; mode = 'menu'; musicStart('title'); setAudioGains(); $('game').classList.remove('echo'); };
 $('rMenu').onclick = () => storyThen(() => { if (S && S.mis && S.mis.puz) { toMenu(); openPuzzles(); } else if (S && S.mis && S.mis.echo) { toMenu(); openArchive('sec'); } else if (S && S.mis) { const c = S.mis.ch; toMenu(); openIslands(c); } else openTitle(); });
 $('rNext').onclick = () => storyThen(() => { const i = +$('rNext').dataset.m; if (i <= -100) { startRun('puzzle', -100 - i); return; } toMenu(); openPrep(i); });
 
@@ -5441,7 +5567,7 @@ function useTide() {
   const mid = (TIDE_LO + TIDE_HI) / 2, dir = S.level > mid ? -1 : 1, side = S.mx < W / 2 ? -1 : 1;
   S.tideCh = 0; S.surge = { t: 3.2, dir, side };
   banner(dir > 0 ? '¡Pleamar!' : '¡Bajamar!', dir > 0 ? 'Los piratas se ahogan y la corriente aparta la flota' : 'Los barcos encallan y la corriente aparta la flota', 1.4);
-  sfx('tsunami'); vib([30, 40, 60]); S.shake = Math.max(S.shake, 0.35);
+  sfx('tide'); vib([30, 40, 60]); S.shake = Math.max(S.shake, 0.35);
   for (let i = 0; i < 26; i++) { const x = rand(0, W); splash(x, waveY(x), 4); }
   missionProgress('tide', 1);
 }
@@ -8500,6 +8626,174 @@ function drawFace(f, x, y, s, sy) {
   ctx.globalAlpha = a0;
 }
 // =====================================================================
+// FEEL: bosses enter like in a film, each moon reacts in its own way, small stops on the big hits
+// =====================================================================
+const BOSS_CINE = {
+  kraken: ['¡Una amenaza emerge del abismo!', 'El terror de las profundidades'],
+  armada: ['¡Velas negras en el horizonte!', 'La flota que nunca se rinde'],
+  leviatan: ['¡Algo enorme se mueve bajo el mar!', 'La serpiente de los mares helados'],
+  eclipse: ['¡El cielo se apaga!', 'El sol que devora la luz'],
+};
+// the sea freezes for a moment: the sky darkens, black bars close in, the boss shows itself and its name lands.
+// The first time it plays whole; after that a tap skips it.
+function bossCine(b, tip) {
+  const seen = !!(save.cineSeen && save.cineSeen[b.type]);
+  const [eye, sub] = BOSS_CINE[b.type] || BOSS_CINE.kraken;
+  S.cine = { b, tip, t: 0, T: seen ? 2.3 : 2.9, seen, eye: b.mini ? '¡Se acerca un guardián!' : eye, sub: b.mini ? sub.replace(/^El /, 'Heraldo del ').replace(/^La /, 'Heraldo de la ') : sub, roar: false };
+  if (reduceMotion) S.cine.T = 1.4;
+  $('hud').classList.add('cine'); $('banner').classList.remove('show');
+  sfx('intro'); vib('boss');
+}
+function cineTick(dt) {
+  const c = S.cine; c.t += dt;
+  if (!c.roar && c.t > 0.9) { c.roar = true; sfx('roar'); S.shake = Math.max(S.shake, 0.5); }
+  if (c.t >= c.T) cineEnd();
+}
+function cineSkip() { if (S && S.cine && (S.cine.seen || S.cine.t > 1.6)) cineEnd(); }
+function cineEnd() {
+  const c = S.cine; if (!c) return;
+  S.cine = null; $('hud').classList.remove('cine');
+  save.cineSeen = save.cineSeen || {}; if (!save.cineSeen[c.b.type]) { save.cineSeen[c.b.type] = 1; persist(); }
+  banner(c.b.name, c.tip, 2.4, true); S.bannerHold = S.t + 2.4;
+  S.shake = Math.max(S.shake, 0.4);
+}
+// tips about new enemies wait while a boss is being introduced, then show one after another
+function tipTick() {
+  if (!S || !S.tipQ || !S.tipQ.length || S.cine || S.bannerHold > S.t) return;
+  const [id, title, sub] = S.tipQ.shift(); tip(id, title, sub); S.bannerHold = S.t + 2.6;
+}
+const easeOut = k => 1 - Math.pow(1 - clamp(k, 0, 1), 3);
+function drawCine() {
+  const c = S && S.cine; if (!c) return;
+  const k = c.t / c.T, inA = easeOut(c.t / 0.45), outA = 1 - easeOut((c.t - (c.T - 0.35)) / 0.35), a = Math.min(inA, outA);
+  // darkness, heavier at the edges
+  const g = ctx.createRadialGradient(W / 2, H * 0.45, W * 0.1, W / 2, H * 0.45, Math.hypot(W, H) * 0.6);
+  g.addColorStop(0, `rgba(4,2,16,${0.35 * a})`); g.addColorStop(1, `rgba(4,2,16,${0.8 * a})`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // the boss slides in on its side of the sea, a little bigger than life, in a pool of light
+  const b = c.b, side = b.side < 0 ? -1 : 1, tx = W / 2 + side * W * 0.25, sx = W / 2 + side * (W * 0.5 + 140 * u);
+  const x = sx + (tx - sx) * easeOut((c.t - 0.15) / 0.7), y = b.type === 'eclipse' ? levelY(1.55) : b.type === 'armada' ? waveY(tx) : levelY(0.5) + Math.sin(T * 2) * 3 * u;
+  softGlow(x, y - 20 * u, 130 * u, b.type === 'eclipse' ? '#b49cff' : b.type === 'leviatan' ? '#9fe3ff' : '#ff6b5a', 0.28 * a);
+  const ox = b.x, oy = b.y, ost = b.st, oph = b.ph;
+  b.x = x; b.y = y; if (b.type === 'leviatan') b.st = 'surface';
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(1.15, 1.15); ctx.translate(-x, -y);
+  try { drawBoss(b); } catch (e) {}
+  ctx.restore();
+  b.x = ox; b.y = oy; b.st = ost; b.ph = oph;
+  // black bars
+  const bh = H * 0.1 * inA * outA;
+  ctx.fillStyle = '#020108'; ctx.fillRect(0, 0, W, bh); ctx.fillRect(0, H - bh, W, bh);
+  // the words: what is coming, its name, what it is
+  const tk = easeOut((c.t - 0.35) / 0.4), nk = easeOut((c.t - 0.55) / 0.35), cy = H * 0.3;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  ctx.globalAlpha = tk * outA;
+  ctx.font = `900 ${Math.round(13 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`;
+  ctx.fillStyle = '#ff6b5a'; ctx.fillText(c.eye.toUpperCase(), W / 2, cy - 34 * u + (1 - tk) * 8 * u);
+  ctx.globalAlpha = nk * outA;
+  const ns = (1.25 - 0.25 * nk), fs = Math.round(Math.min(46 * u, W * 0.11) * ns);
+  ctx.font = `${fs}px "Young Serif", Georgia, serif`;
+  ctx.lineWidth = 6 * u; ctx.strokeStyle = 'rgba(8,4,20,0.9)'; ctx.strokeText(b.name.toUpperCase(), W / 2, cy);
+  ctx.fillStyle = '#f4ecd0'; ctx.fillText(b.name.toUpperCase(), W / 2, cy);
+  ctx.globalAlpha = easeOut((c.t - 0.8) / 0.4) * outA;
+  ctx.font = `italic 600 ${Math.round(14 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`;
+  ctx.fillStyle = '#c9c0e6'; ctx.fillText(c.sub, W / 2, cy + 32 * u);
+  if (c.seen || c.t > 1.6) { ctx.globalAlpha = 0.6 * outA; ctx.font = `700 ${Math.round(11 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`; ctx.fillStyle = '#9aa8c4'; ctx.fillText('Toca para saltar', W / 2, H - bh - 18 * u); }
+  ctx.globalAlpha = 1;
+}
+
+// ---- each moon reacts in its own way: to its ability, a hard hit, a long streak, a narrow escape and a win
+const REACT_T = { active: 1, hurt: 0.55, combo: 0.9, heroic: 1.6, win: 2.4 };
+function moonFx(kind) {
+  if (!S || reduceMotion) return;
+  if (S.react && S.react.kind === 'win') return;
+  if (S.react && kind === 'hurt' && T - S.react.t0 < S.react.dur) return;
+  S.react = { kind, t0: T, dur: REACT_T[kind] || 1, seed: Math.random() * 6 };
+  if (kind === 'heroic') { sfx('heroic'); vib('heroic'); S.face = 'cheer'; S.faceT = 1.8; banner('¡Por los pelos!', 'La isla resiste', 1.4); }
+  if (kind === 'win') { S.face = 'cheer'; S.faceT = 3; }
+  if (kind === 'combo' && !(S.faceT > 0)) { S.face = 'happy'; S.faceT = 1; }
+}
+// a narrow escape: the island fell under a fifth of its health and climbed back over half (or the boss went down meanwhile)
+function heroTick() {
+  if (!S || S.ended) return;
+  const r = S.hp / S.maxHp;
+  if (r < 0.2) S.brink = true;
+  else if (S.brink && (r > 0.5 || (S.boss && S.boss.dead))) { S.brink = false; if (!S.heroT || S.t - S.heroT > 60) { S.heroT = S.t; moonFx('heroic'); } }
+}
+function moonFxDraw() {
+  const R = S && S.react; if (!R) return;
+  const k = (T - R.t0) / R.dur; if (k >= 1) { S.react = null; return; }
+  const id = S.moon.id, m = moonPos(), r = MOON_R(), big = R.kind === 'heroic' || R.kind === 'win' ? 1.4 : R.kind === 'hurt' ? 0.6 : 1;
+  const a = Math.sin(Math.min(1, k * 1.15) * Math.PI), loops = R.kind === 'win' ? 2 : 1, q = (k * loops) % 1;
+  ctx.save();
+  if (id === 'llena') {
+    // silver rings and little stars
+    for (let i = 0; i < 3; i++) { const f = (q + i / 3) % 1; ctx.strokeStyle = `rgba(244,236,208,${(1 - f) * 0.6 * a})`; ctx.lineWidth = 2.5 * u * (1 - f); ctx.beginPath(); ctx.arc(m.x, m.y, r * (1.1 + f * 1.6 * big), 0, TAU); ctx.stroke(); }
+    for (let i = 0; i < 6 * big; i++) { const an = i * 1.7 + R.seed, d = r * (1.3 + 0.9 * q); twinkle(m.x + Math.cos(an) * d, m.y + Math.sin(an) * d, 3.2 * u * a, '#fff8de'); }
+  } else if (id === 'roja') {
+    // flames lick out of the rim
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 10; i++) {
+      const an = i / 10 * TAU + Math.sin(T * 3 + i) * 0.1, fl = (0.6 + 0.4 * Math.sin(T * 19 + i * 2.1)) * r * 0.55 * big * a;
+      const bx = m.x + Math.cos(an) * r * 0.95, by = m.y + Math.sin(an) * r * 0.95, tx = m.x + Math.cos(an) * (r * 0.95 + fl), ty = m.y + Math.sin(an) * (r * 0.95 + fl) - fl * 0.35;
+      const g = ctx.createLinearGradient(bx, by, tx, ty); g.addColorStop(0, `rgba(255,120,60,${0.75 * a})`); g.addColorStop(1, 'rgba(255,220,120,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(bx + Math.sin(an) * 5 * u, by - Math.cos(an) * 5 * u); ctx.quadraticCurveTo((bx + tx) / 2, (by + ty) / 2, tx, ty); ctx.quadraticCurveTo((bx + tx) / 2, (by + ty) / 2, bx - Math.sin(an) * 5 * u, by + Math.cos(an) * 5 * u); ctx.fill();
+    }
+  } else if (id === 'hielo') {
+    // a crown of ice crystals rises over the moon
+    const n = 7, grow = easeOut(k * 2.2);
+    for (let i = 0; i < n; i++) {
+      const an = -Math.PI / 2 + (i - (n - 1) / 2) * 0.32, h = (i === 3 ? 1.3 : i % 2 ? 0.8 : 1) * r * 0.62 * grow * big, w = 4 * u;
+      const bx = m.x + Math.cos(an) * r * 0.92, by = m.y + Math.sin(an) * r * 0.92, tx = bx + Math.cos(an) * h, ty = by + Math.sin(an) * h;
+      ctx.globalAlpha = a; ctx.beginPath(); ctx.moveTo(bx - Math.sin(an) * w, by + Math.cos(an) * w); ctx.lineTo(tx, ty); ctx.lineTo(bx + Math.sin(an) * w, by - Math.cos(an) * w); ctx.closePath();
+      const g = ctx.createLinearGradient(bx, by, tx, ty); g.addColorStop(0, '#9fe3ff'); g.addColorStop(1, '#f4fdff');
+      ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1.2 * u; ctx.stroke();
+    }
+    for (let i = 0; i < 8; i++) { const an = i * 0.8 + R.seed, d = r * (1.2 + q); twinkle(m.x + Math.cos(an) * d, m.y + Math.sin(an) * d + q * 20 * u, 2.6 * u * a, '#e8fbff'); }
+  } else if (id === 'nueva') {
+    // a dark ring passes over it with a violet corona
+    const off = (q - 0.5) * r * 1.6;
+    softGlow(m.x, m.y, r * (2 + 0.6 * big), '#b49cff', 0.4 * a);
+    ctx.globalAlpha = 0.55 * a; ctx.fillStyle = '#12082a'; ctx.beginPath(); ctx.arc(m.x + off, m.y - off * 0.3, r * 0.98, 0, TAU); ctx.fill();
+    ctx.globalAlpha = a; ctx.strokeStyle = 'rgba(214,190,255,0.85)'; ctx.lineWidth = 2 * u; ctx.beginPath(); ctx.arc(m.x, m.y, r * 1.12, 0, TAU); ctx.stroke();
+    for (let i = 0; i < 5; i++) { const an = T * 1.5 + i * 1.25, d = r * (1.4 + 0.3 * Math.sin(T * 2 + i)); softGlow(m.x + Math.cos(an) * d, m.y + Math.sin(an) * d, 7 * u, '#d9b8ff', 0.5 * a); }
+  } else if (id === 'tormenta') {
+    // lightning lights up the sky around it
+    ctx.globalCompositeOperation = 'lighter';
+    const n = Math.round(3 * big);
+    for (let i = 0; i < n; i++) {
+      if (Math.sin(T * 23 + i * 3.7 + R.seed) < 0.2) continue;
+      const an = R.seed + i * 2.1 + Math.floor(T * 8) * 0.7, len = r * (1.6 + 0.8 * big);
+      let px = m.x + Math.cos(an) * r, py = m.y + Math.sin(an) * r;
+      ctx.strokeStyle = `rgba(190,225,255,${0.85 * a})`; ctx.lineWidth = 2 * u; ctx.beginPath(); ctx.moveTo(px, py);
+      for (let j = 1; j <= 5; j++) { const f = j / 5; px = m.x + Math.cos(an) * (r + len * f) + Math.sin(T * 40 + j + i) * 7 * u; py = m.y + Math.sin(an) * (r + len * f) + Math.cos(T * 37 + j) * 7 * u; ctx.lineTo(px, py); }
+      ctx.stroke();
+    }
+    if (big > 1) { ctx.fillStyle = `rgba(170,200,255,${0.05 * a * (Math.sin(T * 31) > 0.6 ? 1 : 0)})`; ctx.fillRect(0, 0, W, levelY(0.9)); }
+  } else if (id === 'dorada') {
+    // a burst of coins
+    const n = Math.round(10 * big);
+    for (let i = 0; i < n; i++) {
+      const an = i / n * TAU + R.seed, sp = (0.6 + (i * 0.37) % 0.5) * r * 2.4, f = q;
+      const x = m.x + Math.cos(an) * sp * f, y = m.y + Math.sin(an) * sp * f + 60 * u * f * f, s = 4.2 * u, sq = Math.abs(Math.cos(T * 9 + i));
+      ctx.globalAlpha = a * (1 - f * 0.6); ctx.fillStyle = '#ffd36b'; ctx.strokeStyle = OUTLINE; ctx.lineWidth = 1 * u;
+      ctx.beginPath(); ctx.ellipse(x, y, s * Math.max(0.2, sq), s, 0, 0, TAU); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#fff3c4'; ctx.beginPath(); ctx.ellipse(x - s * 0.25 * sq, y - s * 0.3, s * 0.3 * Math.max(0.2, sq), s * 0.3, 0, 0, TAU); ctx.fill();
+    }
+  }
+  ctx.restore();
+  // a win throws confetti in the moon's colour and gold
+  if (R.kind === 'win') for (let i = 0; i < (save.fxLow ? 22 : 38); i++) {
+    const f = ((T - R.t0) * (0.35 + (i % 5) * 0.05) + i * 0.13) % 1, x = (i * 0.618 % 1) * W + Math.sin(T * 2 + i) * 14 * u, y = -10 * u + f * H * 0.7;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(T * 4 + i); ctx.globalAlpha = 0.9 * (1 - f); ctx.fillStyle = i % 3 ? S.moon.color : '#ffd36b'; ctx.fillRect(-5 * u, -2.5 * u, 10 * u, 5 * u * Math.abs(Math.cos(T * 6 + i)) + u); ctx.restore();
+  }
+}
+function twinkle(x, y, s, col) {
+  if (s <= 0.3) return;
+  ctx.fillStyle = col; ctx.beginPath();
+  ctx.moveTo(x, y - s); ctx.lineTo(x + s * 0.28, y - s * 0.28); ctx.lineTo(x + s, y); ctx.lineTo(x + s * 0.28, y + s * 0.28);
+  ctx.lineTo(x, y + s); ctx.lineTo(x - s * 0.28, y + s * 0.28); ctx.lineTo(x - s, y); ctx.lineTo(x - s * 0.28, y - s * 0.28); ctx.closePath(); ctx.fill();
+}
+// =====================================================================
 // LOOP
 // =====================================================================
 openTitle();
@@ -8508,6 +8802,7 @@ function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; T += dt;
   if (S && mode === 'play') {
     let g = dt;
+    if (S.cine) { cineTick(dt); g = 0; }
     if (S.hitstop > 0) { S.hitstop -= dt; g = 0; }
     if (S.slowmo > 0) { S.slowmo -= dt; g *= 0.3; }
     if (g > 0) update(g);
