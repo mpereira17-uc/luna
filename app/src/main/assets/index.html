@@ -122,8 +122,8 @@ h2.st { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 
 .lc.locked { opacity: 0.5; }
 .lc .ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-size: 26px; background: color-mix(in srgb, var(--moon) 9%, transparent); }
 .lc .ico.moonico { background: none; }
-.danger { display: flex; gap: 3px; margin-top: 7px; flex-wrap: wrap; }
-.danger button { position: relative; width: 26px; height: 28px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12px; font-weight: 900; padding: 0; color: var(--ink-dim); }
+.danger { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+.danger button { position: relative; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); font-size: 12px; font-weight: 900; padding: 0; color: var(--ink-dim); }
 /* small buttons keep their look but get a 44 px touch area */
 .danger button::after, .moon-pick button::after { content: ""; position: absolute; inset: -9px -4px; }
 .danger button.on { background: var(--danger); border-color: var(--danger); color: #fff; }
@@ -708,6 +708,12 @@ body.guiding #banner { top: 34%; }
 .lc.rivalc .ico { background: color-mix(in srgb, var(--cc, var(--coral)) 18%, transparent); }
 .lc.rivalc.won .ico { background: color-mix(in srgb, var(--dorado) 20%, transparent); }
 .lc.rivalc + .beasts { margin-top: 4px; }
+
+/* ---------- phase 11: settings that choose between values ---------- */
+.set-row .val { flex: none; max-width: 40%; padding: 6px 11px; border-radius: 999px; background: #2a3554; color: var(--gold); font-size: 13px; font-weight: 800; text-align: center; }
+/* tablets: the interface grows with the screen (the game itself already does) */
+.screen, .sheet, #hud, #banner, #labBar, #fuseFx, #guide, #chestPop { zoom: var(--uiz, 1); }
+.moon-pick { cursor: pointer; }
 </style>
 
 <div id="splash" role="img" aria-label="IA Games presenta"><img src="studio.webp" alt="" width="150" height="150"><b>IA Games</b><small>presenta</small></div>
@@ -757,6 +763,7 @@ body.guiding #banner { top: 34%; }
       <p class="lede">Vuela la luna, levanta el mar, estrella flotas contra el arrecife y saquea su tesoro.</p>
     </div>
     <div class="stack title-btns" id="titleBtns">
+      <button class="btn hot big" id="goResume" type="button" hidden><span>Continuar partida<small id="resumeSub"></small></span><span aria-hidden="true">→</span></button>
       <button class="btn primary big" id="goPlay" type="button"><span>Jugar<small id="playSub">Isla Coral</small></span><span aria-hidden="true">→</span></button>
       <div class="row">
         <button class="btn sea" id="goEndless" type="button"><span>Marea sin fin<small id="endlessSub"></small></span></button>
@@ -785,11 +792,18 @@ body.guiding #banner { top: 34%; }
     </div>
     <h3 class="sec">Pantalla</h3>
     <div class="set-list">
-      <button class="set-row" id="setFx" type="button" role="switch" aria-checked="false"><span data-ico="i_estrella"></span><span class="lbl">Efectos reducidos<small>Menos partículas y números en pantalla, para móviles modestos</small></span><span class="switch"></span></button>
+      <button class="set-row" id="setGfx" type="button"><span data-ico="i_prisma"></span><span class="lbl">Calidad gráfica<small id="setGfxTxt"></small></span><span class="val" id="setGfxVal"></span></button>
+      <button class="set-row" id="setCalm" type="button" role="switch" aria-checked="false"><span data-ico="i_ancla"></span><span class="lbl">Movimiento reducido<small>Sin sacudidas de pantalla y con destellos más suaves</small></span><span class="switch"></span></button>
     </div>
+    <h3 class="sec">Controles</h3>
+    <div class="set-list">
+      <button class="set-row" id="setDrag" type="button"><span data-ico="i_motor"></span><span class="lbl">Velocidad de la luna<small id="setDragTxt"></small></span><span class="val" id="setDragVal"></span></button>
+    </div>
+    <div id="setStory">
     <h3 class="sec">Historia</h3>
     <div class="set-list">
       <button class="set-row" id="goStory" type="button"><span data-ico="i_libro"></span><span class="lbl">Ver la historia<small>El cómic de por qué la luna defiende la isla</small></span><span class="go" aria-hidden="true">›</span></button>
+    </div>
     </div>
     <p class="set-foot">Luna · un juego de IA Games</p>
   </div>
@@ -1053,6 +1067,7 @@ body.guiding #banner { top: 34%; }
         <button class="btn ghost center" id="restartBtn" type="button">Reiniciar</button>
         <button class="btn ghost center" id="quitBtn" type="button">Terminar y cobrar</button>
       </div>
+      <button class="btn ghost center" id="pSettings" type="button">Ajustes</button>
     </div>
     <div class="confirm" id="pConfirm" hidden>
       <b id="pConfirmTitle"></b>
@@ -1418,7 +1433,10 @@ const reefActive = () => { const out = []; for (let t = 1; t <= (save.reef || 0)
 let save = JSON.parse(JSON.stringify(DEF_SAVE));
 function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') a[k] = deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
 try {
-  const raw = JSON.parse(localStorage.getItem('luna-v4') || 'null');
+  let raw = null; try { raw = JSON.parse(localStorage.getItem('luna-v4') || 'null'); } catch (e) {}
+  // the Android app keeps its own copy of the save: the newer of the two wins
+  let app = null; try { app = window.LunaHost ? JSON.parse(window.LunaHost.saveRead() || 'null') : null; } catch (e) {}
+  if (app && (!raw || (app.savedAt || 0) > (raw.savedAt || 0))) raw = app;
   if (raw) save = deepMerge(save, raw);
   else {
     // carry progress over from the previous version: pearls (plus what was spent in the old workshop) become coins
@@ -1433,7 +1451,11 @@ try {
 } catch (e) {}
 if (window.claude?.hot?.data?.save) save = deepMerge(save, window.claude.hot.data.save);
 window.claude?.hot?.snapshot?.(() => ({ save }));
-const persist = () => { try { localStorage.setItem('luna-v4', JSON.stringify(save)); } catch (e) {} };
+const persist = () => {
+  save.savedAt = Date.now();
+  let str = ''; try { str = JSON.stringify(save); localStorage.setItem('luna-v4', str); } catch (e) {}
+  try { if (str && window.LunaHost) window.LunaHost.saveWrite(str); } catch (e) {}
+};
 const metaLv = id => save.meta[id] || 0;
 // monday of this week, as the key the weekly missions change on
 const weekKey = () => { const d = new Date(); d.setDate(d.getDate() - (d.getDay() + 6) % 7); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
@@ -1444,14 +1466,20 @@ const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(
 // =====================================================================
 const cv = $('game');
 const ctx = cv.getContext('2d');
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let W = 0, H = 0, DPR = 1, u = 1, stars = [], clouds = [], decor = [];
-function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  W = cv.clientWidth; H = cv.clientHeight;
+const OS_CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let reduceMotion = typeof save.calm === 'boolean' ? save.calm : OS_CALM;
+// quality: how sharp the canvas is (up to 2 pixels per point), fewer particles, the frame rate in a run
+const GFX = { dpr: 2, low: false, cap: 60 };
+function setDpr() {
+  DPR = Math.min(window.devicePixelRatio || 1, GFX.dpr);
+  if (!W) return;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   ctx.imageSmoothingQuality = 'high';
+}
+let W = 0, H = 0, DPR = 1, u = 1, stars = [], clouds = [], decor = [];
+function resize() {
+  W = cv.clientWidth; H = cv.clientHeight; setDpr();
   u = Math.min(W, H * 0.6) / 360;
   stars = []; const n = Math.round(W * H / 3200);
   for (let i = 0; i < n; i++) stars.push({ x: Math.random() * W, y: Math.random() * H * 0.55, r: Math.random() * 1.3 + 0.3, p: Math.random() * 6 });
@@ -1866,7 +1894,8 @@ cv.addEventListener('pointerdown', e => {
 });
 cv.addEventListener('pointermove', e => {
   if (mode !== 'play' || e.pointerId !== dragId) return;
-  moveMoon((e.clientX - dragX) * DRAG_GAIN, (e.clientY - dragY) * DRAG_GAIN);
+  const k = DRAG_GAIN * dragK();
+  moveMoon((e.clientX - dragX) * k, (e.clientY - dragY) * k);
   dragX = e.clientX; dragY = e.clientY;
 });
 cv.addEventListener('pointerup', e => { if (e.pointerId === dragId) dragId = null; });
@@ -2031,6 +2060,7 @@ function nextWave() {
   if (S.mis && S.mis.wave) S.mis.wave(S.wave);
   // the endless sea: at waves 25, 35, 45... the last tide asks whether to retire
   if (S.mode === 'endless' && S.wave >= 25 && (S.wave - 25) % 10 === 0) S.lastTideDue = 1;
+  ckSave();
 }
 // =====================================================================
 // BOSSES: they come in from one side of the sea (the eclipse flies in), then cycle
@@ -2521,7 +2551,7 @@ function comboAnnounce(txt) {
 }
 // damage numbers: quick hits on the same enemy add up into one number, and there are never more than 14
 // on screen (8 with reduced effects); crits always show, the oldest plain number makes room
-const numCap = () => save.fxLow ? 8 : 14;
+const numCap = () => GFX.low ? 8 : 14;
 function num(x, y, v, crit, col, e) {
   if (v < 0.5) return;
   if (e && !crit) { const n = S.nums.find(n => n.e === e && !n.crit && !n.txt && n.t < 0.35); if (n) { n.v += Math.round(v); n.x = x; n.y = y; n.t = Math.min(n.t, 0.12); n.pop = 0.1; return; } }
@@ -3523,7 +3553,7 @@ function update(dt) {
   if (S.clamSnap) S.clamSnap = S.clamSnap.map(v => Math.max(0, v - dt));
   for (const p of S.parts) { p.t += dt; p.vy += (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
   S.parts = S.parts.filter(p => p.t < p.life);
-  const pcap = save.fxLow ? 220 : 560;
+  const pcap = GFX.low ? 220 : 560;
   if (S.parts.length > pcap) S.parts.splice(0, S.parts.length - pcap);
   for (const n of S.nums) { n.t += dt; if (n.pop > 0) n.pop -= dt; }
   S.nums = S.nums.filter(n => n.t < (n.txt ? 1.2 : 0.8));
@@ -3541,7 +3571,7 @@ function update(dt) {
 // =====================================================================
 // FX helpers
 // =====================================================================
-function burst(x, y, n, c, sp = 160) { if (reduceMotion) n = Math.ceil(n / 3); else if (save.fxLow) n = Math.ceil(n / 2); for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: rand(-sp, sp), vy: rand(-sp * 1.2, -sp * 0.2), t: 0, life: rand(0.4, 0.9), c, s: rand(1.5, 3.2), g: 420 }); }
+function burst(x, y, n, c, sp = 160) { if (reduceMotion) n = Math.ceil(n / 3); else if (GFX.low) n = Math.ceil(n / 2); for (let i = 0; i < n; i++) S.parts.push({ x, y, vx: rand(-sp, sp), vy: rand(-sp * 1.2, -sp * 0.2), t: 0, life: rand(0.4, 0.9), c, s: rand(1.5, 3.2), g: 420 }); }
 function splash(x, y, n) { burst(x, y, n, '#cfe6ff', 120); sfx('splash'); ripple(x, y); }
 function bubbles(x, y, n) { for (let i = 0; i < n; i++) S.parts.push({ x: x + rand(-8, 8), y, vx: rand(-10, 10), vy: rand(-70, -30), t: 0, life: rand(0.5, 1), c: 'rgba(220,240,255,0.8)', s: rand(1.5, 3), g: -20, ring: true }); }
 function sparks(x, y) { for (let i = 0; i < 6; i++) S.parts.push({ x, y, vx: rand(-140, 140), vy: rand(-160, -40), t: 0, life: rand(0.2, 0.45), c: '#ffd38a', s: 2, g: 500 }); }
@@ -4379,7 +4409,7 @@ function drawDark() {
 }
 function draw() {
   ctx.save();
-  if (S && S.shake > 0 && !reduceMotion) { const k = 12 * S.shake * u * (save.fxLow ? 0.5 : 1); ctx.translate(Math.sin(T * 61) * k * 0.45 + Math.sin(T * 23) * k * 0.2, Math.cos(T * 53) * k * 0.4); }
+  if (S && S.shake > 0 && !reduceMotion) { const k = 12 * S.shake * u * (GFX.low ? 0.5 : 1); ctx.translate(Math.sin(T * 61) * k * 0.45 + Math.sin(T * 23) * k * 0.2, Math.cos(T * 53) * k * 0.4); }
   drawSky();
   drawLand();
   drawWater(true);
@@ -4416,8 +4446,9 @@ function draw() {
   if (drawBossTop()) drawMoon();   // the moon stays in front of the dark sun
   ctx.restore();
   drawCine();
+  if (S && S.countT > 0 && mode === 'play') drawCount();
   if (S && !S.cine && (mode === 'play' || mode === 'levelup' || mode === 'paused' || mode === 'merchant')) drawGauge();
-  if (S && S.flash > 0) { ctx.fillStyle = `rgba(255,95,109,${S.flash * 0.35})`; ctx.fillRect(0, 0, W, H); }
+  if (S && S.flash > 0) { ctx.fillStyle = `rgba(255,95,109,${S.flash * (reduceMotion ? 0.12 : 0.35)})`; ctx.fillRect(0, 0, W, H); }
   if (S && S.eclipse > 0) { ctx.fillStyle = 'rgba(60,20,120,0.18)'; ctx.fillRect(0, 0, W, H); }
   if (S && S.furia > 0) { ctx.fillStyle = 'rgba(255,60,40,0.08)'; ctx.fillRect(0, 0, W, H); }
   if (S && S.intro > 0) drawIris();
@@ -4550,7 +4581,7 @@ const SCREENS = ['scrIntro', 'scrTitle', 'scrSettings', 'scrIslands', 'scrPrep',
 function show(id) {
   SCREENS.forEach(s => { const el = $(s), on = s === id; if (on && el.hidden) { el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); } el.hidden = !on; });
   $('hud').hidden = !(id === null || id === 'levelUp' || id === 'scrMerchant');
-  if (id !== 'scrTitle') $('moonSay').hidden = true; }
+  if (id !== 'scrTitle') $('moonSay').hidden = true; paceCover(id); }
 // the coin counters roll up to a new total (after a run) and drop straight down when you spend
 let coinsShown = null, coinsAnim = 0;
 function refreshCoins() {
@@ -4589,7 +4620,7 @@ const coinBtn = n => `<i class="coin"></i>${n.toLocaleString('es')}`;
 function paintIcons(root, size) { root.querySelectorAll('[data-ico]').forEach(el => { el.innerHTML = ico(el.dataset.ico, size); }); }
 function openSettings() {
   paintIcons($('scrSettings'), 32);
-  $('setFx').setAttribute('aria-checked', !!save.fxLow);
+  settingsInto();
   $('setMusic').setAttribute('aria-checked', save.music);
   $('setSfx').setAttribute('aria-checked', save.sfx);
   $('setVib').setAttribute('aria-checked', save.vib !== false);
@@ -4597,7 +4628,7 @@ function openSettings() {
 }
 function openTitle() {
   mode = 'menu'; S = null; musicStart('title'); setAudioGains(); $('game').classList.remove('echo');
-  refreshCoins();
+  refreshCoins(); ckTitle();
   const nx = misNext();
   $('playSub').textContent = nx ? `Misión ${nx.n} · ${nx.name}` : 'Campaña y expediciones';
   const dm = dailyMods();
@@ -4866,6 +4897,7 @@ function curtain(fn) {
 }
 function startRun(runMode, islIdx) { audioInit(); curtain(() => beginRun(runMode, islIdx)); }
 function beginRun(runMode, islIdx) {
+  if (!ckBusy) ckClear();
   newRun(runMode, islIdx);
   S.intro = 1;
   // the relic you carry, the islander who guards the island, the answer to their last question
@@ -5026,7 +5058,7 @@ const lowArt = n => n.replace(/^El /, 'el ').replace(/^La /, 'la ').replace(/^(D
 let resultFace = 'calm';
 function endRun(won, quit) {
   if (S.lab) { if (!S.ended) labEnd(); return; }
-  if (S.ended) return; S.ended = true;
+  if (S.ended) return; S.ended = true; ckClear();
   S.face = won ? 'cheer' : quit ? 'calm' : 'sad'; S.faceT = 9;
   resultFace = won ? 'cheer' : quit ? 'happy' : 'sad';
   const unlocks = [];
@@ -5137,12 +5169,11 @@ document.querySelector('#scrTitle .coinPill').addEventListener('click', () => {
 });
 // wiring
 $('goPlay').onclick = () => { audioInit(); if (save.intro) openIslands(); else openIntro(() => openIslands()); };
-$('goSettings').onclick = () => { audioInit(); openSettings(); };
-$('setBack').onclick = () => openTitle();
+$('goSettings').onclick = () => { audioInit(); setFrom = 'title'; openSettings(); };
+$('setBack').onclick = settingsBack;
 $('goStory').onclick = () => { audioInit(); openIntro(openSettings); };
 $('goDaily').onclick = () => { audioInit(); openDaily(); };
 $('goEndless').onclick = () => { audioInit(); if (save.intro) startRun('endless', 0); else openIntro(() => startRun('endless', 0)); };
-$('setFx').onclick = () => { save.fxLow = !save.fxLow; persist(); openSettings(); sfx('card'); };
 $('startDaily').onclick = () => startRun('daily', 0);
 $('startWeekly').onclick = () => startRun('weekly', 0);
 $('goMoons').onclick = () => openMoons('title');
@@ -5158,7 +5189,8 @@ $('setSfx').onclick = () => { save.sfx = !save.sfx; persist(); audioInit(); setA
 $('setVib').onclick = () => { save.vib = save.vib === false; persist(); openSettings(); vib(40); };
 $('pauseBtn').onclick = pause;
 $('activeBtn').addEventListener('pointerdown', e => { e.preventDefault(); useActive(); });
-$('resumeBtn').onclick = resume;
+$('resumeBtn').onclick = resumeCount;
+$('goResume').onclick = ckResume;
 $('restartBtn').onclick = () => askConfirm('restart');
 // ending a run by choice still pays everything earned so far (the only way out of an endless run)
 $('quitBtn').onclick = () => askConfirm('quit');
@@ -5169,7 +5201,7 @@ $('rShop').onclick = () => storyThen(() => openShop('result'));
 $('mDone').onclick = () => { persist(); resume(); };
 $('mReroll').onclick = () => { rerollWares(); sfx('card'); vib(12); };
 // app shell hooks: Android back button and backgrounding
-window.lunaPause = () => { if (mode === 'play') pause(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
+window.lunaPause = () => { if (mode === 'play') pause(); persist(); if (AU.ctx && AU.ctx.state === 'running') AU.ctx.suspend(); };
 window.lunaBack = () => {
   if (!$('guardSheet').hidden) { closeGuardSheet(); return true; }
   if (!$('mastSheet').hidden) { closeMastSheet(); return true; }
@@ -5178,7 +5210,7 @@ window.lunaBack = () => {
   if (mode === 'lab') { labClose(); return true; }
   if (!$('scrTalk').hidden) { $('talkSkip').click(); return true; }
   if (mode === 'play') { pause(); return true; }
-  if (mode === 'paused') { if (!$('pConfirm').hidden) closeConfirm(); else resume(); return true; }
+  if (mode === 'paused') { if (!$('scrSettings').hidden) settingsBack(); else if (!$('pConfirm').hidden) closeConfirm(); else resumeCount(); return true; }
   if (mode === 'fuse') { fuseEnd(); return true; }
   if (mode === 'levelup' || mode === 'revive' || mode === 'merchant' || mode === 'pact') return true;
   if (mode === 'result') { openTitle(); return true; }
@@ -7351,7 +7383,7 @@ function openArchive(tab) {
       const sub = d0 || (epi ? (open ? 'La última viñeta' : `Encuentra los 4 ecos de antiguas mareas (${echoesFound()}/4)`) : open ? `${st.panels.filter(p => !p.credits).length} viñetas` : 'Aún no la has visto');
       el.innerHTML = `<span class="ico" aria-hidden="true">${ico(epi ? 'i_estrella' : 'i_libro', 34)}</span><span><b>${title}</b><span class="d">${sub}</span></span>`;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !open;
-      b.innerHTML = open ? 'Ver' : ico('i_candado', 22);
+      b.innerHTML = open ? 'Ver' : ico('i_candado', 22); if (!open) b.setAttribute('aria-label', 'Bloqueado');
       b.onclick = () => { sfx('card'); if (k === 'intro') openIntro(() => openArchive('hist')); else openStory(k, () => openArchive('hist')); };
       el.appendChild(b); body.appendChild(el);
     }
@@ -7378,7 +7410,7 @@ function openArchive(tab) {
       el.className = 'lc echo' + (rec.found ? '' : ' locked');
       el.innerHTML = `<span class="ico" aria-hidden="true">${ico(rec.found ? m.gico : 'i_candado', 34)}</span><span><span class="eyebrow">Eco ${ROMAN[m.k]} · ${ISLANDS[m.ch].name}</span><b>${rec.found ? m.name : 'Eco perdido'}</b><span class="d">${rec.found ? m.intro : `Pista de Salina: ${m.hint}`}</span>${rec.found ? `<span class="nst">${starsHtml(rec.s, 15)}</span>` : ''}</span>`;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !rec.found;
-      b.innerHTML = rec.found ? 'Jugar' : ico('i_candado', 22);
+      b.innerHTML = rec.found ? 'Jugar' : ico('i_candado', 22); if (!rec.found) b.setAttribute('aria-label', 'Bloqueado');
       b.onclick = () => { sfx('card'); openTalk('salina', `Eco ${ROMAN[m.k]} · ${m.name}`, m.intro, [{ name: 'Escuchar el eco', good: `${m.goal}. ${m.cond}.`, ico: m.gico, pick: () => startRun('echo', m.k) }], () => {}, 'Ahora no'); talkSkipTo = () => openArchive('sec'); };
       el.appendChild(b); body.appendChild(el);
       // its relic
@@ -7645,7 +7677,7 @@ function openPuzzles() {
     el.className = 'lc puz' + (open ? '' : ' locked');
     el.innerHTML = `<span class="ico" aria-hidden="true">${ico(open ? `i_isla${P.ch}` : 'i_candado', 40)}</span><span><span class="eyebrow">${P.n} · ${ISLANDS[P.ch].name}</span><b>${open ? P.name : '???'}</b><span class="d">${open ? `${P.goal} · ${P.cond}` : P.k ? `Supera «${PUZZLES[P.k - 1].name}» para abrirlo` : 'Supera «El despertar» para abrirlo'}</span>${open ? `<span class="nst">${starsHtml(rec.s, 15)}</span>` : ''}</span>`;
     const b = document.createElement('button'); b.type = 'button'; b.className = 'buy'; b.disabled = !open;
-    b.innerHTML = open ? 'Jugar' : ico('i_candado', 22);
+    b.innerHTML = open ? 'Jugar' : ico('i_candado', 22); if (!open) b.setAttribute('aria-label', 'Bloqueado');
     b.onclick = () => { sfx('card'); openPuzBrief(P.k); };
     el.appendChild(b); list.appendChild(el);
   }
@@ -8439,7 +8471,7 @@ function waterLight(P, fy) {
   }
   ctx.setLineDash([]); ctx.lineDashOffset = 0; ctx.lineCap = 'butt';
   // shafts of moonlight slanting down into the water
-  if (save.fxLow) return;
+  if (GFX.low) return;
   const col = moonColor(), sy = waveY(m.x);
   for (let i = 0; i < 3; i++) {
     const sw = Math.sin(T * 0.5 + i * 2.1), x0 = m.x + (i - 1) * 22 * u + sw * 6 * u, w0 = (9 + i * 3) * u, lean = (i - 1) * 26 * u + sw * 10 * u;
@@ -8478,7 +8510,7 @@ function skyLife(P) {
     }
   }
   // mist: long soft wisps just above high water, drifting slowly
-  if (save.fxLow) return;
+  if (GFX.low) return;
   const hy = levelY(0.98);
   for (let i = 0; i < 4; i++) {
     const w = W * (0.5 + 0.12 * i), x = ((T * (5 + i * 2) * u + i * W * 0.37) % (W + w)) - w / 2, y = hy - (6 + i * 7) * u;
@@ -8494,7 +8526,7 @@ const MOTE = { coral: ['#ffe9a8', -1], escarcha: ['#eaf6ff', 1], brasa: ['#ffad5
 const MOTES = Array.from({ length: 18 }, (_, i) => ({ x: (i * 0.618) % 1, y: (i * 0.383) % 1, s: 0.6 + (i * 0.29) % 0.6, p: i * 1.7 }));
 function drawMotes() {
   if (reduceMotion || (S && S.intro > 0)) return;
-  const [col, dir] = MOTE[biome()] || MOTE.coral, n = save.fxLow ? 8 : MOTES.length, snow = dir > 0;
+  const [col, dir] = MOTE[biome()] || MOTE.coral, n = GFX.low ? 8 : MOTES.length, snow = dir > 0;
   for (let i = 0; i < n; i++) {
     const m = MOTES[i], sp = (snow ? 0.035 : 0.022) * m.s;
     const y = (((m.y + dir * T * sp) % 1) + 1) % 1, x = (m.x + Math.sin(T * 0.4 + m.p) * 0.03 + 1) % 1;
@@ -8548,7 +8580,7 @@ function castleWounds(b, I, top) {
 function ripple(x, y) {
   if (!S || reduceMotion || Math.abs(y - waveY(x)) > 40 * u) return;
   let n = 0; for (const f of S.fx) if (f.type === 'ripple') n++;
-  if (n < (save.fxLow ? 4 : 8)) S.fx.push({ type: 'ripple', x, t: 0, life: 0.9 });
+  if (n < (GFX.low ? 4 : 8)) S.fx.push({ type: 'ripple', x, t: 0, life: 0.9 });
 }
 function drawRipple(f, k) {
   const y = waveY(f.x) + 2 * u;
@@ -8790,7 +8822,7 @@ function moonFxDraw() {
   }
   ctx.restore();
   // a win throws confetti in the moon's colour and gold
-  if (R.kind === 'win') for (let i = 0; i < (save.fxLow ? 22 : 38); i++) {
+  if (R.kind === 'win') for (let i = 0; i < (GFX.low ? 22 : 38); i++) {
     const f = ((T - R.t0) * (0.35 + (i % 5) * 0.05) + i * 0.13) % 1, x = (i * 0.618 % 1) * W + Math.sin(T * 2 + i) * 14 * u, y = -10 * u + f * H * 0.7;
     ctx.save(); ctx.translate(x, y); ctx.rotate(T * 4 + i); ctx.globalAlpha = 0.9 * (1 - f); ctx.fillStyle = i % 3 ? S.moon.color : '#ffd36b'; ctx.fillRect(-5 * u, -2.5 * u, 10 * u, 5 * u * Math.abs(Math.cos(T * 6 + i)) + u); ctx.restore();
   }
@@ -9401,15 +9433,178 @@ function weeklyInto() {
 }
 const weeklyNew = () => !weekRec() || !weekRec().plays;
 // =====================================================================
+// ANDROID: frames and quality (a 120 Hz screen plays at 60, menus at 30, nothing redraws under a menu
+// that covers the game, and a phone that can't keep up lowers the resolution by itself), the screen stays
+// on only while you play, a copy of the save on the phone's storage, the run you can continue after
+// closing the app, and a 3-2-1 before the game comes back from a pause
+// =====================================================================
+const HOST = window.LunaHost || null;
+// the quality steps: 'auto' starts at the top and steps down when frames run late
+const GFX_LV = [{ dpr: 2, low: false }, { dpr: 1.5, low: false }, { dpr: 1.25, low: true }];
+const GFX_TXT = {
+  auto: ['Automática', 'Se ajusta sola si el móvil no va fluido'],
+  alta: ['Alta', 'Máxima nitidez y todos los efectos'],
+  ahorro: ['Ahorro de batería', 'Menos efectos y 30 imágenes por segundo: gasta menos y va fluido en móviles modestos'],
+};
+function gfxApply() {
+  if (save['fxLow'] && !save.gfx) save.gfx = 'ahorro';   // the old 'reduced effects' switch
+  delete save['fxLow'];
+  const q = save.gfx || 'auto', L = q === 'alta' ? GFX_LV[0] : q === 'ahorro' ? GFX_LV[2] : GFX_LV[Math.min(2, save.gfxAuto || 0)];
+  GFX.low = L.low; GFX.cap = q === 'ahorro' ? 30 : 60;
+  if (GFX.dpr !== L.dpr) { GFX.dpr = L.dpr; setDpr(); }
+}
+gfxApply();
+var PACE = { last: 0, raw: [], hz: 60, n: 0, f: 0, k: 1, drawT: 0, cover: false, mon: [], warm: 4 };
+const paceCap = () => S && (mode === 'play' || (mode === 'result' && S.endT > 0)) ? GFX.cap : 30;
+// true when this display frame runs the game: every frame at 60 Hz, one in two at 120 Hz, fewer in menus
+function pace(now) {
+  const d = now - PACE.last; PACE.last = now;
+  if (d > 0 && d < 100) {
+    PACE.raw.push(d); if (PACE.raw.length > 40) PACE.raw.shift();
+    // the screen's refresh from the shorter frames (a busy phone shows up as long frames, not a slower screen)
+    if (PACE.raw.length >= 20 && ++PACE.n % 20 === 0) { const s = PACE.raw.slice().sort((a, b) => a - b); PACE.hz = 1000 / s[Math.floor(s.length * 0.2)]; }
+  }
+  PACE.k = Math.max(1, Math.floor(PACE.hz / paceCap() + 0.15));
+  return ++PACE.f % PACE.k === 0;
+}
+// a menu that covers the game: the scene behind it barely changes, so it redraws a few times a second
+function drawDue(now) {
+  if (!PACE.cover || now - PACE.drawT > 120) { PACE.drawT = now; return true; }
+  return false;
+}
+function paceCover(id) { if (PACE) PACE.cover = !!id && !$(id).classList.contains('clear'); }
+// a phone that can't hold the frame rate in a run steps the quality down (once per step, remembered)
+function gfxWatch(d) {
+  if ((save.gfx || 'auto') !== 'auto' || (save.gfxAuto || 0) >= 2 || !S || mode !== 'play' || S.cine || document.hidden) { PACE.mon.length = 0; return; }
+  if (S.t < 4 || PACE.warm > 0) { PACE.warm -= d / 1000; PACE.mon.length = 0; return; }
+  PACE.mon.push(d); if (PACE.mon.length < 150) return;
+  const s = PACE.mon.slice().sort((a, b) => a - b), med = s[s.length >> 1]; PACE.mon.length = 0;
+  if (med > 1000 / GFX.cap * 1.3) {
+    save.gfxAuto = (save.gfxAuto || 0) + 1; persist(); gfxApply(); PACE.warm = 5;
+    tip('gfx', 'Calidad ajustada', 'El juego baja un poco la resolución para ir fluido. Puedes cambiarlo en Ajustes');
+  }
+}
+// the screen stays on while a run is going, and can sleep in the menus or on the pause screen
+let awakeOn = null;
+function awakeTick() {
+  const on = !!S && !S.ended && mode !== 'paused' && mode !== 'result' && !document.hidden;
+  if (on === awakeOn) return; awakeOn = on;
+  try { if (HOST) HOST.keepAwake(on); } catch (e) {}
+}
+
+// ---- the run you can continue: a snapshot at the start of each wave, without the ships on the water
+const CK_MODES = ['island', 'endless', 'daily', 'weekly'];
+const CK_LIVE = new Set(['enemies', 'dying', 'proj', 'fx', 'parts', 'nums', 'ents', 'threat', 'seaT', 'coins', 'chests', 'warn', 'faroBeams', 'boss', 'cap', 'ev', 'door', 'cine', 'ghost', 'isl', 'moon', 'theme', 'dailyList', 'mis', 'tut', 'gSay', 'bars']);
+let CK_TAB = null, ckBusy = false;
+const ckTab = () => CK_TAB || (CK_TAB = new Set([...MOONS, ...ISLANDS, ...THEMES, ...DAILY_MODS, ...CAMPAIGN, ...Object.values(WEAPONS), ...Object.values(PASSIVES), ...Object.values(EN), ...Object.values(CAPTAINS)]));
+// a ship (it carries its kind's table), a page element or one of the game's tables can't go in the snapshot
+function ckRep(k, v) { if (typeof v === 'function' || (v && typeof v === 'object' && ((v.def && typeof v.def === 'object') || v.nodeType > 0 || ckTab().has(v)))) throw new Error('live'); return v; }
+const ckOn = () => S && !S.mis && !S.lab && !S.ended && CK_MODES.includes(S.mode) && S.wave >= 2;
+function ckSave() {
+  if (!ckOn()) return;
+  const d = {}, skipped = [];
+  for (const k of Object.keys(S)) {
+    const v = S[k];
+    if (CK_LIVE.has(k) || v === undefined || typeof v === 'function') continue;
+    try { d[k] = JSON.parse(JSON.stringify(v, ckRep)); } catch (e) { skipped.push(k); }
+  }
+  save.runCk = { v: 1, at: Date.now(), day: today(), week: weekKey(), mode: S.mode, isl: S.islIdx, wave: S.wave, moon: S.moon.id, theme: S.theme ? THEMES.indexOf(S.theme) : -1, d, skipped };
+  persist();
+}
+function ckGet() {
+  const c = save.runCk;
+  if (!c || c.v !== 1 || !c.d) return null;
+  if ((c.mode === 'daily' && c.day !== today()) || (c.mode === 'weekly' && c.week !== weekKey())) { save.runCk = null; persist(); return null; }
+  return c;
+}
+function ckClear() { if (save.runCk) save.runCk = null; }
+// the title: a button to pick the run up where it was
+function ckTitle() {
+  const c = ckGet(); $('goResume').hidden = !c; if (!c) return;
+  const where = c.mode === 'island' ? `Expedición · ${ISLANDS[c.isl].name}` : c.mode === 'endless' ? 'Marea sin fin' : c.mode === 'daily' ? 'Reto diario' : 'Reto semanal';
+  $('resumeSub').textContent = `${where} · oleada ${c.wave}`;
+}
+function ckResume() {
+  const c = ckGet(); if (!c) { openTitle(); return; }
+  audioInit();
+  curtain(() => {
+    ckBusy = true; beginRun(c.mode, c.isl); ckBusy = false;
+    Object.assign(S, c.d);
+    S.moon = MOONS.find(m => m.id === c.moon) || S.moon;
+    S.theme = c.theme >= 0 ? THEMES[c.theme] || null : null;
+    S.intro = 1; S.countT = 0;
+    recompute(); syncEnts(); hudCache = {};
+    $('activeIco').innerHTML = ico(S.moon.ico, 42); $('activeLbl').textContent = S.mods.noActive ? 'Dormida' : S.moon.active;
+    MUS.intensity = Math.min(3, Math.floor(S.wave / 4));
+    banner('Partida recuperada', `Sigues en la oleada ${S.wave}`, 2.2); holdBanner(2.4);
+    updateHUD();
+  });
+}
+
+// ---- back from the pause screen: 3, 2, 1 while you get your finger back on the moon
+function resumeCount() { resume(); if (S && !S.ended) { S.countT = 1.5; S.countN = 0; } }
+function countTick(dt) {
+  const n = Math.ceil(S.countT / 0.5);
+  if (n !== S.countN) { S.countN = n; sfx('card'); vib(10); }
+  S.countT -= dt;
+}
+function drawCount() {
+  const n = Math.ceil(S.countT / 0.5), f = 1 - (S.countT - (n - 1) * 0.5) / 0.5;
+  ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(7,14,32,0.35)'; ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = Math.min(1, (1 - f) * 4);
+  const y = H * 0.36, sz = Math.round(78 * u * (1.25 - 0.25 * Math.min(1, f * 3)));
+  ctx.font = `${sz}px 'Lilita One', Figtree, system-ui, sans-serif`;
+  ctx.lineJoin = 'round'; ctx.lineWidth = 9 * u; ctx.strokeStyle = 'rgba(10,8,30,0.9)'; ctx.fillStyle = '#fff3c4';
+  ctx.strokeText(String(n), W / 2, y); ctx.fillText(String(n), W / 2, y);
+  ctx.globalAlpha = 1; ctx.font = `800 ${Math.round(15 * Math.max(0.9, u))}px Figtree, system-ui, sans-serif`; ctx.lineWidth = 4 * u;
+  ctx.strokeText('Pon el dedo en la pantalla', W / 2, y + 62 * u); ctx.fillStyle = '#e6f6ff'; ctx.fillText('Pon el dedo en la pantalla', W / 2, y + 62 * u);
+  ctx.restore();
+}
+
+// ---- settings: quality, calmer motion, how fast the moon follows your finger; also reachable from the pause
+const DRAG_K = { lenta: 0.75, normal: 1, rapida: 1.3 };
+const DRAG_TXT = { normal: ['Normal', 'Como siempre'], rapida: ['Rápida', 'Para pantallas grandes o arrastrar menos'], lenta: ['Lenta', 'Más precisión en pantallas pequeñas'] };
+const dragK = () => DRAG_K[save.drag] || 1;
+let setFrom = 'title';
+function settingsInto() {
+  const q = save.gfx || 'auto', [qn, qd] = GFX_TXT[q];
+  $('setGfxVal').textContent = qn; $('setGfxTxt').textContent = q === 'auto' && save.gfxAuto ? 'Se ha ajustado sola para que el juego vaya fluido' : qd;
+  const dk = save.drag || 'normal', [dn, dd] = DRAG_TXT[dk];
+  $('setDragVal').textContent = dn; $('setDragTxt').textContent = dd;
+  $('setCalm').setAttribute('aria-checked', !!reduceMotion);
+  $('setStory').hidden = setFrom === 'pause';
+}
+function cycle(list, v) { return list[(list.indexOf(v) + 1) % list.length]; }
+$('setGfx').onclick = () => { save.gfx = cycle(['auto', 'alta', 'ahorro'], save.gfx || 'auto'); save.gfxAuto = 0; persist(); gfxApply(); openSettings(); sfx('card'); };
+$('setDrag').onclick = () => { save.drag = cycle(['normal', 'rapida', 'lenta'], save.drag || 'normal'); persist(); openSettings(); sfx('card'); };
+$('setCalm').onclick = () => { save.calm = !reduceMotion; reduceMotion = save.calm; persist(); openSettings(); sfx('card'); };
+$('pSettings').onclick = () => { setFrom = 'pause'; openSettings(); };
+function settingsBack() { if (setFrom === 'pause' && S && mode === 'paused') { setFrom = 'title'; show('scrPause'); } else { setFrom = 'title'; openTitle(); } }
+// the app shell: back in the app (audio comes back unless the game is paused)
+window.lunaResume = () => { if (AU.ctx && AU.ctx.state === 'suspended' && mode !== 'paused') AU.ctx.resume(); };
+// ---- tablets: the menus, cards and buttons grow with the screen instead of staying phone-sized in the middle
+function uiZoom() {
+  const k = clamp(Math.min(innerWidth / 430, innerHeight / 900), 1, 1.5);
+  document.documentElement.style.setProperty('--uiz', k.toFixed(3));
+}
+uiZoom(); window.addEventListener('resize', uiZoom);
+// the whole "Moon: X · Change" row answers a tap, not only the word
+document.addEventListener('click', e => {
+  const row = e.target.closest('.moon-pick'); if (!row || e.target.closest('button')) return;
+  const b = row.querySelector('button'); if (b && !row.hidden) b.click();
+});
+// =====================================================================
 // LOOP
 // =====================================================================
 openTitle();
 let last = performance.now();
-function loop(now) {
+function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now; T += dt;
   if (S && mode === 'play') {
     let g = dt;
     if (S.cine) { cineTick(dt); g = 0; }
+    if (S.countT > 0) { countTick(dt); g = 0; }
     if (S.hitstop > 0) { S.hitstop -= dt; g = 0; }
     if (S.slowmo > 0) { S.slowmo -= dt; g *= 0.3; }
     if (g > 0) update(g);
@@ -9435,15 +9630,23 @@ function loop(now) {
   }
   if (S && S.intro > 0) S.intro = Math.max(0, S.intro - dt / 0.9);
   hostTick();
-  draw();
+  if (drawDue(now)) draw();
+}
+function loop(now) {
   requestAnimationFrame(loop);
+  if (!pace(now)) return;
+  const d = now - (PACE.prev || now); PACE.prev = now;
+  gfxWatch(d); awakeTick();
+  frame(now);
 }
 requestAnimationFrame(loop);
 // studio splash: fades out on its own, or on the first tap
 {
   const sp = $('splash');
   const hide = () => { if (sp.classList.contains('out')) return; sp.classList.add('out'); setTimeout(() => sp.remove(), 600); };
-  sp.addEventListener('pointerdown', hide); setTimeout(hide, 1700);
+  sp.addEventListener('pointerdown', hide);
+  const t0 = performance.now();
+  (function wait() { const t = performance.now() - t0; if ((artReady && t > 1100) || t > 4000) hide(); else setTimeout(wait, 100); })();
 }
 })();
 </script>

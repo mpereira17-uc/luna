@@ -26,7 +26,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#070E20"));
@@ -43,6 +42,8 @@ public class MainActivity extends Activity {
         s.setSupportZoom(false);
         s.setTextZoom(100);
         web.addJavascriptInterface(new ShareBridge(this), "LunaShare");
+        // the game keeps the screen on while you play (and lets it sleep in the menus), and saves here too
+        web.addJavascriptInterface(new HostBridge(this), "LunaHost");
 
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient() {
@@ -101,7 +102,13 @@ public class MainActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) immersive();
+        // the notification shade, a call or a system dialog over the game pauses it
+        if (hasFocus) {
+            immersive();
+            web.evaluateJavascript("window.lunaResume && window.lunaResume()", null);
+        } else {
+            web.evaluateJavascript("window.lunaPause && window.lunaPause()", null);
+        }
     }
 
     @Override
@@ -115,6 +122,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         web.onResume();
+        web.evaluateJavascript("window.lunaResume && window.lunaResume()", null);
         immersive();
     }
 
