@@ -1,0 +1,1 @@
+{"name":"luna-pixi-bundle","private":true,"version":"1.0.0","dependencies":{"esbuild":"^0.25.0","pixi-filters":"^6.1.5","pixi.js":"^8.22.0"}}

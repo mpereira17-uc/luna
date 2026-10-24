@@ -1,0 +1,14 @@
+.gradle/
+build/
+local.properties
+*.jks
+*.keystore
+.idea/
+node_modules/
+game/out/
+game/art/out/
+game/qa/**/*.png
+# made by tools/build_assets.py from game/ (CI builds them again)
+app/src/main/assets/*.html
+app/src/main/assets/*.js
+app/src/main/assets/*.webp
